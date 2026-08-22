@@ -1,0 +1,8 @@
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# saídas geradas localmente (o painel e o relatório versionados ficam em relatorios/)
+*.pdf
