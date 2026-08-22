@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MOBGOV — Motorista</title>
+<style>
+/* App do motorista. Restrições reais: Android velho, tela pequena, luz do sol
+   entrando pelo para-brisa, motorista de luva, e SEM SINAL na zona rural.
+   Daí: contraste alto, alvo de toque grande, nada de biblioteca, e tudo o que
+   ele fizer fica guardado no aparelho até dar para sincronizar. */
+:root{
+  --fundo:#0E1D27; --cartao:#162A38; --linha:#22404F;
+  --texto:#F2F7FA; --fraco:#9DB4C2;
+  --ok:#2BB394; --alerta:#E8A24E; --erro:#E2683F; --acento:#4FA3E3;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--fundo);color:var(--texto);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:17px;line-height:1.45;padding-bottom:96px;overflow-x:hidden}
+header{position:sticky;top:0;z-index:5;background:var(--cartao);
+  border-bottom:1px solid var(--linha);padding:14px 16px}
+h1{font-size:18px;letter-spacing:.01em}
+.sub{font-size:13.5px;color:var(--fraco);margin-top:2px}
+.estado{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;
+  flex-wrap:wrap}
+.bolinha{width:10px;height:10px;border-radius:50%;background:var(--ok)}
+.bolinha.offline{background:var(--alerta)}
+.fila{margin-left:auto;font-size:13px;color:var(--fraco);white-space:nowrap}
+main{padding:14px}
+.viagem{background:var(--cartao);border:1px solid var(--linha);border-radius:14px;
+  padding:14px;margin-bottom:14px}
+.viagem h2{font-size:16px}
+.viagem .meta{font-size:13.5px;color:var(--fraco);margin-top:2px}
+/* flex-wrap é cinto de segurança: em tela estreita, ou com a fonte do sistema
+   aumentada (comum em celular de motorista), o botão desce para a linha de
+   baixo em vez de sair pela direita. */
+.parada{display:flex;align-items:center;gap:10px;padding:12px 0;
+  border-top:1px solid var(--linha);flex-wrap:wrap}
+.parada button{margin-left:auto}
+.parada:first-of-type{border-top:0}
+.parada .hora{font-variant-numeric:tabular-nums;font-weight:700;flex:0 0 auto}
+/* min-width:0 permite o item flex encolher abaixo do próprio conteúdo — sem
+   isso, um nome de ponto comprido empurraria o botão para fora em tela
+   estreita ou com a fonte do sistema aumentada. */
+.parada .quem{flex:1 1 auto;min-width:0;font-size:15px;overflow-wrap:anywhere}
+.parada .quem small{display:block;color:var(--fraco);font-size:12.5px}
+button{font:inherit;border:0;border-radius:12px;padding:12px 14px;font-weight:700;
+  background:var(--acento);color:#04121C;min-height:48px;flex:0 0 auto;
+  white-space:nowrap}
+button.feito{background:var(--ok)}
+button.secundaria{background:transparent;color:var(--texto);
+  border:1.5px solid var(--linha)}
+button:active{transform:scale(.98)}
+.barra{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;padding:10px;
+  background:var(--cartao);border-top:1px solid var(--linha);flex-wrap:wrap}
+.barra button{flex:1 1 90px;min-width:0;font-size:14.5px;padding:12px 6px;
+  white-space:normal}
+.aviso{background:#3A2A16;border-left:4px solid var(--alerta);border-radius:10px;
+  padding:12px;font-size:14.5px;margin-bottom:14px}
+.vazio{color:var(--fraco);text-align:center;padding:40px 20px}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="titulo">Carregando…</h1>
+  <div class="sub" id="subtitulo"></div>
+  <div class="estado">
+    <span class="bolinha" id="bolinha"></span>
+    <span id="conexao">online</span>
+    <span class="fila" id="fila"></span>
+  </div>
+</header>
+
+<main id="conteudo">
+  <div class="vazio">Buscando a rota do dia…</div>
+</main>
+
+<div class="barra">
+  <button class="secundaria" id="botao-gps">Ligar GPS</button>
+  <button class="secundaria" id="botao-imprevisto">Imprevisto</button>
+  <button id="botao-sincronizar">Sincronizar</button>
+</div>
+
+<script>
+/* Offline-first de verdade: a rota é guardada no aparelho assim que baixa, e
+   cada toque do motorista vira um evento numa fila local. Se tem sinal, a fila
+   esvazia na hora; se não tem, espera. Nada se perde e nada trava a operação —
+   é o requisito nº 4 do projeto ("zona rural tem sinal ruim"). */
+(function () {
+  "use strict";
+  var params = new URLSearchParams(location.search);
+  var motorista = params.get("motorista") || "";
+  var token = params.get("token") || "";
+  var CHAVE_ROTA = "mobgov.rota." + motorista;
+  var CHAVE_FILA = "mobgov.fila." + motorista;
+  var CHAVE_FEITOS = "mobgov.feitos." + motorista;
+
+  function guardar(chave, valor) {
+    try { localStorage.setItem(chave, JSON.stringify(valor)); } catch (e) {}
+  }
+  function recuperar(chave, padrao) {
+    try {
+      var bruto = localStorage.getItem(chave);
+      return bruto ? JSON.parse(bruto) : padrao;
+    } catch (e) { return padrao; }
+  }
+
+  var fila = recuperar(CHAVE_FILA, []);
+  var feitos = recuperar(CHAVE_FEITOS, {});
+  var rota = recuperar(CHAVE_ROTA, null);
+
+  function agora() {
+    var d = new Date();
+    function p(n) { return String(n).padStart(2, "0"); }
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate())
+      + "T" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+  }
+
+  function enfileirar(evento) {
+    evento.motorista = motorista;
+    evento.em = agora();
+    fila.push(evento);
+    guardar(CHAVE_FILA, fila);
+    pintarEstado();
+    sincronizar();
+  }
+
+  function pintarEstado() {
+    var online = navigator.onLine;
+    document.getElementById("bolinha").className =
+      "bolinha" + (online ? "" : " offline");
+    document.getElementById("conexao").textContent =
+      online ? "online" : "sem sinal — trabalhando offline";
+    document.getElementById("fila").textContent =
+      fila.length ? fila.length + " para enviar" : "tudo sincronizado";
+  }
+
+  function sincronizar() {
+    if (!fila.length || !navigator.onLine) { return; }
+    var lote = fila.slice();
+    fetch("/api/eventos?motorista=" + encodeURIComponent(motorista)
+          + "&token=" + encodeURIComponent(token), {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({eventos: lote})
+    }).then(function (r) {
+      if (!r.ok) { throw new Error("recusado"); }
+      return r.json();
+    }).then(function () {
+      fila = fila.slice(lote.length);      // só tira o que foi aceito
+      guardar(CHAVE_FILA, fila);
+      pintarEstado();
+    }).catch(function () { pintarEstado(); });
+  }
+
+  function baixarRota() {
+    return fetch("/api/rota-do-dia?motorista=" + encodeURIComponent(motorista)
+                 + "&token=" + encodeURIComponent(token))
+      .then(function (r) { return r.json(); })
+      .then(function (dados) {
+        if (dados && dados.viagens) {
+          rota = dados;
+          guardar(CHAVE_ROTA, rota);       // fica no aparelho para o dia todo
+        }
+        return rota;
+      }).catch(function () { return rota; });
+  }
+
+  function pintarRota() {
+    var conteudo = document.getElementById("conteudo");
+    if (!rota || !rota.viagens || !rota.viagens.length) {
+      conteudo.innerHTML = '<div class="vazio">Nenhuma rota para hoje. '
+        + 'Se você deveria ter rota, avise a secretaria.</div>';
+      return;
+    }
+    document.getElementById("titulo").textContent =
+      rota.veiculo + " · " + rota.turno;
+    document.getElementById("subtitulo").textContent =
+      rota.viagens.length + " viagens · " + rota.total_alunos + " alunos · "
+      + rota.jornada_prevista_min + " min previstos";
+
+    var html = "";
+    if (!navigator.onLine) {
+      html += '<div class="aviso">Sem sinal. Pode seguir: tudo o que você '
+        + 'marcar fica guardado e sobe sozinho quando a rede voltar.</div>';
+    }
+    rota.viagens.forEach(function (v, i) {
+      html += '<div class="viagem"><h2>Viagem ' + (i + 1) + ' — ' + v.escola
+        + '</h2><div class="meta">' + v.alunos + ' alunos · ' + v.km
+        + ' km · chega ' + v.chegada_prevista + '</div>';
+      v.paradas.forEach(function (p) {
+        var id = v.viagem + "|" + p.ponto;
+        var pronto = !!feitos[id];
+        html += '<div class="parada"><span class="hora">' + p.hora_prevista
+          + '</span><span class="quem">' + p.ponto
+          + '<small>ponto de embarque</small></span>'
+          + '<button data-parada="' + id + '" class="' + (pronto ? "feito" : "")
+          + '">' + (pronto ? "✓ feito" : "Embarcou") + '</button></div>';
+      });
+      html += '</div>';
+    });
+    conteudo.innerHTML = html;
+
+    Array.prototype.forEach.call(
+      conteudo.querySelectorAll("button[data-parada]"), function (b) {
+        b.addEventListener("click", function () {
+          var id = b.getAttribute("data-parada");
+          var partes = id.split("|");
+          feitos[id] = true;
+          guardar(CHAVE_FEITOS, feitos);
+          b.className = "feito";
+          b.textContent = "✓ feito";
+          enfileirar({tipo: "embarque", viagem: partes[0], ponto: partes[1]});
+        });
+      });
+  }
+
+  document.getElementById("botao-sincronizar")
+    .addEventListener("click", function () {
+      baixarRota().then(pintarRota);
+      sincronizar();
+    });
+
+  document.getElementById("botao-imprevisto")
+    .addEventListener("click", function () {
+      var motivo = prompt("O que aconteceu? (ex.: veículo quebrou, "
+                          + "estrada fechada)");
+      if (motivo) {
+        enfileirar({tipo: "imprevisto", motivo: motivo});
+        alert("Avisado. A central vai receber assim que houver sinal.");
+      }
+    });
+
+  document.getElementById("botao-gps")
+    .addEventListener("click", function () {
+      if (!navigator.geolocation) { alert("Sem GPS neste aparelho."); return; }
+      this.textContent = "GPS ligado";
+      this.className = "feito";
+      navigator.geolocation.watchPosition(function (pos) {
+        enfileirar({tipo: "ping", lat: +pos.coords.latitude.toFixed(6),
+                    lon: +pos.coords.longitude.toFixed(6),
+                    precisao_m: Math.round(pos.coords.accuracy || 0)});
+      }, function () {}, {enableHighAccuracy: true, maximumAge: 30000});
+    });
+
+  window.addEventListener("online", function () { pintarEstado(); sincronizar(); });
+  window.addEventListener("offline", pintarEstado);
+
+  pintarEstado();
+  pintarRota();                    // desenha o que já está no aparelho
+  baixarRota().then(pintarRota);   // e atualiza se houver sinal
+  sincronizar();
+  setInterval(sincronizar, 30000);
+})();
+</script>
+<script>
+setTimeout(function(){
+  var largos = [];
+  document.querySelectorAll("*").forEach(function(el){
+    if (el.getBoundingClientRect().right > window.innerWidth + 1) {
+      largos.push(el.tagName + "." + el.className + "@" +
+                  Math.round(el.getBoundingClientRect().right));
+    }
+  });
+  document.title = "inner=" + window.innerWidth + " scroll=" +
+    document.documentElement.scrollWidth + " estouram=" + largos.slice(0,6).join(",");
+}, 2500);
+</script>
+</body>
+</html>

@@ -55,7 +55,7 @@ previu X, aconteceu Y, ajustou Z".
 | 3 | `motor/escala.py` — roteirização multiviagem + demanda real (~2.900 alunos, 2 turnos) | ✅ pronto |
 | 4 | `dados/tempos.py` (trânsito variável), `motor/porta_a_porta.py` (PCD n:n), `motor/reotimizar.py` (falta, cancelamento, inserção dinâmica) | ✅ pronto |
 | 5 | `dados/osrm.py` (malha viária real), `aprendizado/` (ciclo com rollback), mapa das rotas em SVG | ✅ pronto |
-| 6 | App do motorista (React Native) → troca simulação por GPS real | ⬜ |
+| 6 | `dados/importador.py` (planilha da prefeitura) + `operacao/` (app do motorista offline-first, API e ingestão para o aprendizado) | ✅ pronto |
 | 7 | Camada conversacional + roteiro de demo ensaiado | ⬜ |
 | 8 | Elegibilidade PCD (ou pós-MVP, conforme o edital-alvo) | ⬜ |
 
@@ -88,6 +88,12 @@ mobgov/                          (raiz deste repositório)
   aprendizado/aprender.py        estimativas, métricas, versão e rollback do modelo
   motor/rodar_aprendizado.py     roda o ciclo e grava os fatores que o motor usa
   dados/demanda_pcd.py           demanda sintética do porta a porta (sem dado pessoal)
+  dados/planilha.py              lê csv/tsv/xlsx sem dependência (xlsx = zip + xml)
+  dados/importador.py            colunas por sinônimo, dedup, geocodificação com plano B
+  operacao/app_motorista.html    app offline-first (fila local + sincronização)
+  operacao/servidor.py           API do app: rota do dia, eventos, resumo
+  operacao/registro.py           trilha append-only dos eventos da operação
+  aprendizado/ingestao.py        eventos do app -> observações do ciclo de aprendizado
   painel/economia.py             recálculo auditável + cenários + memória de cálculo
   painel/aprendizado.py          série "o que o sistema aprendeu" (real ou demonstração)
   painel/graficos.py             gráficos SVG gerados no servidor
@@ -109,6 +115,8 @@ python motor/rodar_aprendizado.py      # ciclo de aprendizado (~5 s)
 MOBGOV_OSRM_URL=http://localhost:5000 python motor/dimensionar.py   # malha real
 python -m painel.render                # gera relatorios/painel-economia.html
 python -m painel.render --diesel 7.20 --dias 20
+python motor/importar.py --gerar-exemplo   # planilha bagunçada -> demanda
+python -m operacao.servidor            # app do motorista (127.0.0.1:8080)
 python -m painel.servidor              # http://127.0.0.1:8000/
 python -m unittest discover -s testes -v
 ```
@@ -184,6 +192,11 @@ python -m unittest discover -s testes -v
   promoção), outro reporta. Medir no conjunto que escolheu o modelo infla o
   resultado; e reusar a "semana seguinte" faz a curva oscilar com o clima, não
   com o modelo.
+- **Screenshot headless engana**: o Chromium legado ignora `--window-size`
+  para o layout (a viewport fica em ~500px) e só recorta a imagem. Um elemento
+  "cortado" na captura pode estar perfeitamente dentro da página — meça
+  `document.documentElement.scrollWidth` antes de "consertar" CSS que não está
+  quebrado.
 - **`urlparse` corta o que vem depois de `;`** no último segmento da URL (vira
   `params`) — e o OSRM separa coordenadas com `;`. Qualquer código que
   interprete URLs do OSRM precisa recolar `path + ';' + params`.

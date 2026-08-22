@@ -9,3 +9,4 @@ venv/
 relatorios/cache/
 relatorios/planilha-prefeitura.xlsx
 relatorios/cofre-nomes.json
+relatorios/operacao/

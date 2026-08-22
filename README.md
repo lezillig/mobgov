@@ -19,6 +19,7 @@ auditáveis, nada de número mágico.
 | 3 | `motor/escala.py` + `dados/` | **Roteirização multiviagem**: cada veículo encadeia várias viagens por turno, como a prefeitura opera de verdade. Destrava a demanda real (~3.000 alunos, dois turnos) e a frota atual passa a ser derivada de premissas declaradas |
 | 4 | `dados/tempos.py`, `motor/porta_a_porta.py`, `motor/reotimizar.py` | **Trânsito variável** por faixa horária e zona (com provedor externo plugável), **porta a porta n:n** para o vertical PCD (PDPTW) e **reotimização do dia**: falta informada, cancelamento e inserção dinâmica de pedido novo |
 | 5 | `dados/osrm.py`, `aprendizado/`, `painel/graficos.py` | **Malha viária real** (cliente OSRM com blocos, cache, retry e fallback), **ciclo de aprendizado** com versionamento e rollback — o que a operação mostra volta para o motor — e **mapa das rotas** desenhado em SVG, sem tiles e sem internet |
+| 6 | `dados/importador.py`, `operacao/` | **Importador da planilha da prefeitura** (xlsx/csv sem dependências, detecção de colunas, dedup, geocodificação com plano B e relatório linha a linha) e **app do motorista** offline-first, com a API que recebe embarque, GPS e imprevisto |
 
 Resultado atual do Município Modelo: **30 → 23 veículos (−23,3%)**, R$ 141.122/mês,
 R$ 1,69 mi/ano — com 107 viagens diárias, ocupação média de 93% e nenhum aluno
@@ -38,7 +39,9 @@ pip install -r requirements.txt      # só o motor precisa de dependência (OR-T
 
 python motor/dimensionar.py          # 1) planejamento escolar (~5 min)
 python motor/rodar_dia.py            # 2) porta a porta + eventos do dia (~40 s)
+python motor/importar.py --gerar-exemplo  # importa planilha bagunçada
 python motor/rodar_aprendizado.py    # 3) ciclo de aprendizado (~5 s)
+python -m operacao.servidor          # app do motorista em http://127.0.0.1:8080/
 python -m painel.render              # 4) gera relatorios/painel-economia.html
 python -m painel.servidor            # 5) ou sirva em http://127.0.0.1:8000/
 
@@ -204,10 +207,27 @@ O painel mostra a curva do erro e o selo da origem dos dados — *demonstração
 *simulação* ou *medido com GPS* —, porque apresentar simulação como medição
 seria exatamente o tipo de número mágico que o projeto proíbe.
 
-## Próximos passos
+## App do motorista
 
-- **App do motorista** (offline-first): é o que troca o selo de *simulação*
-  por *medido com GPS* em todo o sistema.
+`operacao/` traz o app e a API que o alimenta. O app é uma página só, sem
+biblioteca nenhuma, pensada para Android velho com tela rachada e **sem sinal**:
+
+- baixa a rota do dia e **guarda no aparelho**; o dia inteiro funciona offline;
+- cada toque (embarcou, imprevisto, ping de GPS) entra numa **fila local** e
+  sobe sozinho quando a rede volta — nada se perde, nada trava a operação;
+- contraste alto e alvo de toque grande, porque o motorista está de luva e com
+  sol no para-brisa.
+
+Do lado do servidor, `operacao/registro.py` grava tudo num arquivo
+append-only: evento que chega atrasado entra no fim com o horário em que
+**aconteceu**, e nada é reescrito — é trilha de auditoria, não log.
+
+E `aprendizado/ingestao.py` converte esses eventos em observações no mesmo
+formato do simulador. É a peça que troca "simulação" por GPS real: quando
+houver massa crítica de viagens observadas, o ciclo de aprendizado passa a
+rodar sobre dado medido sem que nenhuma outra linha mude.
+
+## Próximos passos
 - **Painel**: mapa das rotas (MapLibre) e tela de planejamento (importar
   planilha → otimizar → aprovar e publicar).
 - **App do motorista**: GPS real alimentando o ciclo de aprendizado, que troca
