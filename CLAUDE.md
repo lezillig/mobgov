@@ -108,7 +108,8 @@ mobgov/                          (raiz deste repositório)
   planejamento/servidor.py       a tela da roteirização: envia, confere, ajusta, publica
   planejamento/tela.html         os cinco passos numa página só
   planejamento/multipart.py      envio de arquivo sem dependência (o cgi saiu do 3.13)
-  painel/console.py              console de operação: Hoje, Elegibilidade, Assistente
+  painel/console.py              console: Hoje, Elegibilidade, Equipe, Assistente
+  docs/demonstracao/gerar_telas_estaticas.py  todas as telas em HTML autocontido
   motor/rodadas.py               reotimização contínua: o dia inteiro em rodadas
   motor/rodar_rodadas.py         roda a manhã em rodadas e grava rodadas.json
   operacao/app_motorista.html    app offline-first (fila local + sincronização)
@@ -155,6 +156,7 @@ python comercial/cli.py precificar --plano relatorios/plano-fretamento.json --ma
 python comercial/cli.py diagnosticar --plano ... --linhas linhas-atuais.csv
 python comercial/cli.py proposta --plano ... --linhas ... --cliente "Empresa X"
 python -m painel.console               # gera relatorios/console.html
+python docs/demonstracao/gerar_telas_estaticas.py   # o sistema inteiro em HTML
 python -m operacao.servidor            # apps do motorista e do responsável (8080)
 python conversa/cli.py --offline "quanto eu economizo por mês?"
 python elegibilidade/demonstracao.py && python elegibilidade/relatorio.py
@@ -321,6 +323,11 @@ demonstração — é essa conta que decide o preço da proposta, e ela vive em
   seguido de exatamente três dígitos é milhar) e NÃO serve para coordenada:
   "-21.150" cairia na regra do milhar. Coordenada tem parser próprio, de
   propósito. `100.3` km/dia virando `1003` inflava a economia em quatro vezes.
+- **A escala gulosa deixa restos.** Depois de distribuir os blocos, `_consolidar`
+  tenta esvaziar quem ficou com sobra e redistribuir — apareceram motoristas
+  com 1h09 de jornada na primeira escala do fretamento. A consolidação só
+  aceita movimento que continua dentro da jornada, do descanso e da
+  interjornada: consolidar quebrando a lei seria economia falsa.
 - **`urlparse` corta o que vem depois de `;`** no último segmento da URL (vira
   `params`) — e o OSRM separa coordenadas com `;`. Qualquer código que
   interprete URLs do OSRM precisa recolar `path + ';' + params`.

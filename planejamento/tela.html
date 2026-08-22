@@ -81,6 +81,12 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .progresso{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;
   background:#0E1D27;color:#DDEAF2;border-radius:10px;padding:14px;
   max-height:220px;overflow:auto;white-space:pre-wrap}
+select{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--linha);
+  max-width:300px}
+.achado{background:var(--papel-2);border-left:4px solid var(--otim);
+  border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:10px}
+.achado b{color:var(--otim)}
+.achado .conferir{font-size:13.5px;color:var(--tinta-fraca);margin-top:5px}
 .lista{margin:12px 0 0 20px}
 .lista li{margin:6px 0}
 </style>
@@ -100,9 +106,15 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
     <div class="cabeca"><div class="numero">1</div>
       <h2>Enviar a planilha da secretaria</h2></div>
     <p class="sub">.xlsx, .csv ou .tsv. Pode estar bagunçada: título antes do
-    cabeçalho, turno escrito de vários jeitos, aluno repetido, endereço rural
+    cabeçalho, turno escrito de vários jeitos, pessoa repetida, endereço rural
     sem coordenada. É para isso que existe o passo 2.</p>
     <div class="campos">
+      <div><label for="perfil">Tipo de operação</label>
+        <select id="perfil">
+          <option value="escolar">Transporte escolar (prefeitura)</option>
+          <option value="fretamento">Fretamento corporativo (empresa)</option>
+        </select>
+        <p class="sub" id="explicacao-perfil" style="max-width:340px"></p></div>
       <div><label for="arquivo">Arquivo</label>
         <input type="file" id="arquivo" accept=".xlsx,.csv,.tsv"></div>
       <div style="align-self:flex-end">
@@ -149,6 +161,39 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
     roteirização terminar.</p></div>
   </section>
 
+  <section class="passo" id="passo-6" data-bloqueado="1">
+    <div class="cabeca"><div class="numero">6</div>
+      <h2>Precificar</h2></div>
+    <p class="sub">Custo aberto item a item e preço com a margem entrando por
+    divisão — porque somar a margem ao custo e depois pagar imposto sobre a
+    receita entrega margem menor do que a combinada, às vezes negativa.</p>
+    <div class="campos" id="campos-preco"></div>
+    <div class="campos">
+      <div style="align-self:flex-end">
+        <button id="botao-precificar">Calcular o preço</button></div>
+      <div style="align-self:flex-end">
+        <button class="secundaria" id="botao-proposta" disabled>Abrir a
+        proposta</button></div>
+    </div>
+    <div id="area-preco"></div>
+  </section>
+
+  <section class="passo" id="passo-7" data-bloqueado="1">
+    <div class="cabeca"><div class="numero">7</div>
+      <h2>Comparar com a operação de hoje</h2></div>
+    <p class="sub">Se a operação já roda, envie o quadro de linhas atuais —
+    linha, turno, destino, veículo, km/dia e passageiros transportados. O
+    sistema aponta o que dá para cortar, linha por linha, e o que conferir
+    antes de mexer.</p>
+    <div class="campos">
+      <div><label for="arquivo-linhas">Quadro de linhas em operação</label>
+        <input type="file" id="arquivo-linhas" accept=".xlsx,.csv,.tsv"></div>
+      <div style="align-self:flex-end">
+        <button id="botao-linhas">Comparar</button></div>
+    </div>
+    <div id="area-diagnostico"></div>
+  </section>
+
 </div></main>
 
 <script>
@@ -157,7 +202,8 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
    aparece aqui, ele veio do motor — a mesma regra do painel. */
 (function () {
   "use strict";
-  var estado = {importacao: null, plano: null, rodando: false};
+  var estado = {importacao: null, plano: null, rodando: false, perfil: null,
+                preco: null, diagnostico: null};
   var pontos = [];
   var mapa = null;
 
@@ -191,6 +237,9 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
           pontos = d.importacao.pontos || [];
         }
         estado.plano = d.plano && d.plano.frota ? d.plano : null;
+        if (d.perfil) { estado.perfil = d.perfil; }
+        estado.preco = d.preco || null;
+        estado.diagnostico = d.diagnostico || null;
         pintar(d);
         return d;
       });
@@ -351,18 +400,24 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
   function pintarCamposDeRoteirizacao() {
     var frota = (estado.importacao && estado.importacao.frota_declarada) || {};
     var comp = frota.composicao || {};
+    var tipos = (estado.perfil && estado.perfil.tipos_veiculo) || [];
+    var fonte = (estado.perfil && estado.perfil.vertical === "fretamento")
+      ? "no contrato de fretamento vigente"
+      : "no contrato de transporte ou no relatório do PNATE";
     var origem = frota.origem
       ? '<p class="sub">Frota atual lida da planilha (' + esc(frota.origem)
         + '). Confira antes de calcular.</p>'
-      : '<div class="aviso">A planilha não trouxe a frota que o município usa '
-        + 'hoje. Sem ela o sistema calcula as rotas, mas <b>não</b> apresenta '
-        + 'economia — não dá para comparar com um "antes" que ninguém '
-        + 'informou. Os números costumam estar no contrato de transporte ou no '
-        + 'relatório do PNATE.</div>';
+      : '<div class="aviso">A planilha não trouxe a frota usada hoje. Sem ela '
+        + 'o sistema calcula as rotas, mas <b>não</b> apresenta economia — não '
+        + 'dá para comparar com um "antes" que ninguém informou. Os números '
+        + 'costumam estar ' + fonte + '.</div>';
+    // os campos de frota saem do PERFIL: escolar e fretamento têm tipos
+    // diferentes, e uma lista fixa aqui obrigaria a mexer no código a cada
+    // cliente novo
     elemento("campos-roteirizacao").innerHTML = origem
-      + campo("Ônibus 31 lugares", "frota-ONIBUS31", comp.ONIBUS31 || 0)
-      + campo("Micro-ônibus 20", "frota-MICRO20", comp.MICRO20 || 0)
-      + campo("Van acessível 15", "frota-VAN15A", comp.VAN15A || 0)
+      + tipos.map(function (t) {
+          return campo(t.nome, "frota-" + t.id, comp[t.id] || 0);
+        }).join("")
       + campo("Km por dia (hoje)", "frota-km", frota.km_dia || 0)
       + campo("Raio urbano (m)", "raio-urbano", 300)
       + campo("Raio rural (m)", "raio-rural", 800)
@@ -473,7 +528,136 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
   function pintar(d) {
     if (estado.importacao) { pintarImportacao(); }
     pintarProgresso(d);
-    if (d.plano && d.plano.frota) { pintarPlano(d.plano); }
+    if (d.plano && d.plano.frota) {
+      pintarPlano(d.plano);
+      pintarEquipe(d.equipe);
+      liberar("passo-6");
+      liberar("passo-7");
+      pintarCamposDePreco();
+    }
+    if (d.preco) { pintarPreco(d.preco); }
+    if (d.diagnostico) { pintarDiagnostico(d.diagnostico); }
+  }
+
+  /* ------------------------------------------------------------ passo 6 --- */
+  function pintarCamposDePreco() {
+    if (elemento("campos-preco").children.length) { return; }
+    elemento("campos-preco").innerHTML =
+      campo("Margem alvo (%)", "margem", 12)
+      + '<div><label for="regime">Regime tributário</label>'
+      + '<select id="regime">'
+      + '<option value="presumido">Lucro Presumido</option>'
+      + '<option value="simples">Simples Nacional</option>'
+      + '<option value="sem_imposto">Sem imposto (uso interno)</option>'
+      + '</select></div>'
+      + campo("Monitores", "monitores", 0)
+      + '<div><label for="cliente">Nome do cliente na proposta</label>'
+      + '<input type="text" id="cliente" style="max-width:280px"></div>';
+  }
+
+  function pintarPreco(preco) {
+    var p = preco.preco, c = preco.custo;
+    var participacao = (preco.indicadores || {}).participacao_no_custo_pct || {};
+    var grupos = Object.keys(c.por_grupo).map(function (g) {
+      return kpi(g, reais(c.por_grupo[g]),
+                 numero(participacao[g], 1) + "% do custo");
+    }).join("");
+    var cenarios = (preco.cenarios || []).map(function (x) {
+      return '<tr><td>' + esc(x.cenario) + '</td><td class="num">'
+        + reais(x.preco_mes) + '</td><td class="num">'
+        + (x.diferenca_pct ? numero(x.diferenca_pct, 1) + "%" : "—")
+        + '</td></tr>';
+    }).join("");
+    elemento("area-preco").innerHTML =
+      '<div class="kpis">'
+      + kpi("Preço", reais(p.mes) + "/mês", reais(p.ano) + "/ano", "bom")
+      + kpi("Custo total", reais(c.total_mes),
+            "direto " + reais(c.direto) + " + indireto " + reais(c.indireto))
+      + kpi("Impostos", reais(p.impostos_mes),
+            numero(p.carga_tributaria_pct, 2) + "% — " + esc(p.regime))
+      + kpi("Margem", reais(p.lucro_mes),
+            numero(p.margem_alvo_pct, 1) + "% sobre a receita", "bom")
+      + '</div><div class="kpis">' + grupos + '</div>'
+      + '<ul class="lista">'
+      + preco.memoria.map(function (m) { return '<li>' + esc(m) + '</li>'; })
+        .join("")
+      + '</ul>'
+      + (cenarios ? '<table style="margin-top:14px"><thead><tr>'
+          + '<th>Cenário</th><th class="num">Preço/mês</th>'
+          + '<th class="num">Diferença</th></tr></thead><tbody>'
+          + cenarios + '</tbody></table>' : "");
+    elemento("botao-proposta").disabled = false;
+    elemento("passo-6").classList.add("pronto");
+  }
+
+  /* ------------------------------------------------------------ passo 7 --- */
+  function pintarDiagnostico(d) {
+    var r = d.resumo;
+    var achados = (d.achados || []).slice(0, 10).map(function (a) {
+      return '<div class="achado"><div>' + esc(a.titulo) + ' — <b>'
+        + reais(a.economia_mes) + '/mês</b></div><div>' + esc(a.detalhe)
+        + '</div><div class="conferir">Antes de aplicar: '
+        + esc(a.o_que_conferir) + '</div></div>';
+    }).join("");
+    elemento("area-diagnostico").innerHTML =
+      '<div class="kpis">'
+      + kpi("Linhas analisadas", numero(r.linhas_analisadas),
+            "ocupação média de " + numero(r.ocupacao_media_hoje_pct, 1) + "%")
+      + kpi("Frota hoje", numero(r.veiculos_hoje),
+            "contra " + numero(r.veiculos_no_plano) + " no plano",
+            r.veiculos_hoje > r.veiculos_no_plano ? "ruim" : "")
+      + kpi("Ações imediatas", reais(r.economia_acoes_imediatas_mes),
+            "troca de veículo e fusão de linha", "bom")
+      + kpi("Teto do que dá para capturar", reais(r.economia_teto_mes),
+            "já contém as ações acima — não some")
+      + '</div>' + achados
+      + ((d.problemas_da_planilha || []).length
+          ? '<div class="aviso">' + esc(d.problemas_da_planilha[0]) + '</div>'
+          : "");
+    elemento("passo-7").classList.add("pronto");
+  }
+
+  /* ------------------------------------------------- equipe (fretamento) -- */
+  function pintarEquipe(equipe) {
+    if (!equipe || !equipe.resumo) { return; }
+    var r = equipe.resumo;
+    var existente = document.getElementById("area-equipe");
+    if (!existente) {
+      existente = document.createElement("div");
+      existente.id = "area-equipe";
+      elemento("area-plano").appendChild(existente);
+    }
+    var escalas = (equipe.motoristas || []).slice(0, 8).map(function (m) {
+      return '<tr><td>' + esc(m.id) + '</td><td>' + esc(m.inicio) + '–'
+        + esc(m.fim) + '</td><td class="num">'
+        + Math.floor(m.jornada_min / 60) + 'h'
+        + String(m.jornada_min % 60).padStart(2, "0") + '</td><td>'
+        + esc((m.turnos || []).join(", ")) + '</td><td>'
+        + esc((m.veiculos || []).join(", ")) + '</td><td>'
+        + (m.problemas && m.problemas.length ? esc(m.problemas[0]) : "—")
+        + '</td></tr>';
+    }).join("");
+    existente.innerHTML =
+      '<h2 style="margin-top:22px;font-size:17px">Equipe: '
+      + numero(r.motoristas) + ' motoristas</h2>'
+      + '<p class="sub">O veículo roda todos os turnos; o motorista não. Este '
+      + 'número sai da jornada — e é ele que entra no custo.</p>'
+      + '<div class="kpis">'
+      + kpi("Motoristas", numero(r.motoristas),
+            numero(r.blocos) + " blocos de trabalho", "bom")
+      + kpi("Jornada média",
+            Math.floor(r.jornada_media_min / 60) + "h"
+            + String(Math.round(r.jornada_media_min % 60)).padStart(2, "0"),
+            numero(r.ocupacao_da_jornada_pct, 1) + "% da jornada normal")
+      + kpi("Dupla pegada", numero(r.com_dupla_pegada),
+            "pega cedo, larga, volta à tarde")
+      + kpi("Escalas fora da regra", numero(r.escalas_com_problema),
+            "jornada, intervalo ou interjornada",
+            r.escalas_com_problema ? "ruim" : "bom")
+      + '</div><div class="rolagem"><table><thead><tr><th>Motorista</th>'
+      + '<th>Jornada</th><th class="num">Horas</th><th>Turnos</th>'
+      + '<th>Veículos</th><th>Observação</th></tr></thead><tbody>'
+      + escalas + '</tbody></table></div>';
   }
 
   /* ------------------------------------------------------------- eventos -- */
@@ -486,6 +670,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
     }
     var dados = new FormData();
     dados.append("planilha", entrada.files[0]);
+    dados.append("perfil", elemento("perfil").value);
     this.disabled = true;
     this.textContent = "Lendo a planilha…";
     var botao = this;
@@ -502,16 +687,19 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
         elemento("erro-envio").innerHTML = "";
         elemento("passo-1").classList.add("pronto");
         estado.importacao = d;
+        if (d.perfil) { estado.perfil = d.perfil; }
         pontos = d.pontos || [];
         pintarImportacao();
       });
   });
 
   elemento("botao-roteirizar").addEventListener("click", function () {
-    var frota = {ONIBUS31: valor("frota-ONIBUS31"),
-                 MICRO20: valor("frota-MICRO20"),
-                 VAN15A: valor("frota-VAN15A")};
-    var total = frota.ONIBUS31 + frota.MICRO20 + frota.VAN15A;
+    var frota = {};
+    var total = 0;
+    ((estado.perfil && estado.perfil.tipos_veiculo) || []).forEach(function (t) {
+      frota[t.id] = valor("frota-" + t.id);
+      total += frota[t.id];
+    });
     this.disabled = true;
     fetch("/api/roteirizar", {
       method: "POST", headers: {"Content-Type": "application/json"},
@@ -524,6 +712,65 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
       acompanhar();
     });
   });
+
+  elemento("botao-precificar").addEventListener("click", function () {
+    var botao = this;
+    botao.disabled = true;
+    fetch("/api/precificar", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({margem: valor("margem"),
+                            regime: elemento("regime").value,
+                            monitores: valor("monitores"),
+                            cliente: elemento("cliente").value})
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      botao.disabled = false;
+      if (d.erro) {
+        elemento("area-preco").innerHTML =
+          '<div class="erro-caixa">' + esc(d.erro) + '</div>';
+        return;
+      }
+      estado.preco = d;
+      pintarPreco(d);
+    });
+  });
+
+  elemento("botao-proposta").addEventListener("click", function () {
+    window.open("/api/proposta", "_blank");
+  });
+
+  elemento("botao-linhas").addEventListener("click", function () {
+    var entrada = elemento("arquivo-linhas");
+    if (!entrada.files.length) {
+      elemento("area-diagnostico").innerHTML =
+        '<div class="erro-caixa">Escolha o arquivo do quadro de linhas.</div>';
+      return;
+    }
+    var dados = new FormData();
+    dados.append("linhas", entrada.files[0]);
+    var botao = this;
+    botao.disabled = true;
+    fetch("/api/enviar-linhas", {method: "POST", body: dados})
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        botao.disabled = false;
+        if (d.erro) {
+          elemento("area-diagnostico").innerHTML =
+            '<div class="erro-caixa">' + esc(d.erro) + '</div>';
+          return;
+        }
+        estado.diagnostico = d;
+        pintarDiagnostico(d);
+      });
+  });
+
+  elemento("perfil").addEventListener("change", function () {
+    elemento("explicacao-perfil").textContent = this.value === "fretamento"
+      ? "Turnos da indústria, destino é planta, e o motorista entra na conta "
+        + "por cabeça — com jornada, intervalo e interjornada."
+      : "Dois turnos, destino é escola, e o custo do motorista já vem dentro "
+        + "do custo do veículo (é como a prefeitura contrata).";
+  });
+  elemento("perfil").dispatchEvent(new Event("change"));
 
   function acompanhar() {
     buscarEstado().then(function (d) {

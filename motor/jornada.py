@@ -193,6 +193,59 @@ def _interjornada_ok(motorista: dict, bloco: dict, regras: RegrasDeJornada) -> b
     return descanso >= regras.interjornada_min
 
 
+def _consolidar(motoristas: list, regras: RegrasDeJornada,
+                prefixo: str) -> list:
+    """Tenta esvaziar quem ficou com sobra e distribuir os blocos nos outros.
+
+    A construção gulosa deixa restos: na primeira escala do fretamento
+    apareceram motoristas com 1h09 e 1h19 de jornada, que na prática viram
+    contrato de meio período ou hora extra de outro. Cada motorista a menos é
+    salário, encargos e benefícios a menos — vale a passada extra.
+
+    A regra de aceitação é a mesma de sempre: só sai do lugar o que continua
+    dentro da jornada, do descanso e da interjornada. Consolidar quebrando a
+    lei seria economia falsa.
+    """
+    mudou = True
+    while mudou and len(motoristas) > 1:
+        mudou = False
+        # o mais folgado primeiro: é o que tem mais chance de caber nos outros
+        candidatos = sorted(
+            motoristas, key=lambda m: sum(b["duracao"] for b in m["blocos"]))
+        for doador in candidatos:
+            outros = [m for m in motoristas if m is not doador]
+            destino = {}
+            for bloco in doador["blocos"]:
+                escolhido = None
+                for receptor in outros:
+                    virtual = {"blocos": receptor["blocos"]
+                               + destino.get(id(receptor), [])}
+                    if not _interjornada_ok(virtual, bloco, regras):
+                        continue
+                    if not _cabe(virtual, bloco, regras):
+                        continue
+                    escolhido = receptor
+                    break
+                if escolhido is None:
+                    destino = None
+                    break
+                destino.setdefault(id(escolhido), []).append(bloco)
+            if destino is None:
+                continue
+            # todos os blocos acharam casa: o doador some
+            for receptor in outros:
+                receptor["blocos"].extend(destino.get(id(receptor), []))
+            motoristas = outros
+            mudou = True
+            break
+
+    # renumera para a escala sair M01, M02, ... na ordem de início
+    motoristas.sort(key=lambda m: min(b["inicio"] for b in m["blocos"]))
+    for i, motorista in enumerate(motoristas, start=1):
+        motorista["id"] = f"{prefixo}{i:02d}"
+    return motoristas
+
+
 def escalar(blocos: list, regras: RegrasDeJornada = None,
             prefixo: str = "M") -> dict:
     """Encaixa os blocos em motoristas. Devolve escala + indicadores.
@@ -219,6 +272,8 @@ def escalar(blocos: list, regras: RegrasDeJornada = None,
                          "blocos": []}
             motoristas.append(escolhido)
         escolhido["blocos"].append(bloco)
+
+    motoristas = _consolidar(motoristas, regras, prefixo)
 
     for motorista in motoristas:
         motorista["blocos"].sort(key=lambda b: b["inicio"])

@@ -37,6 +37,11 @@ from urllib.parse import urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from comercial import diagnostico as diagnostico_mod  # noqa: E402
+from comercial import operacao_atual as operacao_mod  # noqa: E402
+from comercial import precificacao as precificacao_mod  # noqa: E402
+from comercial import proposta as proposta_mod  # noqa: E402
+from dados import perfis as perfis_mod  # noqa: E402
 from dados.planilha import ErroDePlanilha  # noqa: E402
 from motor import planejar as planejar_mod  # noqa: E402
 from planejamento import multipart  # noqa: E402
@@ -60,6 +65,10 @@ class Estado:
         self.progresso = []
         self.rodando = False
         self.erro = ""
+        self.perfil = perfis_mod.PERFIL_ESCOLAR
+        self.linhas_atuais = None       # o quadro de linhas que já roda hoje
+        self.preco = None
+        self.diagnostico = None
         self.trava = threading.Lock()
 
     # ------------------------------------------------------------ persistência
@@ -82,6 +91,19 @@ class Estado:
             self.progresso.append({
                 "etapa": etapa, "detalhe": detalhe,
                 "em": datetime.now().strftime("%H:%M:%S")})
+
+    def perfil_em_dicionario(self) -> dict:
+        perfil = self.perfil
+        return {
+            "id": perfil.id, "nome": perfil.nome, "vertical": perfil.vertical,
+            "rotulo_passageiro_plural": perfil.rotulo_passageiro_plural,
+            "rotulo_destino_plural": perfil.rotulo_destino_plural,
+            "separa_custo_do_motorista": perfil.separa_custo_do_motorista,
+            "turnos": [{"id": t.id, "nome": t.nome} for t in perfil.turnos],
+            "tipos_veiculo": [{"id": t.id, "nome": t.nome,
+                               "capacidade": t.capacidade}
+                              for t in perfil.tipos_veiculo],
+        }
 
     def resumo_da_importacao(self) -> dict:
         if not self.importacao:
@@ -142,6 +164,7 @@ def roteirizar_em_segundo_plano(opcoes: dict):
             plano = planejar_mod.planejar(
                 ESTADO.importacao,
                 frota_declarada=frota,
+                perfil=ESTADO.perfil,
                 municipio=opcoes.get("municipio") or None,
                 tempo_limite_s=int(opcoes.get("tempo_limite") or 20),
                 raio_urbano=float(opcoes.get("raio_urbano") or 300),
@@ -196,9 +219,23 @@ class Planejamento(BaseHTTPRequestHandler):
                 "erro": ESTADO.erro,
                 "progresso": ESTADO.progresso[-40:],
                 "plano": _plano_resumido(ESTADO.plano),
+                "perfil": ESTADO.perfil_em_dicionario(),
+                "perfis": [{"id": p.id, "nome": p.nome}
+                           for p in perfis_mod.EMBUTIDOS.values()],
+                "equipe": (ESTADO.plano or {}).get("equipe"),
+                "preco": ESTADO.preco,
+                "diagnostico": ESTADO.diagnostico,
+                "linhas_atuais": len(ESTADO.linhas_atuais or []),
                 "publicado": os.path.exists(
                     os.path.join(DIR_RELATORIOS, "dimensionamento.json")),
             })
+
+        if caminho == "/api/proposta":
+            arquivo = os.path.join(DIR_TRABALHO, "proposta.html")
+            if not os.path.exists(arquivo):
+                return self._json({"erro": "Gere a proposta primeiro."}, 404)
+            with open(arquivo, "rb") as f:
+                return self._responder(f.read(), "text/html; charset=utf-8")
         self._json({"erro": "Rota não encontrada.",
                     "rotas": ["/", "/api/estado", "/api/enviar-planilha",
                               "/api/ajustar", "/api/roteirizar",
@@ -217,6 +254,10 @@ class Planejamento(BaseHTTPRequestHandler):
                 return self._roteirizar()
             if caminho == "/api/publicar":
                 return self._publicar()
+            if caminho == "/api/enviar-linhas":
+                return self._enviar_linhas()
+            if caminho == "/api/precificar":
+                return self._precificar()
         except (multipart.ErroDeEnvio, ErroDePlanilha) as erro:
             return self._json({"erro": str(erro)}, 400)
         except Exception as erro:
@@ -232,19 +273,87 @@ class Planejamento(BaseHTTPRequestHandler):
         if not isinstance(arquivo, dict) or not arquivo["conteudo"]:
             return self._json({"erro": "Nenhum arquivo foi enviado."}, 400)
 
+        # O perfil muda o que a planilha significa: quais turnos existem, o
+        # que é o destino e se o motorista é custo à parte. Escolher isso
+        # depois da importação seria reimportar tudo.
+        try:
+            ESTADO.perfil = perfis_mod.carregar(campos.get("perfil")
+                                                or "escolar")
+        except ValueError as erro:
+            return self._json({"erro": str(erro)}, 400)
+
         os.makedirs(DIR_TRABALHO, exist_ok=True)
         destino = os.path.join(DIR_TRABALHO, arquivo["nome"])
         with open(destino, "wb") as f:
             f.write(arquivo["conteudo"])
 
-        importacao = planejar_mod.importar_planilha(destino)
-        importacao["frota_declarada"] = planejar_mod.ler_frota_declarada(destino)
+        importacao = planejar_mod.importar_planilha(destino,
+                                                    perfil=ESTADO.perfil)
+        importacao["frota_declarada"] = planejar_mod.ler_frota_declarada(
+            destino, perfil=ESTADO.perfil)
         importacao["caminho"] = destino
         ESTADO.importacao = importacao
         ESTADO.plano = None
         ESTADO.progresso = []
+        ESTADO.preco = None
+        ESTADO.diagnostico = None
         ESTADO.salvar()
-        return self._json(ESTADO.resumo_da_importacao())
+        resposta = ESTADO.resumo_da_importacao()
+        resposta["perfil"] = ESTADO.perfil_em_dicionario()
+        return self._json(resposta)
+
+    def _enviar_linhas(self):
+        """A planilha da operação que a empresa JÁ roda — o 'antes' real."""
+        if not ESTADO.plano:
+            return self._json({"erro": "Roteirize antes: o diagnóstico compara "
+                                       "a operação de hoje com o plano."}, 400)
+        campos = multipart.analisar(self._corpo(),
+                                    self.headers.get("Content-Type", ""))
+        arquivo = campos.get("linhas")
+        if not isinstance(arquivo, dict) or not arquivo["conteudo"]:
+            return self._json({"erro": "Nenhum arquivo foi enviado."}, 400)
+
+        os.makedirs(DIR_TRABALHO, exist_ok=True)
+        destino = os.path.join(DIR_TRABALHO, f"linhas-{arquivo['nome']}")
+        with open(destino, "wb") as f:
+            f.write(arquivo["conteudo"])
+
+        tipos = ESTADO.plano["premissas"]["custos_por_tipo"]
+        lido = operacao_mod.importar(destino, tipos)
+        if not lido["linhas"]:
+            return self._json({"erro": " ".join(lido["problemas"])
+                                       or "Planilha sem linhas."}, 400)
+        ESTADO.linhas_atuais = lido["linhas"]
+        ESTADO.diagnostico = diagnostico_mod.diagnosticar(lido["linhas"],
+                                                          ESTADO.plano)
+        ESTADO.diagnostico["problemas_da_planilha"] = lido["problemas"][:6]
+        return self._json(ESTADO.diagnostico)
+
+    def _precificar(self):
+        if not ESTADO.plano:
+            return self._json({"erro": "Roteirize antes de precificar."}, 400)
+        opcoes = json.loads(self._corpo().decode("utf-8") or "{}")
+        campos = {}
+        if opcoes.get("margem") is not None:
+            campos["margem_alvo"] = float(opcoes["margem"]) / 100.0
+        if opcoes.get("regime"):
+            campos["regime"] = opcoes["regime"]
+        if opcoes.get("monitores") is not None:
+            campos["monitores"] = int(opcoes["monitores"])
+        try:
+            premissas = precificacao_mod.Premissas(**campos)
+            ESTADO.preco = precificacao_mod.precificar(ESTADO.plano, premissas)
+            cenarios = precificacao_mod.sensibilidade(ESTADO.plano, premissas)
+        except ValueError as erro:
+            return self._json({"erro": str(erro)}, 400)
+        ESTADO.preco["cenarios"] = cenarios
+
+        os.makedirs(DIR_TRABALHO, exist_ok=True)
+        proposta_mod.gerar(
+            ESTADO.plano, ESTADO.preco, cenarios, ESTADO.diagnostico,
+            cliente=opcoes.get("cliente") or None,
+            saida=os.path.join(DIR_TRABALHO, "proposta.html"))
+        return self._json(ESTADO.preco)
 
     def _ajustar(self):
         pedido = json.loads(self._corpo().decode("utf-8"))
@@ -320,6 +429,7 @@ def main(argv=None):
     print(f"Planejamento em http://{a.host}:{a.porta}/")
     print("  1) envie a planilha  2) confira  3) ajuste no mapa  "
           "4) roteirize  5) publique")
+    print("  6) precifique  7) compare com a operação de hoje")
     try:
         servidor.serve_forever()
     except KeyboardInterrupt:

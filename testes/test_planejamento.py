@@ -268,6 +268,54 @@ class TestTelaDePlanejamento(unittest.TestCase):
         finally:
             self.mod.planejar_mod.planejar = original
 
+    def test_perfil_escolhido_no_envio_manda_nos_turnos(self):
+        """T1 numa operação escolar não é turno: o perfil valida isso."""
+        linhas = ["Colaborador;Endereço;Bairro;Planta;Turno;Lat;Lon"]
+        linhas.append("Ana;Rua A 1;Sede Urbana;Planta 1;T1;-21.15;-47.80")
+        csv = ("\n".join(linhas) + "\n").encode("utf-8")
+        f = "----limite777"
+        corpo = (f"--{f}\r\nContent-Disposition: form-data; name=\"planilha\"; "
+                 f"filename=\"rh.csv\"\r\n\r\n".encode("utf-8") + csv
+                 + f"\r\n--{f}\r\nContent-Disposition: form-data; "
+                   f"name=\"perfil\"\r\n\r\nfretamento\r\n"
+                   f"--{f}--\r\n".encode("utf-8"))
+        d = self.post("/api/enviar-planilha", corpo,
+                      f"multipart/form-data; boundary={f}")
+        self.assertEqual(d["perfil"]["id"], "fretamento")
+        self.assertIn("t1", d["resumo"]["por_turno"])
+
+    def test_perfil_desconhecido_e_recusado(self):
+        f = "----limite888"
+        corpo = (f"--{f}\r\nContent-Disposition: form-data; name=\"planilha\"; "
+                 f"filename=\"x.csv\"\r\n\r\nnome;endereco\nA;B\n"
+                 f"\r\n--{f}\r\nContent-Disposition: form-data; "
+                 f"name=\"perfil\"\r\n\r\nmarciano\r\n"
+                 f"--{f}--\r\n").encode("utf-8")
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            self.post("/api/enviar-planilha", corpo,
+                      f"multipart/form-data; boundary={f}")
+        self.assertEqual(ctx.exception.code, 400)
+
+    def test_precificar_sem_plano_e_recusado(self):
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            self.post("/api/precificar", {"margem": 12})
+        self.assertEqual(ctx.exception.code, 400)
+
+    def test_diagnostico_sem_plano_e_recusado(self):
+        f = "----limite999"
+        corpo = (f"--{f}\r\nContent-Disposition: form-data; name=\"linhas\"; "
+                 f"filename=\"l.csv\"\r\n\r\nLinha;Tipo\nL1;VAN16\n"
+                 f"\r\n--{f}--\r\n").encode("utf-8")
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            self.post("/api/enviar-linhas", corpo,
+                      f"multipart/form-data; boundary={f}")
+        self.assertEqual(ctx.exception.code, 400)
+
+    def test_proposta_so_existe_depois_de_precificar(self):
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            self.get("/api/proposta")
+        self.assertEqual(ctx.exception.code, 404)
+
     def test_publicar_grava_o_plano_e_guarda_o_anterior(self):
         self.enviar_planilha()
         self.mod.ESTADO.plano = {

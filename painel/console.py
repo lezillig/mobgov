@@ -9,6 +9,9 @@ trabalha. As quatro abas correspondem às quatro perguntas que ele faz por dia:
 
     Hoje           o que está acontecendo agora, e o que já mudou no plano
     Elegibilidade  quem está esperando decisão, há quanto tempo, e com o quê
+    Equipe         quantos motoristas a escala exige, e a jornada de cada um
+                   (só aparece quando o plano publicado separa esse custo —
+                   no escolar, o motorista vem dentro do custo do veículo)
     Assistente     "quanto eu economizo?" respondido com número do motor
     Economia       o resumo que ele leva para a reunião
 
@@ -92,6 +95,8 @@ def coletar(caminho_relatorio: str = None) -> dict:
     return {
         "painel": painel,
         "plano": plano,
+        "equipe": rel.get("equipe"),
+        "perfil": rel.get("perfil"),
         "motoristas": rotas.motoristas(plano),
         "eventos": eventos,
         "resumo_eventos": registro.resumo(),
@@ -255,6 +260,97 @@ def aba_elegibilidade(d: dict) -> str:
     )
 
 
+def _observacao_da_escala(motorista: dict, horas) -> str:
+    partes = []
+    if motorista.get("dupla_pegada"):
+        partes.append("dupla pegada")
+    if motorista.get("hora_extra_min"):
+        partes.append(f"{horas(motorista['hora_extra_min'])} extra")
+    return esc(" · ".join(partes)) if partes else "—"
+
+
+def aba_equipe(d: dict) -> str:
+    """Escala de motoristas — a conta que o número de veículos não responde."""
+    equipe = d.get("equipe")
+    if not equipe or not equipe.get("resumo"):
+        return ""
+    r = equipe["resumo"]
+    regras = equipe.get("regras", {})
+
+    def horas(minutos):
+        minutos = int(round(minutos or 0))
+        return f"{minutos // 60}h{minutos % 60:02d}"
+
+    linhas = "".join(
+        f'<tr class="{"atrasada" if m.get("problemas") else ""}">'
+        f'<td><b>{esc(m["id"])}</b></td>'
+        f'<td>{esc(m["inicio"])}–{esc(m["fim"])}</td>'
+        f'<td class="num">{horas(m["jornada_min"])}</td>'
+        f'<td class="num">{horas(m["amplitude_min"])}</td>'
+        f'<td>{esc(", ".join(m.get("turnos", [])))}</td>'
+        f'<td>{esc(", ".join(m.get("veiculos", [])))}</td>'
+        f'<td>{_observacao_da_escala(m, horas)}</td>'
+        f'<td>{esc(m["problemas"][0]) if m.get("problemas") else "—"}</td></tr>'
+        for m in equipe.get("motoristas", [])[:20])
+
+    por_turno = "".join(
+        f'<tr><td>{esc(turno)}</td><td class="num">{numero(qtd)}</td></tr>'
+        for turno, qtd in sorted((r.get("por_turno") or {}).items()))
+
+    return (
+        '<section><h2>Equipe — quantos motoristas a operação exige</h2>'
+        '<p class="chamada">O veículo roda todos os turnos; o motorista não. '
+        'Este número sai da jornada, não da frota — e é ele que entra no '
+        'custo. As regras usadas estão listadas abaixo: acordo coletivo muda '
+        'quase todas, e quem assina a escala precisa poder conferir.</p>'
+        '<div class="kpis">'
+        + _kpi("Motoristas", numero(r["motoristas"]),
+               f'para {numero(r["blocos"])} blocos de trabalho', destaque=True)
+        + _kpi("Jornada média", horas(r["jornada_media_min"]),
+               f'{pct(r["ocupacao_da_jornada_pct"])} da jornada normal')
+        + _kpi("Com dupla pegada", numero(r["com_dupla_pegada"]),
+               'pega cedo, larga, volta à tarde')
+        + _kpi("Escalas fora da regra", numero(r["escalas_com_problema"]),
+               'jornada, intervalo ou interjornada',
+               piora=r["escalas_com_problema"] > 0)
+        + '</div>'
+        '<div class="rolagem" style="margin-top:18px"><table>'
+        '<caption>Escala do dia — motorista a motorista</caption>'
+        '<thead><tr><th>Motorista</th><th>Da primeira à última hora</th>'
+        '<th class="num">Jornada</th><th class="num">Amplitude</th>'
+        '<th>Turnos</th><th>Veículos</th><th>Observação</th>'
+        '<th>Problema</th></tr></thead>'
+        f'<tbody>{linhas}</tbody></table></div>'
+        '<div class="colunas" style="margin-top:18px">'
+        '<div><table><caption>Motoristas por turno</caption>'
+        '<thead><tr><th>Turno</th><th class="num">Motoristas</th></tr></thead>'
+        f'<tbody>{por_turno}</tbody></table></div>'
+        '<div><table><caption>Regras usadas nesta escala</caption><tbody>'
+        + "".join(
+            f'<tr><td>{esc(rotulo)}</td><td class="num">{esc(valor)}</td></tr>'
+            for rotulo, valor in (
+                ("Jornada normal", horas(regras.get("jornada_normal_min"))),
+                ("Hora extra máxima", horas(regras.get("hora_extra_max_min"))),
+                ("Direção contínua máxima",
+                 horas(regras.get("direcao_continua_max_min"))),
+                ("Parada obrigatória depois disso",
+                 f'{regras.get("parada_obrigatoria_min", "?")} min'),
+                ("Intervalo de refeição",
+                 f'{regras.get("intervalo_refeicao_min", "?")} min'),
+                ("Interjornada", horas(regras.get("interjornada_min"))),
+                ("Amplitude máxima", horas(regras.get("amplitude_max_min"))),
+                ("Dupla pegada permitida",
+                 "sim" if regras.get("permite_dupla_pegada") else "não")))
+        + '</tbody></table></div></div>'
+        f'<div class="aviso"><b>Custo da equipe:</b> '
+        f'{reais(equipe.get("custo_equipe_mes", 0))}/mês — '
+        f'{numero(r["motoristas"])} motoristas a '
+        f'{reais(equipe.get("custo_motorista_mes", 0))} cada, sem encargos e '
+        f'benefícios (que entram na precificação).</div>'
+        '</section>'
+    )
+
+
 def aba_assistente(d: dict) -> str:
     cartoes = "".join(
         f'<details class="pergunta"{" open" if i == 0 else ""}>'
@@ -372,9 +468,14 @@ JS_CONSOLE = """
 def renderizar(d: dict) -> str:
     p = d["painel"]
     abas = [("hoje", "Hoje", aba_hoje(d)),
-            ("elegibilidade", "Elegibilidade", aba_elegibilidade(d)),
-            ("assistente", "Perguntar ao sistema", aba_assistente(d)),
-            ("economia", "Economia", aba_economia(d))]
+            ("elegibilidade", "Elegibilidade", aba_elegibilidade(d))]
+    equipe = aba_equipe(d)
+    if equipe:
+        # só existe quando o plano publicado separa o custo do motorista —
+        # no escolar a prefeitura contrata veículo COM motorista
+        abas.append(("equipe", "Equipe", equipe))
+    abas += [("assistente", "Perguntar ao sistema", aba_assistente(d)),
+             ("economia", "Economia", aba_economia(d))]
     botoes = "".join(
         f'<button data-aba="{ident}" role="tab" '
         f'aria-selected="{"true" if i == 0 else "false"}">{esc(rotulo)}</button>'

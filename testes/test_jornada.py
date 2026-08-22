@@ -117,6 +117,36 @@ class TestEscalar(unittest.TestCase):
         escala = jornada.escalar(blocos, self.regras)
         self.assertGreater(escala["resumo"]["hora_extra_total_min"], 0)
 
+    def test_consolida_as_sobras_da_construcao_gulosa(self):
+        """A primeira escala do fretamento deixou motoristas com 1h09."""
+        blocos = [bloco("A", 4 * 60, 6 * 60, veiculo="V1"),
+                  bloco("B", 4 * 60, 6 * 60, veiculo="V2"),
+                  bloco("C", 13 * 60, 14 * 60, veiculo="V1", turno="t2"),
+                  bloco("D", 15 * 60, 16 * 60, veiculo="V2", turno="t2")]
+        escala = jornada.escalar(blocos, self.regras)
+        # dois blocos simultâneos exigem dois motoristas; as sobras da tarde
+        # cabem neles, e não podem virar um terceiro
+        self.assertEqual(escala["resumo"]["motoristas"], 2)
+        self.assertEqual(escala["resumo"]["escalas_com_problema"], 0)
+
+    def test_consolidacao_nao_quebra_a_regra_para_economizar(self):
+        """Menos motorista é bom; menos motorista fora da lei, não."""
+        blocos = [bloco("A", 4 * 60, 9 * 60, veiculo="V1"),
+                  bloco("B", 4 * 60, 9 * 60, veiculo="V2"),
+                  bloco("C", 10 * 60, 15 * 60, veiculo="V3")]
+        escala = jornada.escalar(blocos, self.regras)
+        for motorista in escala["motoristas"]:
+            self.assertEqual(motorista["problemas"], [])
+
+    def test_motoristas_sao_renumerados_na_ordem_do_dia(self):
+        blocos = [bloco("tarde", 14 * 60, 16 * 60, veiculo="V1"),
+                  bloco("manha", 4 * 60, 6 * 60, veiculo="V2")]
+        escala = jornada.escalar(blocos, self.regras)
+        ids = [m["id"] for m in escala["motoristas"]]
+        self.assertEqual(ids, sorted(ids))
+        self.assertLess(escala["motoristas"][0]["inicio"],
+                        escala["motoristas"][-1]["fim"])
+
     def test_escala_vazia_nao_quebra(self):
         escala = jornada.escalar([], self.regras)
         self.assertEqual(escala["resumo"]["motoristas"], 0)

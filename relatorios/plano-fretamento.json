@@ -1,6 +1,6 @@
 {
   "municipio": "Empresa Modelo S.A.",
-  "gerado_em": "2026-08-22 21:20",
+  "gerado_em": "2026-08-22 21:58",
   "premissas": {
     "dias_letivos_mes": 22,
     "preco_diesel_l": 6.1,
@@ -1025,9 +1025,9 @@
       "VANPCD": 1
     },
     "total_veiculos": 7,
-    "km_dia": 1519.0,
-    "custo_mes": 251564,
-    "litros_dia": 308.7,
+    "km_dia": 1540.2,
+    "custo_mes": 252681,
+    "litros_dia": 313.0,
     "viagens": [
       {
         "id": "E2-t1-01",
@@ -1431,10 +1431,10 @@
           "P056",
           "P061",
           "P073",
-          "P085",
-          "P086",
           "P084",
-          "P096",
+          "P093",
+          "P086",
+          "P085",
           "P091",
           "P092",
           "P105",
@@ -1442,9 +1442,9 @@
         ],
         "alunos": 30,
         "cadeirantes": 0,
-        "km_viagem": 46.2,
-        "min_viagem": 89,
-        "veiculo": "VT03",
+        "km_viagem": 46.4,
+        "min_viagem": 90,
+        "veiculo": "VT01",
         "tipo": "RODO46",
         "tipo_nome": "Ônibus rodoviário 46 lugares",
         "ocupacao_pct": 65
@@ -1467,13 +1467,13 @@
           "P114",
           "P108",
           "P103",
-          "P093",
+          "P096",
           "P100"
         ],
         "alunos": 12,
         "cadeirantes": 1,
-        "km_viagem": 34.8,
-        "min_viagem": 66,
+        "km_viagem": 34.6,
+        "min_viagem": 65,
         "veiculo": "VT04",
         "tipo": "VANPCD",
         "tipo_nome": "Van acessível 12 lugares",
@@ -1488,8 +1488,6 @@
         "tipo_sugerido": "EXEC28",
         "paradas": [
           "P155",
-          "P188",
-          "P189",
           "P180",
           "P182",
           "P185",
@@ -1501,19 +1499,20 @@
           "P216",
           "P217",
           "P205",
-          "P192",
+          "P196",
+          "P186",
           "P174",
-          "P170",
-          "P150"
+          "P150",
+          "P144"
         ],
-        "alunos": 23,
+        "alunos": 24,
         "cadeirantes": 0,
-        "km_viagem": 49.0,
+        "km_viagem": 48.4,
         "min_viagem": 90,
-        "veiculo": "VT01",
+        "veiculo": "VT02",
         "tipo": "EXEC28",
         "tipo_nome": "Micro-ônibus executivo 28 lugares",
-        "ocupacao_pct": 82
+        "ocupacao_pct": 86
       },
       {
         "id": "E3-t2-02",
@@ -1533,18 +1532,18 @@
           "P214",
           "P206",
           "P202",
-          "P196",
-          "P186",
+          "P192",
+          "P170",
           "P153"
         ],
-        "alunos": 14,
+        "alunos": 13,
         "cadeirantes": 0,
-        "km_viagem": 54.5,
+        "km_viagem": 54.4,
         "min_viagem": 90,
-        "veiculo": "VT02",
+        "veiculo": "VT03",
         "tipo": "VAN16",
         "tipo_nome": "Van executiva 16 lugares",
-        "ocupacao_pct": 88
+        "ocupacao_pct": 81
       },
       {
         "id": "E3-t2-03",
@@ -1559,13 +1558,14 @@
           "P141",
           "P140",
           "P146",
-          "P148",
-          "P144"
+          "P188",
+          "P189",
+          "P148"
         ],
         "alunos": 8,
         "cadeirantes": 0,
-        "km_viagem": 21.1,
-        "min_viagem": 39,
+        "km_viagem": 32.4,
+        "min_viagem": 58,
         "veiculo": "VT05",
         "tipo": "VAN16",
         "tipo_nome": "Van executiva 16 lugares",
@@ -1852,6 +1852,23 @@
         "id": "VT01",
         "turno": "t2",
         "turno_nome": "2º turno (14h20)",
+        "tipo": "RODO46",
+        "tipo_nome": "Ônibus rodoviário 46 lugares",
+        "capacidade": 46,
+        "viagens": [
+          "E2-t2-01"
+        ],
+        "min_turno": 90,
+        "km_turno": 46.4,
+        "alunos": 30,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 65,
+        "folga_jornada_min": 30
+      },
+      {
+        "id": "VT02",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
         "tipo": "EXEC28",
         "tipo_nome": "Micro-ônibus executivo 28 lugares",
         "capacidade": 28,
@@ -1859,14 +1876,14 @@
           "E3-t2-01"
         ],
         "min_turno": 90,
-        "km_turno": 49.0,
-        "alunos": 23,
+        "km_turno": 48.4,
+        "alunos": 24,
         "ultima_escola": "E3",
-        "ocupacao_media_pct": 82,
+        "ocupacao_media_pct": 86,
         "folga_jornada_min": 30
       },
       {
-        "id": "VT02",
+        "id": "VT03",
         "turno": "t2",
         "turno_nome": "2º turno (14h20)",
         "tipo": "VAN16",
@@ -1876,28 +1893,11 @@
           "E3-t2-02"
         ],
         "min_turno": 90,
-        "km_turno": 54.5,
-        "alunos": 14,
+        "km_turno": 54.4,
+        "alunos": 13,
         "ultima_escola": "E3",
-        "ocupacao_media_pct": 88,
+        "ocupacao_media_pct": 81,
         "folga_jornada_min": 30
-      },
-      {
-        "id": "VT03",
-        "turno": "t2",
-        "turno_nome": "2º turno (14h20)",
-        "tipo": "RODO46",
-        "tipo_nome": "Ônibus rodoviário 46 lugares",
-        "capacidade": 46,
-        "viagens": [
-          "E2-t2-01"
-        ],
-        "min_turno": 89,
-        "km_turno": 46.2,
-        "alunos": 30,
-        "ultima_escola": "E2",
-        "ocupacao_media_pct": 65,
-        "folga_jornada_min": 31
       },
       {
         "id": "VT04",
@@ -1909,12 +1909,12 @@
         "viagens": [
           "E2-t2-02"
         ],
-        "min_turno": 66,
-        "km_turno": 34.8,
+        "min_turno": 65,
+        "km_turno": 34.6,
         "alunos": 12,
         "ultima_escola": "E2",
         "ocupacao_media_pct": 100,
-        "folga_jornada_min": 54
+        "folga_jornada_min": 55
       },
       {
         "id": "VT05",
@@ -1926,12 +1926,12 @@
         "viagens": [
           "E3-t2-03"
         ],
-        "min_turno": 39,
-        "km_turno": 21.1,
+        "min_turno": 58,
+        "km_turno": 32.4,
         "alunos": 8,
         "ultima_escola": "E3",
         "ocupacao_media_pct": 50,
-        "folga_jornada_min": 81
+        "folga_jornada_min": 62
       },
       {
         "id": "VT01",
@@ -2009,11 +2009,11 @@
   "economia": {
     "veiculos": 14,
     "reducao_frota_pct": 66.7,
-    "custo_mes": 193292,
-    "custo_ano": 2319505,
-    "km_dia": 461.0,
-    "litros_dia": 187.1,
-    "tco2_ano": 132.4
+    "custo_mes": 192176,
+    "custo_ano": 2306113,
+    "km_dia": 439.8,
+    "litros_dia": 182.8,
+    "tco2_ano": 129.4
   },
   "coerencia": [
     "A frota declarada oferece 670 lugares por viagem, para um turno de 148 colaboradores (4.5× a demanda). Confira se a planilha cobre a empresa inteira — comparar a frota inteira com uma parte dos colaboradores produz uma economia que não existe."
@@ -2145,7 +2145,7 @@
     "resumo": {
       "motoristas": 16,
       "blocos": 36,
-      "jornada_media_min": 246.8,
+      "jornada_media_min": 249.1,
       "jornada_maxima_min": 496,
       "com_hora_extra": 1,
       "hora_extra_total_min": 16,
@@ -2153,11 +2153,11 @@
       "escalas_com_problema": 0,
       "por_turno": {
         "adm": 8,
-        "t1": 9,
+        "t1": 8,
         "t2": 8,
         "t3": 6
       },
-      "ocupacao_da_jornada_pct": 51.4
+      "ocupacao_da_jornada_pct": 51.9
     },
     "regras": {
       "jornada_normal_min": 480,
@@ -2196,6 +2196,93 @@
         "id": "M02",
         "turnos": [
           "adm",
+          "t1"
+        ],
+        "veiculos": [
+          "VA04",
+          "VT01"
+        ],
+        "inicio": "04h00",
+        "fim": "16h00",
+        "jornada_min": 306,
+        "amplitude_min": 720,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 105.3,
+        "problemas": []
+      },
+      {
+        "id": "M03",
+        "turnos": [
+          "t1"
+        ],
+        "veiculos": [
+          "VT02"
+        ],
+        "inicio": "04h00",
+        "fim": "16h00",
+        "jornada_min": 240,
+        "amplitude_min": 720,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 110.2,
+        "problemas": []
+      },
+      {
+        "id": "M04",
+        "turnos": [
+          "t1"
+        ],
+        "veiculos": [
+          "VT03"
+        ],
+        "inicio": "04h00",
+        "fim": "16h00",
+        "jornada_min": 240,
+        "amplitude_min": 720,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 105.2,
+        "problemas": []
+      },
+      {
+        "id": "M05",
+        "turnos": [
+          "t1"
+        ],
+        "veiculos": [
+          "VT04"
+        ],
+        "inicio": "04h16",
+        "fim": "06h00",
+        "jornada_min": 104,
+        "amplitude_min": 104,
+        "dupla_pegada": false,
+        "hora_extra_min": 0,
+        "km": 41.0,
+        "problemas": []
+      },
+      {
+        "id": "M06",
+        "turnos": [
+          "t1"
+        ],
+        "veiculos": [
+          "VT06"
+        ],
+        "inicio": "04h41",
+        "fim": "06h00",
+        "jornada_min": 79,
+        "amplitude_min": 79,
+        "dupla_pegada": false,
+        "hora_extra_min": 0,
+        "km": 24.9,
+        "problemas": []
+      },
+      {
+        "id": "M07",
+        "turnos": [
+          "adm",
           "t2"
         ],
         "veiculos": [
@@ -2208,11 +2295,86 @@
         "amplitude_min": 509,
         "dupla_pegada": true,
         "hora_extra_min": 0,
-        "km": 93.0,
+        "km": 86.9,
         "problemas": []
       },
       {
-        "id": "M03",
+        "id": "M08",
+        "turnos": [
+          "adm",
+          "t2",
+          "t3"
+        ],
+        "veiculos": [
+          "VA02",
+          "VT03"
+        ],
+        "inicio": "06h00",
+        "fim": "18h59",
+        "jornada_min": 366,
+        "amplitude_min": 779,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 154.9,
+        "problemas": []
+      },
+      {
+        "id": "M09",
+        "turnos": [
+          "t1",
+          "t3"
+        ],
+        "veiculos": [
+          "VT01",
+          "VT06"
+        ],
+        "inicio": "06h00",
+        "fim": "15h19",
+        "jornada_min": 197,
+        "amplitude_min": 559,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 81.6,
+        "problemas": []
+      },
+      {
+        "id": "M10",
+        "turnos": [
+          "t3"
+        ],
+        "veiculos": [
+          "VT02"
+        ],
+        "inicio": "06h00",
+        "fim": "07h37",
+        "jornada_min": 97,
+        "amplitude_min": 97,
+        "dupla_pegada": false,
+        "hora_extra_min": 0,
+        "km": 38.0,
+        "problemas": []
+      },
+      {
+        "id": "M11",
+        "turnos": [
+          "adm",
+          "t2"
+        ],
+        "veiculos": [
+          "VA02",
+          "VT05"
+        ],
+        "inicio": "06h01",
+        "fim": "14h20",
+        "jornada_min": 207,
+        "amplitude_min": 499,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 75.0,
+        "problemas": []
+      },
+      {
+        "id": "M12",
         "turnos": [
           "adm",
           "t2",
@@ -2229,88 +2391,33 @@
         "amplitude_min": 720,
         "dupla_pegada": true,
         "hora_extra_min": 16,
-        "km": 194.4,
+        "km": 189.2,
         "problemas": []
       },
       {
-        "id": "M04",
+        "id": "M13",
         "turnos": [
           "adm",
-          "t1",
+          "t2",
           "t3"
         ],
         "veiculos": [
-          "VA02",
-          "VT01",
-          "VT03"
-        ],
-        "inicio": "06h00",
-        "fim": "18h59",
-        "jornada_min": 366,
-        "amplitude_min": 779,
-        "dupla_pegada": true,
-        "hora_extra_min": 0,
-        "km": 147.9,
-        "problemas": []
-      },
-      {
-        "id": "M05",
-        "turnos": [
-          "adm",
-          "t1"
-        ],
-        "veiculos": [
           "VA04",
-          "VT01",
-          "VT02"
-        ],
-        "inicio": "04h00",
-        "fim": "16h00",
-        "jornada_min": 306,
-        "amplitude_min": 720,
-        "dupla_pegada": true,
-        "hora_extra_min": 0,
-        "km": 113.0,
-        "problemas": []
-      },
-      {
-        "id": "M06",
-        "turnos": [
-          "t1"
-        ],
-        "veiculos": [
           "VT02",
-          "VT03"
+          "VT03",
+          "VT04"
         ],
-        "inicio": "04h00",
-        "fim": "16h00",
-        "jornada_min": 240,
-        "amplitude_min": 720,
+        "inicio": "12h45",
+        "fim": "00h20",
+        "jornada_min": 378,
+        "amplitude_min": 695,
         "dupla_pegada": true,
         "hora_extra_min": 0,
-        "km": 107.7,
+        "km": 137.5,
         "problemas": []
       },
       {
-        "id": "M07",
-        "turnos": [
-          "t1",
-          "t2"
-        ],
-        "veiculos": [
-          "VT03"
-        ],
-        "inicio": "04h00",
-        "fim": "14h20",
-        "jornada_min": 239,
-        "amplitude_min": 620,
-        "dupla_pegada": true,
-        "hora_extra_min": 0,
-        "km": 98.8,
-        "problemas": []
-      },
-      {
-        "id": "M08",
+        "id": "M14",
         "turnos": [
           "adm",
           "t1",
@@ -2329,105 +2436,11 @@
         "amplitude_min": 620,
         "dupla_pegada": true,
         "hora_extra_min": 0,
-        "km": 180.2,
+        "km": 174.1,
         "problemas": []
       },
       {
-        "id": "M09",
-        "turnos": [
-          "adm",
-          "t1"
-        ],
-        "veiculos": [
-          "VA02",
-          "VT06"
-        ],
-        "inicio": "06h01",
-        "fim": "15h19",
-        "jornada_min": 198,
-        "amplitude_min": 558,
-        "dupla_pegada": true,
-        "hora_extra_min": 0,
-        "km": 67.5,
-        "problemas": []
-      },
-      {
-        "id": "M10",
-        "turnos": [
-          "adm",
-          "t2",
-          "t3"
-        ],
-        "veiculos": [
-          "VA04",
-          "VT02",
-          "VT03",
-          "VT04"
-        ],
-        "inicio": "12h44",
-        "fim": "00h19",
-        "jornada_min": 378,
-        "amplitude_min": 695,
-        "dupla_pegada": true,
-        "hora_extra_min": 0,
-        "km": 129.5,
-        "problemas": []
-      },
-      {
-        "id": "M11",
-        "turnos": [
-          "t2",
-          "t3"
-        ],
-        "veiculos": [
-          "VT01",
-          "VT05"
-        ],
-        "inicio": "06h00",
-        "fim": "14h20",
-        "jornada_min": 187,
-        "amplitude_min": 500,
-        "dupla_pegada": true,
-        "hora_extra_min": 0,
-        "km": 77.8,
-        "problemas": []
-      },
-      {
-        "id": "M12",
-        "turnos": [
-          "t1"
-        ],
-        "veiculos": [
-          "VT04"
-        ],
-        "inicio": "04h16",
-        "fim": "06h00",
-        "jornada_min": 104,
-        "amplitude_min": 104,
-        "dupla_pegada": false,
-        "hora_extra_min": 0,
-        "km": 41.0,
-        "problemas": []
-      },
-      {
-        "id": "M13",
-        "turnos": [
-          "t3"
-        ],
-        "veiculos": [
-          "VT02"
-        ],
-        "inicio": "06h00",
-        "fim": "07h37",
-        "jornada_min": 97,
-        "amplitude_min": 97,
-        "dupla_pegada": false,
-        "hora_extra_min": 0,
-        "km": 38.0,
-        "problemas": []
-      },
-      {
-        "id": "M14",
+        "id": "M15",
         "turnos": [
           "t2"
         ],
@@ -2435,29 +2448,12 @@
           "VT04"
         ],
         "inicio": "22h20",
-        "fim": "23h56",
-        "jornada_min": 96,
-        "amplitude_min": 96,
+        "fim": "23h55",
+        "jornada_min": 95,
+        "amplitude_min": 95,
         "dupla_pegada": false,
         "hora_extra_min": 0,
-        "km": 34.8,
-        "problemas": []
-      },
-      {
-        "id": "M15",
-        "turnos": [
-          "t1"
-        ],
-        "veiculos": [
-          "VT06"
-        ],
-        "inicio": "04h41",
-        "fim": "06h00",
-        "jornada_min": 79,
-        "amplitude_min": 79,
-        "dupla_pegada": false,
-        "hora_extra_min": 0,
-        "km": 24.9,
+        "km": 34.6,
         "problemas": []
       },
       {
@@ -2469,12 +2465,12 @@
           "VT05"
         ],
         "inicio": "22h20",
-        "fim": "23h29",
-        "jornada_min": 69,
-        "amplitude_min": 69,
+        "fim": "23h48",
+        "jornada_min": 88,
+        "amplitude_min": 88,
         "dupla_pegada": false,
         "hora_extra_min": 0,
-        "km": 21.1,
+        "km": 32.4,
         "problemas": []
       }
     ],
@@ -2506,6 +2502,85 @@
         "motorista": "M02",
         "blocos": [
           {
+            "veiculo": "VT01",
+            "turno": "1º turno (06h)",
+            "inicio": 240,
+            "fim": 360
+          },
+          {
+            "veiculo": "VA04",
+            "turno": "Administrativo (08h)",
+            "inicio": 414,
+            "fim": 480
+          },
+          {
+            "veiculo": "VT01",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 960
+          }
+        ]
+      },
+      {
+        "motorista": "M03",
+        "blocos": [
+          {
+            "veiculo": "VT02",
+            "turno": "1º turno (06h)",
+            "inicio": 240,
+            "fim": 360
+          },
+          {
+            "veiculo": "VT02",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 960
+          }
+        ]
+      },
+      {
+        "motorista": "M04",
+        "blocos": [
+          {
+            "veiculo": "VT03",
+            "turno": "1º turno (06h)",
+            "inicio": 240,
+            "fim": 360
+          },
+          {
+            "veiculo": "VT03",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 960
+          }
+        ]
+      },
+      {
+        "motorista": "M05",
+        "blocos": [
+          {
+            "veiculo": "VT04",
+            "turno": "1º turno (06h)",
+            "inicio": 256,
+            "fim": 360
+          }
+        ]
+      },
+      {
+        "motorista": "M06",
+        "blocos": [
+          {
+            "veiculo": "VT06",
+            "turno": "1º turno (06h)",
+            "inicio": 281,
+            "fim": 360
+          }
+        ]
+      },
+      {
+        "motorista": "M07",
+        "blocos": [
+          {
             "veiculo": "VA01",
             "turno": "Administrativo (08h)",
             "inicio": 351,
@@ -2520,7 +2595,75 @@
         ]
       },
       {
-        "motorista": "M03",
+        "motorista": "M08",
+        "blocos": [
+          {
+            "veiculo": "VT03",
+            "turno": "3º turno (22h) (volta)",
+            "inicio": 360,
+            "fim": 487
+          },
+          {
+            "veiculo": "VT03",
+            "turno": "2º turno (14h20)",
+            "inicio": 740,
+            "fim": 860
+          },
+          {
+            "veiculo": "VA02",
+            "turno": "Administrativo (08h) (volta)",
+            "inicio": 1020,
+            "fim": 1139
+          }
+        ]
+      },
+      {
+        "motorista": "M09",
+        "blocos": [
+          {
+            "veiculo": "VT01",
+            "turno": "3º turno (22h) (volta)",
+            "inicio": 360,
+            "fim": 478
+          },
+          {
+            "veiculo": "VT06",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 919
+          }
+        ]
+      },
+      {
+        "motorista": "M10",
+        "blocos": [
+          {
+            "veiculo": "VT02",
+            "turno": "3º turno (22h) (volta)",
+            "inicio": 360,
+            "fim": 457
+          }
+        ]
+      },
+      {
+        "motorista": "M11",
+        "blocos": [
+          {
+            "veiculo": "VA02",
+            "turno": "Administrativo (08h)",
+            "inicio": 361,
+            "fim": 480
+          },
+          {
+            "veiculo": "VT05",
+            "turno": "2º turno (14h20)",
+            "inicio": 772,
+            "fim": 860
+          }
+        ]
+      },
+      {
+        "motorista": "M12",
         "blocos": [
           {
             "veiculo": "VT01",
@@ -2549,87 +2692,36 @@
         ]
       },
       {
-        "motorista": "M04",
+        "motorista": "M13",
         "blocos": [
           {
-            "veiculo": "VT03",
-            "turno": "3º turno (22h) (volta)",
-            "inicio": 360,
-            "fim": 487
-          },
-          {
-            "veiculo": "VT01",
-            "turno": "1º turno (06h) (volta)",
-            "inicio": 840,
-            "fim": 960
-          },
-          {
-            "veiculo": "VA02",
-            "turno": "Administrativo (08h) (volta)",
-            "inicio": 1020,
-            "fim": 1139
-          }
-        ]
-      },
-      {
-        "motorista": "M05",
-        "blocos": [
-          {
-            "veiculo": "VT01",
-            "turno": "1º turno (06h)",
-            "inicio": 240,
-            "fim": 360
+            "veiculo": "VT04",
+            "turno": "2º turno (14h20)",
+            "inicio": 765,
+            "fim": 860
           },
           {
             "veiculo": "VA04",
-            "turno": "Administrativo (08h)",
-            "inicio": 414,
-            "fim": 480
+            "turno": "Administrativo (08h) (volta)",
+            "inicio": 1020,
+            "fim": 1086
           },
           {
             "veiculo": "VT02",
-            "turno": "1º turno (06h) (volta)",
-            "inicio": 840,
-            "fim": 960
-          }
-        ]
-      },
-      {
-        "motorista": "M06",
-        "blocos": [
-          {
-            "veiculo": "VT02",
-            "turno": "1º turno (06h)",
-            "inicio": 240,
-            "fim": 360
+            "turno": "3º turno (22h)",
+            "inicio": 1223,
+            "fim": 1320
           },
           {
             "veiculo": "VT03",
-            "turno": "1º turno (06h) (volta)",
-            "inicio": 840,
-            "fim": 960
+            "turno": "2º turno (14h20) (volta)",
+            "inicio": 1340,
+            "fim": 1460
           }
         ]
       },
       {
-        "motorista": "M07",
-        "blocos": [
-          {
-            "veiculo": "VT03",
-            "turno": "1º turno (06h)",
-            "inicio": 240,
-            "fim": 360
-          },
-          {
-            "veiculo": "VT03",
-            "turno": "2º turno (14h20)",
-            "inicio": 741,
-            "fim": 860
-          }
-        ]
-      },
-      {
-        "motorista": "M08",
+        "motorista": "M14",
         "blocos": [
           {
             "veiculo": "VT04",
@@ -2658,109 +2750,13 @@
         ]
       },
       {
-        "motorista": "M09",
-        "blocos": [
-          {
-            "veiculo": "VA02",
-            "turno": "Administrativo (08h)",
-            "inicio": 361,
-            "fim": 480
-          },
-          {
-            "veiculo": "VT06",
-            "turno": "1º turno (06h) (volta)",
-            "inicio": 840,
-            "fim": 919
-          }
-        ]
-      },
-      {
-        "motorista": "M10",
-        "blocos": [
-          {
-            "veiculo": "VT04",
-            "turno": "2º turno (14h20)",
-            "inicio": 764,
-            "fim": 860
-          },
-          {
-            "veiculo": "VA04",
-            "turno": "Administrativo (08h) (volta)",
-            "inicio": 1020,
-            "fim": 1086
-          },
-          {
-            "veiculo": "VT02",
-            "turno": "3º turno (22h)",
-            "inicio": 1223,
-            "fim": 1320
-          },
-          {
-            "veiculo": "VT03",
-            "turno": "2º turno (14h20) (volta)",
-            "inicio": 1340,
-            "fim": 1459
-          }
-        ]
-      },
-      {
-        "motorista": "M11",
-        "blocos": [
-          {
-            "veiculo": "VT01",
-            "turno": "3º turno (22h) (volta)",
-            "inicio": 360,
-            "fim": 478
-          },
-          {
-            "veiculo": "VT05",
-            "turno": "2º turno (14h20)",
-            "inicio": 791,
-            "fim": 860
-          }
-        ]
-      },
-      {
-        "motorista": "M12",
-        "blocos": [
-          {
-            "veiculo": "VT04",
-            "turno": "1º turno (06h)",
-            "inicio": 256,
-            "fim": 360
-          }
-        ]
-      },
-      {
-        "motorista": "M13",
-        "blocos": [
-          {
-            "veiculo": "VT02",
-            "turno": "3º turno (22h) (volta)",
-            "inicio": 360,
-            "fim": 457
-          }
-        ]
-      },
-      {
-        "motorista": "M14",
-        "blocos": [
-          {
-            "veiculo": "VT04",
-            "turno": "2º turno (14h20) (volta)",
-            "inicio": 1340,
-            "fim": 1436
-          }
-        ]
-      },
-      {
         "motorista": "M15",
         "blocos": [
           {
-            "veiculo": "VT06",
-            "turno": "1º turno (06h)",
-            "inicio": 281,
-            "fim": 360
+            "veiculo": "VT04",
+            "turno": "2º turno (14h20) (volta)",
+            "inicio": 1340,
+            "fim": 1435
           }
         ]
       },
@@ -2771,17 +2767,17 @@
             "veiculo": "VT05",
             "turno": "2º turno (14h20) (volta)",
             "inicio": 1340,
-            "fim": 1409
+            "fim": 1428
           }
         ]
       }
     ],
     "explicacao": [
       "M01: 03h31–16h29 (6h40 de jornada) · turnos adm, t1 · veículos VA03, VT05 · dupla pegada",
-      "M02: 05h51–14h20 (4h09 de jornada) · turnos adm, t2 · veículos VA01, VT02 · dupla pegada",
-      "M03: 12h20–00h20 (8h16 de jornada) · turnos adm, t2, t3 · veículos VA01, VT01, VT03 · 16 min de hora extra · dupla pegada",
-      "M04: 06h00–18h59 (6h06 de jornada) · turnos adm, t1, t3 · veículos VA02, VT01, VT03 · dupla pegada",
-      "M05: 04h00–16h00 (5h06 de jornada) · turnos adm, t1 · veículos VA04, VT01, VT02 · dupla pegada"
+      "M02: 04h00–16h00 (5h06 de jornada) · turnos adm, t1 · veículos VA04, VT01 · dupla pegada",
+      "M03: 04h00–16h00 (4h00 de jornada) · turnos t1 · veículos VT02 · dupla pegada",
+      "M04: 04h00–16h00 (4h00 de jornada) · turnos t1 · veículos VT03 · dupla pegada",
+      "M05: 04h16–06h00 (1h44 de jornada) · turnos t1 · veículos VT04"
     ]
   },
   "demanda_nao_atendida": {
@@ -2797,7 +2793,7 @@
   "origem": {
     "tipo": "planilha_importada",
     "arquivo": "planilha-fretamento-demo.csv",
-    "importado_em": "2026-08-22 21:19",
+    "importado_em": "2026-08-22 21:53",
     "alunos_na_planilha": 339,
     "erros_na_importacao": 101,
     "avisos_na_importacao": 79

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOBGOV — o sistema, tela por tela</title>
+<style>
+:root{--papel:#FFF;--papel-2:#F4F7F9;--tinta:#0E1D27;--fraca:#4E6273;
+  --linha:#D3DDE4;--institucional:#123E6B}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--papel-2);color:var(--tinta);font-size:17px;line-height:1.5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--papel);border-bottom:3px solid var(--institucional);
+  padding:26px 0}
+.folha{max-width:960px;margin:0 auto;padding:0 22px}
+.produto{font-weight:800;letter-spacing:.08em;color:var(--institucional)}
+h1{font-size:27px;margin-top:6px}
+p.sub{color:var(--fraca);margin-top:6px}
+main{padding:26px 0 70px}
+.grupo{margin-bottom:30px}
+.grupo h2{font-size:16px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--fraca);margin-bottom:12px}
+a.tela{display:block;background:var(--papel);border:1px solid var(--linha);
+  border-radius:14px;padding:18px 20px;margin-bottom:12px;text-decoration:none;
+  color:inherit}
+a.tela:hover{border-color:var(--institucional)}
+a.tela b{font-size:18px;color:var(--institucional)}
+a.tela span{display:block;color:var(--fraca);font-size:15px;margin-top:4px}
+.nota{background:#FCF3DF;border-left:4px solid #8A5A00;border-radius:0 12px 12px 0;
+  padding:14px 16px;margin:22px 0;font-size:15px}
+</style></head><body>
+<header><div class="folha">
+  <div class="produto">MOBGOV</div>
+  <h1>O sistema, tela por tela</h1>
+  <p class="sub">Todas as telas abrem sem internet e sem servidor. As de
+  aplicação levam dados embutidos — o HTML e o JavaScript são os mesmos que
+  rodam de verdade.</p>
+</div></header>
+<main><div class="folha">
+  <div class="grupo"><h2>Operação do dia</h2>
+  <a class="tela" href="1-console-escolar.html"><b>Console de operação — escolar</b><span>O que está acontecendo hoje, a fila de elegibilidade ao porta a porta, o assistente e o resumo da economia.</span></a>
+  <a class="tela" href="2-console-fretamento.html"><b>Console de operação — fretamento</b><span>O mesmo console para uma operação de empresa, com a aba Equipe: 16 motoristas, jornada de cada um e as regras usadas.</span></a>
+</div>
+  <div class="grupo"><h2>Planejamento e comercial</h2>
+  <a class="tela" href="3-planejamento.html"><b>Planejamento: da planilha às rotas</b><span>Os sete passos: enviar a planilha, conferir, ajustar no mapa, roteirizar, publicar, precificar e comparar com a operação atual.</span></a>
+  <a class="tela" href="4-proposta.html"><b>Proposta comercial</b><span>O preço com a planilha de custo aberta, os cenários e o diagnóstico da operação que já roda.</span></a>
+  <a class="tela" href="5-painel-economia.html"><b>Painel de economia</b><span>O relatório que vira PDF de prestação de contas: antes e depois, mapa, premissas e memória de cálculo.</span></a>
+</div>
+  <div class="grupo"><h2>Quem está na rua</h2>
+  <a class="tela" href="6-app-motorista.html"><b>App do motorista</b><span>Offline-first: a rota do dia no aparelho, embarque por parada e fila local que sobe sozinha quando volta o sinal.</span></a>
+  <a class="tela" href="7-app-responsavel.html"><b>App do responsável</b><span>Onde está o ônibus, com a previsão marcada como medida ou planejada — e o aviso de falta, que alimenta o aprendizado.</span></a>
+</div>
+  <div class="nota"><b>O que é demonstração:</b> os dados são do município e
+  da empresa fictícios do projeto. O mecanismo é o real — roteirização,
+  escala de motoristas, precificação e diagnóstico foram calculados por estas
+  mesmas funções antes de a página ser escrita.</div>
+</div></main></body></html>

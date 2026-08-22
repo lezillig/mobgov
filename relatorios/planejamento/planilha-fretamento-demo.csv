@@ -1,0 +1,428 @@
+﻿RELAÇÃO DE COLABORADORES — FRETAMENTO 2026
+Empresa Modelo S.A. · exportado do RH
+
+Matrícula;Colaborador;Endereço;Nº;Bairro;Planta;Turno de trabalho;Mobilidade reduzida;Latitude;Longitude;Centro de custo
+50000;DOUGLAS NUNES;Estrada do Contorno;1140;Jardim Operário;Planta 1 — Fábrica;turno 2;;-47.820919;-21.165104;CC-5020 Manutenção
+50001;Paulo Santos;Travessa da Fábrica;24;Vila Industrial;Planta 2 — Centro de distribuição;turno 1;;-21.138839;-47.78068;CC-2040 Logística
+50002;Márcia Lima;Rodovia SP-330 km 12;s/n;Centro;Planta 1 — Fábrica;T2;;;;CC-1010 Produção
+50003;Sérgio Moreira;Rua 7 de Setembro;51;Distrito de Bonfim;Planta 2 — Centro de distribuição;1 TURNO;;-21.220743;-47.880241;CC-4090 Administrativo
+50004;Cláudia Queiroz;Travessa da Fábrica;816;Zona Rural Norte;Escritório administrativo;Geral;;-21.079629;-47.782466;CC-4090 Administrativo
+50005;Tânia Teixeira;Rua das Palmeiras;1072;Jardim Operário;Planta 2 — Centro de distribuição;T2;;-21.185687;-47.823057;CC-4090 Administrativo
+50006;Paulo Esteves;Travessa da Fábrica;962;Vila Industrial;Planta 1 — Fábrica;B;;-21.14031;-47.798444;CC-4090 Administrativo
+50007;Jonas Teixeira;Rua das Palmeiras;68;Centro;Escritório administrativo;Administrativo;;-21.154768;-47.792486;CC-5020 Manutenção
+50008;Odete Teixeira;Travessa da Fábrica;890;Distrito de Bonfim;Planta 1 — Fábrica;B;;-21.21243;-47.879718;CC-1010 Produção
+50009;Jonas Nunes;Rodovia SP-330 km 12;531;Zona Rural Norte;Planta 2 — Centro de distribuição;turno 2;não;-21.135626;-47.745492;CC-2040 Logística
+50010;Nilton Teixeira;Estrada do Contorno;843;Jardim Operário;Escritório administrativo;Administrativo;;-21.159595;-47.822238;CC-1010 Produção
+50011;Cláudia Almeida;Estrada do Contorno;508;Vila Industrial;Planta 2 — Centro de distribuição;T2;;-21.143444;-47.800872;CC-5020 Manutenção
+50012;Iara Pires;Travessa da Fábrica;277;Centro;Planta 1 — Fábrica;A;;-21.167193;-47.808287;CC-5020 Manutenção
+50013;Edna Moreira;Rua 7 de Setembro;1040;Distrito de Bonfim;Planta 2 — Centro de distribuição;turno 1;;-21.180459;-47.87061;CC-2040 Logística
+50014;Renata Gonçalves;Av. dos Trabalhadores;s/n;Zona Rural Norte;Planta 1 — Fábrica;2 TURNO;não;;;CC-1010 Produção
+50015;Adriana Teixeira;Travessa da Fábrica;1171;Jardim Operário;Planta 2 — Centro de distribuição;A;;-21.173739;-47.807779;CC-2040 Logística
+50016;Tânia Gonçalves;Av. Industrial;1121;Vila Industrial;Planta 1 — Fábrica;turno 2;;-21.160875;-47.797717;CC-2040 Logística
+50017;Bruno Barbosa;Rua das Palmeiras;265;Centro;Planta 2 — Centro de distribuição;B;;-21.15415;-47.793532;CC-5020 Manutenção
+50018;Edna Farias;Av. Industrial;785;Distrito de Bonfim;Planta 1 — Fábrica;3 TURNO;;-21.208196;-47.837852;CC-2040 Logística
+50019;IARA SANTOS;Av. dos Trabalhadores;1064;Zona Rural Norte;Planta 2 — Centro de distribuição;turno 2;;-21.127307;-47.744021;CC-5020 Manutenção
+50020;Renata Lima;Travessa da Fábrica;s/n;Jardim Operário;Escritório administrativo;COMERCIAL;;;;CC-2040 Logística
+50021;Adriana Pires;Estrada do Contorno;225;Vila Industrial;Escritório administrativo;Geral;;-21.155513;-47.803228;CC-5020 Manutenção
+50022;Tânia Gonçalves;Rua 7 de Setembro;198;Centro;Planta 1 — Fábrica;turno 2;;-21.160417;-47.807416;CC-1010 Produção
+50023;Leandro Farias;Av. Industrial;597;Distrito de Bonfim;Planta 2 — Centro de distribuição;3 TURNO;;-21.2141;-47.838435;CC-3070 Qualidade
+50024;Cláudia Almeida;Rua das Palmeiras;s/n;Zona Rural Norte;Planta 1 — Fábrica;T2;;;;CC-1010 Produção
+50025;Jonas Duarte;Av. dos Trabalhadores;934;Jardim Operário;Planta 2 — Centro de distribuição;A;;-21.151456;-47.816392;CC-5020 Manutenção
+50026;Bruno Queiroz;Av. Industrial;767;Vila Industrial;Planta 1 — Fábrica;A;;-21.165407;-47.786319;CC-3070 Qualidade
+50027;Márcia Moreira;Rua das Palmeiras;577;Centro;Escritório administrativo;COMERCIAL;;-21.15875;-47.811148;CC-1010 Produção
+50028;Jonas Ramos;Rodovia SP-330 km 12;s/n;Distrito de Bonfim;Planta 1 — Fábrica;T1;;;;CC-1010 Produção
+50029;Fernando Duarte;Rua 7 de Setembro;59;Zona Rural Norte;Planta 2 — Centro de distribuição;turno 1;;-21.122325;-47.730858;CC-3070 Qualidade
+50030;Nilton Queiroz;Rua Dom Pedro;1112;Jardim Operário;Planta 1 — Fábrica;T2;;-21.179257;-47.830125;CC-5020 Manutenção
+50031;Sérgio Queiroz;Rodovia SP-330 km 12;981;Vila Industrial;Escritório administrativo;Escritório;;-21.149441;-47.785935;CC-3070 Qualidade
+50032;Edna Cardoso;Rodovia SP-330 km 12;544;Centro;Escritório administrativo;COMERCIAL;;-21.16491;-47.812537;CC-3070 Qualidade
+50033;Bruno Almeida;Rodovia SP-330 km 12;309;Distrito de Bonfim;Planta 2 — Centro de distribuição;turno 3;;-21.190697;-47.854513;CC-3070 Qualidade
+50034;Hélio Lima;Rodovia SP-330 km 12;971;Zona Rural Norte;Planta 1 — Fábrica;B;;-21.12306;-47.731805;CC-2040 Logística
+50035;Nilton Esteves;Rodovia SP-330 km 12;837;Jardim Operário;Planta 2 — Centro de distribuição;T2;;-21.181941;-47.799492;CC-1010 Produção
+50036;Jonas Pires;Rua das Palmeiras;1093;Vila Industrial;Planta 1 — Fábrica;2º turno;;-21.151343;-47.795958;CC-5020 Manutenção
+50037;Jonas Barbosa;Rua Dom Pedro;1042;Centro;Escritório administrativo;ADM;;-21.149411;-47.805025;CC-4090 Administrativo
+50038;KÁTIA LIMA;Rua 7 de Setembro;605;Distrito de Bonfim;Planta 1 — Fábrica;A;;-21.21254;-47.872264;CC-2040 Logística
+50039;Márcia Gonçalves;Rua Projetada B;729;Zona Rural Norte;Escritório administrativo;Geral;;-21.078929;-47.790057;CC-5020 Manutenção
+50040;Adriana Farias;Rua das Palmeiras;768;Jardim Operário;Planta 1 — Fábrica;T1;;-21.162106;-47.813575;CC-2040 Logística
+50041;Sérgio Esteves;Av. Industrial;150;Vila Industrial;Planta 2 — Centro de distribuição;turno 2;;-21.142462;-47.784056;CC-3070 Qualidade
+50042;Douglas Pires;Av. dos Trabalhadores;934;Centro;Planta 1 — Fábrica;B;;-21.164016;-47.805191;CC-1010 Produção
+50043;Cláudia Teixeira;Rua Projetada B;1037;Distrito de Bonfim;Planta 2 — Centro de distribuição;C;;-21.212211;-47.871702;CC-4090 Administrativo
+50044;Márcia Nunes;Av. dos Trabalhadores;718;Zona Rural Norte;Planta 1 — Fábrica;turno 1;;-21.092961;-47.722886;CC-5020 Manutenção
+50045;Márcia Gonçalves;Rua 7 de Setembro;674;Jardim Operário;Planta 2 — Centro de distribuição;T1;;-21.174572;-47.821898;CC-4090 Administrativo
+50046;Iara Esteves;Av. Industrial;549;Vila Industrial;Planta 1 — Fábrica;2 TURNO;;-21.153394;-47.783986;CC-4090 Administrativo
+50047;Márcia Almeida;Travessa da Fábrica;1120;Centro;Planta 2 — Centro de distribuição;B;;-21.161789;-47.800584;CC-3070 Qualidade
+50048;Kátia Barbosa;Rua 7 de Setembro;268;Distrito de Bonfim;Escritório administrativo;COMERCIAL;;-21.182183;-47.85849;CC-5020 Manutenção
+50049;Nilton Teixeira;Av. Industrial;551;Zona Rural Norte;Escritório administrativo;COMERCIAL;;-21.060635;-47.757088;CC-2040 Logística
+50050;Odete Lima;Rua das Palmeiras;196;Jardim Operário;Planta 1 — Fábrica;3º turno;;-21.178975;-47.81828;CC-2040 Logística
+50051;Odete Gonçalves;Rodovia SP-330 km 12;1146;Vila Industrial;Planta 2 — Centro de distribuição;2º turno;;-21.154482;-47.778565;CC-3070 Qualidade
+50052;Nilton Barbosa;Travessa da Fábrica;699;Centro;Planta 1 — Fábrica;1 TURNO;;-21.146097;-47.803861;CC-5020 Manutenção
+50053;Paulo Lima;Rua Dom Pedro;45;Distrito de Bonfim;Planta 2 — Centro de distribuição;turno 2;;-21.205016;-47.835602;CC-3070 Qualidade
+50054;Odete Gonçalves;Rua das Palmeiras;842;Zona Rural Norte;Planta 1 — Fábrica;T2;;-21.102932;-47.786031;CC-5020 Manutenção
+50055;Sérgio Moreira;Av. dos Trabalhadores;1002;Jardim Operário;Escritório administrativo;COMERCIAL;;-21.158084;-47.830757;CC-3070 Qualidade
+50056;Fernando Cardoso;Rodovia SP-330 km 12;s/n;Vila Industrial;Escritório administrativo;Geral;-;;;CC-1010 Produção
+50057;VAGNER GONÇALVES;Rua Dom Pedro;1053;Centro;Planta 2 — Centro de distribuição;1º turno;;-21.168055;-47.79819;CC-3070 Qualidade
+50058;Paulo Esteves;Rua Projetada B;s/n;Distrito de Bonfim;Planta 1 — Fábrica;B;;;;CC-5020 Manutenção
+50059;Gisele Esteves;Rua das Palmeiras;71;Zona Rural Norte;Planta 2 — Centro de distribuição;2 TURNO;;-21.088878;-47.744046;CC-2040 Logística
+50060;Edna Lima;Rua das Palmeiras;381;Jardim Operário;Escritório administrativo;Administrativo;;-21.163644;-47.808401;CC-5020 Manutenção
+50061;Paulo Almeida;Rua Projetada B;318;Vila Industrial;Planta 2 — Centro de distribuição;1 TURNO;;-21.145478;-47.793837;CC-5020 Manutenção
+50062;Bruno Teixeira;Rua 7 de Setembro;674;Centro;Planta 1 — Fábrica;T1;;-21.166728;-47.808237;CC-2040 Logística
+50063;Cláudia Ramos;Travessa da Fábrica;436;Distrito de Bonfim;Planta 2 — Centro de distribuição;3 TURNO;;-21.196356;-47.873283;CC-4090 Administrativo
+50064;Nilton Santos;Travessa da Fábrica;1145;Zona Rural Norte;Escritório administrativo;Geral;;-21.064489;-47.767138;CC-2040 Logística
+50065;Gisele Duarte;Av. Industrial;353;Jardim Operário;Planta 2 — Centro de distribuição;3º turno;;-21.177236;-47.830134;CC-2040 Logística
+50066;Nilton Almeida;Rua 7 de Setembro;589;Vila Industrial;Planta 1 — Fábrica;2 TURNO;;-21.139749;-47.797872;CC-4090 Administrativo
+50067;Renata Santos;Rua Dom Pedro;s/n;Centro;Escritório administrativo;Geral;;;;CC-3070 Qualidade
+50068;Odete Queiroz;Av. dos Trabalhadores;522;Distrito de Bonfim;Planta 1 — Fábrica;T2;;-21.182461;-47.87048;CC-3070 Qualidade
+50069;Sérgio Duarte;Rodovia SP-330 km 12;927;Zona Rural Norte;Escritório administrativo;Geral;;-21.088207;-47.753464;CC-5020 Manutenção
+50070;Odete Teixeira;Rua Projetada B;189;Jardim Operário;Planta 1 — Fábrica;2º turno;;-21.172286;-47.810013;CC-3070 Qualidade
+50071;Adriana Barbosa;Av. dos Trabalhadores;314;Vila Industrial;Planta 2 — Centro de distribuição;3 TURNO;NÃO;-21.15519;-47.793869;CC-2040 Logística
+50072;Kátia Santos;Rua Projetada B;85;Centro;Planta 1 — Fábrica;turno 3;;-21.169059;-47.803981;CC-2040 Logística
+50073;Odete Gonçalves;Rua das Palmeiras;1022;Distrito de Bonfim;Planta 2 — Centro de distribuição;3º turno;;-47.871528;-21.223026;CC-1010 Produção
+50074;Renata Santos;Rua Projetada B;1189;Zona Rural Norte;Escritório administrativo;ADM;;-21.082999;-47.780397;CC-5020 Manutenção
+50075;Fernando Duarte;Travessa da Fábrica;831;Jardim Operário;Planta 2 — Centro de distribuição;T2;;-21.182999;-47.822861;CC-4090 Administrativo
+50076;MÁRCIA ALMEIDA;Rua 7 de Setembro;767;Vila Industrial;Planta 1 — Fábrica;T1;;-21.149919;-47.797341;CC-1010 Produção
+50077;Gisele Duarte;Travessa da Fábrica;1056;Centro;Escritório administrativo;ADM;NÃO;-21.146523;-47.800391;CC-2040 Logística
+50078;Paulo Barbosa;Rua 7 de Setembro;90;Distrito de Bonfim;Planta 1 — Fábrica;turno 1;não;-21.191408;-47.854067;CC-1010 Produção
+50079;Sérgio Farias;Rua das Palmeiras;1110;Zona Rural Norte;Planta 2 — Centro de distribuição;2 TURNO;;-21.131435;-47.768117;CC-4090 Administrativo
+50080;Odete Cardoso;Rua Dom Pedro;352;Jardim Operário;Planta 1 — Fábrica;1º turno;;-21.175536;-47.810171;CC-2040 Logística
+50081;Renata Nunes;Rua das Palmeiras;s/n;Vila Industrial;Planta 2 — Centro de distribuição;2 TURNO;;;;CC-2040 Logística
+50082;Tânia Henriques;Av. dos Trabalhadores;360;Centro;Escritório administrativo;Escritório;;-21.161499;-47.812428;CC-2040 Logística
+50083;Adriana Queiroz;Av. dos Trabalhadores;1050;Distrito de Bonfim;Planta 2 — Centro de distribuição;1 TURNO;;-21.222108;-47.878052;CC-5020 Manutenção
+50084;Adriana Lima;Rua Dom Pedro;629;Zona Rural Norte;Planta 1 — Fábrica;A;;-21.099138;-47.733831;CC-1010 Produção
+50085;Kátia Farias;Rua Dom Pedro;1030;Jardim Operário;Planta 2 — Centro de distribuição;turno 3;;-21.169349;-47.800903;CC-2040 Logística
+50086;Adriana Moreira;Rua Dom Pedro;s/n;Vila Industrial;Planta 1 — Fábrica;turno 1;;;;CC-1010 Produção
+50087;Odete Duarte;Rua Projetada B;s/n;Centro;Planta 2 — Centro de distribuição;1 TURNO;;;;CC-4090 Administrativo
+50088;Jonas Lima;Rua Dom Pedro;209;Distrito de Bonfim;Planta 1 — Fábrica;B;;-21.232423;-47.85468;CC-2040 Logística
+50089;Gisele Moreira;Av. dos Trabalhadores;340;Zona Rural Norte;Planta 2 — Centro de distribuição;T3;;-21.134556;-47.735995;CC-2040 Logística
+50090;Vagner Nunes;Rodovia SP-330 km 12;1103;Jardim Operário;Planta 1 — Fábrica;turno 3;;-21.17865;-47.822764;CC-3070 Qualidade
+50091;Odete Henriques;Rua 7 de Setembro;348;Vila Industrial;Planta 2 — Centro de distribuição;turno 1;;-21.151381;-47.804542;CC-2040 Logística
+50092;Odete Queiroz;Rodovia SP-330 km 12;692;Centro;Planta 1 — Fábrica;C;;-21.165936;-47.809721;CC-4090 Administrativo
+50093;Hélio Moreira;Av. dos Trabalhadores;s/n;Distrito de Bonfim;Escritório administrativo;Escritório;;;;CC-1010 Produção
+50094;Nilton Ramos;Estrada do Contorno;s/n;Zona Rural Norte;Planta 1 — Fábrica;B;;;;CC-3070 Qualidade
+50095;ADRIANA DUARTE;Rua Dom Pedro;892;Jardim Operário;Planta 2 — Centro de distribuição;A;;-21.180436;-47.824529;CC-1010 Produção
+50096;Sérgio Cardoso;Av. dos Trabalhadores;1057;Vila Industrial;Escritório administrativo;ADM;;-21.158908;-47.783316;CC-3070 Qualidade
+50097;Jonas Almeida;Rua Projetada B;204;Centro;Planta 2 — Centro de distribuição;T1;;-21.160875;-47.798579;CC-2040 Logística
+50097;Jonas Almeida;Rua Projetada B;204;Centro;Planta 1 — Fábrica;T1;;-21.160875;-47.798579;CC-2040 Logística
+50098;Sérgio Teixeira;Travessa da Fábrica;955;Distrito de Bonfim;Planta 1 — Fábrica;T2;não;-21.191543;-47.851858;CC-5020 Manutenção
+50099;Nilton Esteves;Travessa da Fábrica;1020;Zona Rural Norte;Planta 2 — Centro de distribuição;T1;;-21.13968;-47.739163;CC-3070 Qualidade
+50100;Douglas Barbosa;Rodovia SP-330 km 12;509;Jardim Operário;Planta 1 — Fábrica;turno 2;;-21.154508;-47.807866;CC-2040 Logística
+50101;Adriana Esteves;Av. Industrial;464;Vila Industrial;Planta 2 — Centro de distribuição;2 TURNO;não;-21.150736;-47.775606;CC-1010 Produção
+50102;Nilton Cardoso;Rua 7 de Setembro;480;Centro;Planta 1 — Fábrica;B;;-21.162699;-47.792877;CC-5020 Manutenção
+50103;Nilton Lima;Rua 7 de Setembro;426;Distrito de Bonfim;Planta 2 — Centro de distribuição;A;;-21.221867;-47.862926;CC-3070 Qualidade
+50104;Renata Moreira;Estrada do Contorno;692;Zona Rural Norte;Escritório administrativo;COMERCIAL;;-21.083327;-47.777264;CC-1010 Produção
+50105;Kátia Queiroz;Av. dos Trabalhadores;882;Jardim Operário;Planta 2 — Centro de distribuição;turno 3;;-21.182902;-47.825501;CC-5020 Manutenção
+50106;Márcia Pires;Travessa da Fábrica;21;Vila Industrial;Planta 1 — Fábrica;1 TURNO;;-21.151305;-47.804276;CC-1010 Produção
+50107;Vagner Almeida;Av. Industrial;678;Centro;Escritório administrativo;Escritório;;-21.147369;-47.80464;CC-3070 Qualidade
+50108;Iara Almeida;Av. dos Trabalhadores;1106;Distrito de Bonfim;Planta 1 — Fábrica;turno 1;;-21.203762;-47.850727;CC-5020 Manutenção
+50109;Sérgio Barbosa;Av. Industrial;215;Zona Rural Norte;Planta 2 — Centro de distribuição;T1;?;-21.115719;-47.751147;CC-4090 Administrativo
+50110;Bruno Esteves;Rua 7 de Setembro;s/n;Jardim Operário;Planta 1 — Fábrica;turno 2;não;;;CC-5020 Manutenção
+50111;Odete Gonçalves;Rodovia SP-330 km 12;338;Vila Industrial;Escritório administrativo;Geral;;-21.142345;-47.779524;CC-1010 Produção
+50112;Cláudia Santos;Rua Dom Pedro;2;Centro;Escritório administrativo;COMERCIAL;;-21.16761;-47.801662;CC-1010 Produção
+50113;Edna Ramos;Estrada do Contorno;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;1 TURNO;;;;CC-3070 Qualidade
+50114;ADRIANA DUARTE;Rua das Palmeiras;752;Zona Rural Norte;Planta 1 — Fábrica;A;;-21.128106;-47.725768;CC-3070 Qualidade
+50115;Sérgio Henriques;Rodovia SP-330 km 12;150;Jardim Operário;Planta 2 — Centro de distribuição;1º turno;;-21.175054;-47.800574;CC-3070 Qualidade
+50116;Edna Farias;Travessa da Fábrica;744;Vila Industrial;Planta 1 — Fábrica;1º turno;;-21.154234;-47.799476;CC-2040 Logística
+50117;Leandro Teixeira;Rodovia SP-330 km 12;101;Centro;Planta 2 — Centro de distribuição;A;;-21.150109;-47.794015;CC-2040 Logística
+50118;Iara Teixeira;Rua Projetada B;212;Distrito de Bonfim;Planta 1 — Fábrica;3º turno;;-21.21065;-47.84443;CC-3070 Qualidade
+50119;Nilton Cardoso;Rua das Palmeiras;140;Zona Rural Norte;Planta 2 — Centro de distribuição;2 TURNO;;-21.070251;-47.72794;CC-1010 Produção
+50120;Gisele Gonçalves;Av. dos Trabalhadores;193;Jardim Operário;Escritório administrativo;COMERCIAL;;-21.160209;-47.815958;CC-5020 Manutenção
+50121;Nilton Nunes;Travessa da Fábrica;1001;Vila Industrial;Planta 2 — Centro de distribuição;turno 2;;-21.135778;-47.786087;CC-3070 Qualidade
+50122;Leandro Gonçalves;Rua Projetada B;1101;Centro;Planta 1 — Fábrica;T2;;-21.162909;-47.808497;CC-1010 Produção
+50123;Nilton Santos;Travessa da Fábrica;827;Distrito de Bonfim;Escritório administrativo;ADM;;-21.222266;-47.872281;CC-3070 Qualidade
+50124;Douglas Lima;Estrada do Contorno;943;Zona Rural Norte;Planta 1 — Fábrica;T1;;-21.11542;-47.779969;CC-5020 Manutenção
+50125;Paulo Pires;Estrada do Contorno;s/n;Jardim Operário;Planta 2 — Centro de distribuição;A;;;;CC-3070 Qualidade
+50126;Nilton Moreira;Rua Projetada B;754;Vila Industrial;Planta 1 — Fábrica;2º turno;;-21.155357;-47.787582;CC-5020 Manutenção
+50127;Tânia Teixeira;Av. dos Trabalhadores;1127;Centro;Planta 2 — Centro de distribuição;T1;;-21.160311;-47.813096;CC-3070 Qualidade
+50128;Fernando Cardoso;Rua Projetada B;956;Distrito de Bonfim;Planta 1 — Fábrica;turno 2;;-21.200691;-47.888672;CC-3070 Qualidade
+50129;Jonas Cardoso;Av. Industrial;794;Zona Rural Norte;Planta 2 — Centro de distribuição;C;;-21.075775;-47.780193;CC-3070 Qualidade
+50130;Nilton Cardoso;Rua Dom Pedro;507;Jardim Operário;Planta 1 — Fábrica;1 TURNO;;-21.165312;-47.810643;CC-3070 Qualidade
+50131;Hélio Lima;Rua 7 de Setembro;986;Vila Industrial;Planta 2 — Centro de distribuição;2 TURNO;;-21.156556;-47.803828;CC-5020 Manutenção
+50132;Cláudia Esteves;Av. Industrial;759;Centro;Planta 1 — Fábrica;turno 1;;-21.150221;-47.802613;CC-1010 Produção
+50133;SÉRGIO ALMEIDA;Av. dos Trabalhadores;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;1º turno;;;;CC-4090 Administrativo
+50134;Bruno Almeida;Rua Dom Pedro;1010;Zona Rural Norte;Planta 1 — Fábrica;2º turno;N;-21.097542;-47.781853;CC-1010 Produção
+50135;Leandro Santos;Travessa da Fábrica;1084;Jardim Operário;Planta 2 — Centro de distribuição;T1;-;-21.184355;-47.817297;CC-4090 Administrativo
+50136;Cláudia Duarte;Rua das Palmeiras;503;Vila Industrial;Planta 1 — Fábrica;A;;-21.146761;-47.788122;CC-1010 Produção
+50137;Bruno Moreira;Rua Projetada B;404;Centro;Planta 2 — Centro de distribuição;turno 1;N;-21.15131;-47.805183;CC-4090 Administrativo
+50138;Paulo Duarte;Rua das Palmeiras;168;Distrito de Bonfim;Planta 1 — Fábrica;1º turno;;-21.198739;-47.874667;CC-1010 Produção
+50139;Renata Cardoso;Rua das Palmeiras;695;Zona Rural Norte;Escritório administrativo;Escritório;;-21.079854;-47.783657;CC-2040 Logística
+50140;Tânia Farias;Estrada do Contorno;s/n;Jardim Operário;Planta 1 — Fábrica;1º turno;;;;CC-2040 Logística
+50141;Paulo Duarte;Av. Industrial;599;Vila Industrial;Planta 2 — Centro de distribuição;turno 2;não;-21.156052;-47.792311;CC-4090 Administrativo
+50142;Paulo Nunes;Estrada do Contorno;676;Centro;Planta 1 — Fábrica;T1;;-21.161161;-47.795578;CC-4090 Administrativo
+50143;Renata Esteves;Rodovia SP-330 km 12;187;Distrito de Bonfim;Escritório administrativo;Administrativo;;-21.217696;-47.867165;CC-4090 Administrativo
+50144;Fernando Queiroz;Rua Dom Pedro;1059;Zona Rural Norte;Planta 1 — Fábrica;1º turno;;-21.100123;-47.789726;CC-5020 Manutenção
+50145;Fernando Almeida;Rua 7 de Setembro;s/n;Jardim Operário;Planta 2 — Centro de distribuição;2º turno;;;;CC-1010 Produção
+50146;Jonas Esteves;Rua das Palmeiras;748;Vila Industrial;Planta 1 — Fábrica;T2;;-47.794571;-21.137341;CC-1010 Produção
+50147;Sérgio Santos;Rua das Palmeiras;216;Centro;Planta 2 — Centro de distribuição;1º turno;;-21.149658;-47.795119;CC-2040 Logística
+50148;Kátia Farias;Estrada do Contorno;964;Distrito de Bonfim;Planta 1 — Fábrica;B;NÃO;-21.205896;-47.885843;CC-2040 Logística
+50149;Odete Queiroz;Rua Projetada B;224;Zona Rural Norte;Planta 2 — Centro de distribuição;3º turno;;-21.074773;-47.731911;CC-5020 Manutenção
+50150;Leandro Queiroz;Rua Projetada B;1188;Jardim Operário;Planta 1 — Fábrica;turno 1;;-21.164962;-47.806301;CC-3070 Qualidade
+50151;Gisele Lima;Av. dos Trabalhadores;70;Vila Industrial;Planta 2 — Centro de distribuição;T1;;-21.147516;-47.804781;CC-3070 Qualidade
+50152;DOUGLAS BARBOSA;Travessa da Fábrica;s/n;Centro;Planta 1 — Fábrica;T3;;;;CC-4090 Administrativo
+50153;Cláudia Duarte;Av. dos Trabalhadores;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;T1;;;;CC-5020 Manutenção
+50154;Leandro Barbosa;Av. Industrial;666;Zona Rural Norte;Planta 1 — Fábrica;2 TURNO;;-21.128221;-47.741186;CC-4090 Administrativo
+50155;Cláudia Barbosa;Rua das Palmeiras;321;Jardim Operário;Planta 2 — Centro de distribuição;T1;;-21.160775;-47.813537;CC-2040 Logística
+50156;Adriana Pires;Rua 7 de Setembro;240;Vila Industrial;Escritório administrativo;Geral;sim;-21.152134;-47.774956;CC-3070 Qualidade
+50157;Douglas Almeida;Av. Industrial;466;Centro;Escritório administrativo;COMERCIAL;;-21.156042;-47.794455;CC-1010 Produção
+50158;Edna Farias;Rua Projetada B;420;Distrito de Bonfim;Planta 1 — Fábrica;turno 1;;-21.196853;-47.880617;CC-5020 Manutenção
+50159;Odete Teixeira;Rua Dom Pedro;587;Zona Rural Norte;Planta 2 — Centro de distribuição;turno 2;;-21.073847;-47.758035;CC-3070 Qualidade
+50160;Jonas Esteves;Av. Industrial;321;Jardim Operário;Planta 1 — Fábrica;A;;-21.186636;-47.80723;CC-4090 Administrativo
+50161;Jonas Lima;Travessa da Fábrica;181;Vila Industrial;Planta 2 — Centro de distribuição;3º turno;;-21.157267;-47.784796;CC-4090 Administrativo
+50162;Bruno Pires;Rua das Palmeiras;1170;Centro;Planta 1 — Fábrica;turno 2;;-21.167205;-47.795774;CC-4090 Administrativo
+50163;Iara Henriques;Rua Dom Pedro;797;Distrito de Bonfim;Planta 2 — Centro de distribuição;A;;-21.180174;-47.872356;CC-4090 Administrativo
+50164;Douglas Almeida;Rua Projetada B;s/n;Zona Rural Norte;Planta 1 — Fábrica;C;;;;CC-1010 Produção
+50165;Hélio Santos;Rua Dom Pedro;862;Jardim Operário;Planta 2 — Centro de distribuição;turno 1;sim;-21.187649;-47.81946;CC-1010 Produção
+50166;Paulo Nunes;Rua 7 de Setembro;1119;Vila Industrial;Planta 1 — Fábrica;T2;;-21.154181;-47.786163;CC-5020 Manutenção
+50167;Fernando Barbosa;Rua Dom Pedro;s/n;Centro;Planta 2 — Centro de distribuição;T3;;;;CC-5020 Manutenção
+50168;Odete Ramos;Travessa da Fábrica;182;Distrito de Bonfim;Planta 1 — Fábrica;T2;;-21.183168;-47.8735;CC-5020 Manutenção
+50169;Renata Teixeira;Rua Dom Pedro;343;Zona Rural Norte;Planta 2 — Centro de distribuição;T2;;-21.085268;-47.730602;CC-1010 Produção
+50170;Cláudia Ramos;Rua Dom Pedro;1021;Jardim Operário;Escritório administrativo;Geral;;-21.178064;-47.822362;CC-4090 Administrativo
+50171;EDNA LIMA;Rua 7 de Setembro;871;Vila Industrial;Escritório administrativo;Escritório;;-21.14183;-47.801611;CC-2040 Logística
+50172;Gisele Duarte;Av. Industrial;587;Centro;Planta 1 — Fábrica;T2;;-21.166748;-47.799502;CC-2040 Logística
+50173;Jonas Moreira;Rua Dom Pedro;719;Distrito de Bonfim;Planta 2 — Centro de distribuição;2º turno;;-21.185639;-47.862672;CC-5020 Manutenção
+50174;Tânia Barbosa;Rua Projetada B;1045;Zona Rural Norte;Escritório administrativo;Escritório;NÃO;-21.065202;-47.742873;CC-2040 Logística
+50175;Fernando Santos;Rua Dom Pedro;1158;Jardim Operário;Escritório administrativo;COMERCIAL;;-21.163342;-47.798624;CC-4090 Administrativo
+50176;Cláudia Pires;Av. dos Trabalhadores;s/n;Vila Industrial;Planta 1 — Fábrica;3º turno;;;;CC-1010 Produção
+50177;Paulo Moreira;Estrada do Contorno;962;Centro;Planta 2 — Centro de distribuição;T1;;-21.161988;-47.794685;CC-4090 Administrativo
+50178;Gisele Moreira;Rua 7 de Setembro;645;Distrito de Bonfim;Planta 1 — Fábrica;T1;?;-21.197615;-47.884407;CC-1010 Produção
+50179;Cláudia Moreira;Rua Projetada B;s/n;Zona Rural Norte;Planta 2 — Centro de distribuição;2 TURNO;;;;CC-5020 Manutenção
+50180;Jonas Nunes;Rodovia SP-330 km 12;s/n;Jardim Operário;Planta 1 — Fábrica;3 TURNO;;;;CC-3070 Qualidade
+50181;Sérgio Duarte;Av. dos Trabalhadores;878;Vila Industrial;Escritório administrativo;ADM;;-21.148281;-47.79504;CC-1010 Produção
+50182;Sérgio Gonçalves;Rua Projetada B;133;Centro;Escritório administrativo;ADM;;-21.150181;-47.808422;CC-1010 Produção
+50183;Tânia Nunes;Av. Industrial;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;3 TURNO;;;;CC-3070 Qualidade
+50184;Paulo Pires;Av. Industrial;102;Zona Rural Norte;Planta 1 — Fábrica;3º turno;;-21.112784;-47.773981;CC-5020 Manutenção
+50185;Bruno Farias;Rua das Palmeiras;s/n;Jardim Operário;Escritório administrativo;COMERCIAL;;;;CC-3070 Qualidade
+50186;Hélio Cardoso;Rua Projetada B;1160;Vila Industrial;Escritório administrativo;Escritório;;-21.158261;-47.789254;CC-1010 Produção
+50187;Nilton Nunes;Rodovia SP-330 km 12;24;Centro;Escritório administrativo;COMERCIAL;;-21.158816;-47.796068;CC-5020 Manutenção
+50188;Renata Barbosa;Rua Projetada B;283;Distrito de Bonfim;Planta 1 — Fábrica;3 TURNO;;-21.223464;-47.862561;CC-3070 Qualidade
+50189;Kátia Ramos;Rua 7 de Setembro;60;Zona Rural Norte;Planta 2 — Centro de distribuição;1 TURNO;;-21.062273;-47.765868;CC-2040 Logística
+50190;LEANDRO TEIXEIRA;Rua Projetada B;791;Jardim Operário;Escritório administrativo;Geral;;-21.179749;-47.82082;CC-1010 Produção
+50191;Jonas Gonçalves;Rua 7 de Setembro;455;Vila Industrial;Planta 2 — Centro de distribuição;T1;;-21.144549;-47.791708;CC-4090 Administrativo
+50192;Odete Santos;Rua Projetada B;1162;Centro;Planta 1 — Fábrica;T2;;-21.156213;-47.811662;CC-3070 Qualidade
+50193;Iara Cardoso;Rua 7 de Setembro;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;T2;N;;;CC-4090 Administrativo
+50194;Vagner Nunes;Av. dos Trabalhadores;565;Zona Rural Norte;Planta 1 — Fábrica;turno 2;sim;-21.078731;-47.763366;CC-1010 Produção
+50194;Vagner Nunes;Av. dos Trabalhadores;565;Zona Rural Norte;Planta 2 — Centro de distribuição;turno 2;sim;-21.078731;-47.763366;CC-1010 Produção
+50195;Renata Barbosa;Av. Industrial;s/n;Jardim Operário;Planta 2 — Centro de distribuição;turno 3;;;;CC-3070 Qualidade
+50196;Márcia Queiroz;Rua das Palmeiras;380;Vila Industrial;Planta 1 — Fábrica;A;;-21.140415;-47.777378;CC-5020 Manutenção
+50197;Kátia Esteves;Av. dos Trabalhadores;955;Centro;Planta 2 — Centro de distribuição;C;;-21.168258;-47.80655;CC-4090 Administrativo
+50198;Sérgio Cardoso;Rua Projetada B;246;Distrito de Bonfim;Escritório administrativo;Escritório;;-21.226891;-47.861801;CC-5020 Manutenção
+50199;Leandro Nunes;Rua 7 de Setembro;1084;Zona Rural Norte;Planta 2 — Centro de distribuição;2º turno;não;-21.07149;-47.75794;CC-4090 Administrativo
+50200;Paulo Barbosa;Rua Projetada B;384;Jardim Operário;Planta 1 — Fábrica;2 TURNO;;-21.17956;-47.815134;CC-5020 Manutenção
+50201;Odete Cardoso;Rua 7 de Setembro;87;Vila Industrial;Planta 2 — Centro de distribuição;2º turno;;-21.143726;-47.794679;CC-1010 Produção
+50202;Tânia Cardoso;Av. dos Trabalhadores;s/n;Centro;Planta 1 — Fábrica;turno 2;;;;CC-3070 Qualidade
+50203;Renata Barbosa;Av. dos Trabalhadores;619;Distrito de Bonfim;Planta 2 — Centro de distribuição;2 TURNO;;-21.234923;-47.861257;CC-1010 Produção
+50204;Adriana Duarte;Estrada do Contorno;s/n;Zona Rural Norte;Escritório administrativo;Geral;;;;CC-4090 Administrativo
+50205;Cláudia Teixeira;Rua 7 de Setembro;434;Jardim Operário;Escritório administrativo;COMERCIAL;;-21.167801;-47.834738;CC-1010 Produção
+50206;Kátia Gonçalves;Rua 7 de Setembro;990;Vila Industrial;Planta 1 — Fábrica;T2;;-21.146062;-47.780218;CC-4090 Administrativo
+50207;Gisele Esteves;Rodovia SP-330 km 12;1000;Centro;Planta 2 — Centro de distribuição;turno 1;;-21.157719;-47.810602;CC-2040 Logística
+50208;Odete Lima;Rua das Palmeiras;s/n;Distrito de Bonfim;Planta 1 — Fábrica;A;;;;CC-3070 Qualidade
+50209;FERNANDO FARIAS;Rua 7 de Setembro;s/n;Zona Rural Norte;Planta 2 — Centro de distribuição;1º turno;;;;CC-5020 Manutenção
+50210;Cláudia Gonçalves;Av. dos Trabalhadores;972;Jardim Operário;Escritório administrativo;COMERCIAL;-;-21.173962;-47.799554;CC-3070 Qualidade
+50211;Cláudia Nunes;Av. Industrial;280;Vila Industrial;Escritório administrativo;COMERCIAL;;-21.143651;-47.778568;CC-2040 Logística
+50212;Adriana Moreira;Rua Projetada B;369;Centro;Planta 1 — Fábrica;turno 3;-;-21.15475;-47.805706;CC-5020 Manutenção
+50213;Kátia Henriques;Travessa da Fábrica;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;T2;;;;CC-3070 Qualidade
+50214;Edna Queiroz;Av. Industrial;1047;Zona Rural Norte;Planta 1 — Fábrica;2º turno;;-21.124303;-47.748472;CC-1010 Produção
+50215;Odete Cardoso;Travessa da Fábrica;366;Jardim Operário;Planta 2 — Centro de distribuição;1º turno;;-21.156705;-47.829466;CC-3070 Qualidade
+50216;Renata Henriques;Rua 7 de Setembro;69;Vila Industrial;Planta 1 — Fábrica;A;;-21.1419;-47.778966;CC-2040 Logística
+50217;Hélio Henriques;Rua das Palmeiras;870;Centro;Planta 2 — Centro de distribuição;T2;-;-21.146045;-47.802966;CC-2040 Logística
+50218;Edna Santos;Estrada do Contorno;540;Distrito de Bonfim;Planta 1 — Fábrica;2 TURNO;;-21.215953;-47.839918;CC-3070 Qualidade
+50219;Leandro Cardoso;Av. dos Trabalhadores;s/n;Zona Rural Norte;Planta 2 — Centro de distribuição;B;;;;CC-5020 Manutenção
+50220;Fernando Cardoso;Estrada do Contorno;1139;Jardim Operário;Planta 1 — Fábrica;turno 2;;-21.165427;-47.802603;CC-2040 Logística
+50221;Odete Pires;Rodovia SP-330 km 12;s/n;Vila Industrial;Planta 2 — Centro de distribuição;turno 1;;;;CC-1010 Produção
+50222;Sérgio Gonçalves;Av. dos Trabalhadores;s/n;Centro;Planta 1 — Fábrica;3º turno;;;;CC-5020 Manutenção
+50223;Fernando Nunes;Travessa da Fábrica;394;Distrito de Bonfim;Planta 2 — Centro de distribuição;T2;;-21.229759;-47.852661;CC-5020 Manutenção
+50224;Bruno Queiroz;Rua 7 de Setembro;671;Zona Rural Norte;Escritório administrativo;Administrativo;;-21.095511;-47.730149;CC-2040 Logística
+50225;Nilton Almeida;Travessa da Fábrica;321;Jardim Operário;Planta 2 — Centro de distribuição;turno 1;;-21.174179;-47.798705;CC-2040 Logística
+50226;Fernando Nunes;Rua Projetada B;694;Vila Industrial;Escritório administrativo;Escritório;;-21.156573;-47.776317;CC-3070 Qualidade
+50227;Edna Ramos;Rodovia SP-330 km 12;712;Centro;Planta 2 — Centro de distribuição;A;;-21.154213;-47.805208;CC-2040 Logística
+50228;RENATA HENRIQUES;Travessa da Fábrica;975;Distrito de Bonfim;Escritório administrativo;ADM;;-21.207786;-47.889454;CC-2040 Logística
+50229;Cláudia Santos;Av. Industrial;809;Zona Rural Norte;Planta 2 — Centro de distribuição;B;;-21.071043;-47.763263;CC-4090 Administrativo
+50230;Márcia Moreira;Estrada do Contorno;s/n;Jardim Operário;Escritório administrativo;Escritório;;;;CC-5020 Manutenção
+50231;Douglas Santos;Rua 7 de Setembro;257;Vila Industrial;Planta 2 — Centro de distribuição;3º turno;;-21.152212;-47.797343;CC-5020 Manutenção
+50232;Nilton Queiroz;Av. dos Trabalhadores;547;Centro;Planta 1 — Fábrica;turno 1;;-21.169111;-47.80646;CC-3070 Qualidade
+50233;Jonas Teixeira;Estrada do Contorno;865;Distrito de Bonfim;Planta 2 — Centro de distribuição;turno 2;;-21.219039;-47.875491;CC-2040 Logística
+50234;Adriana Moreira;Rodovia SP-330 km 12;482;Zona Rural Norte;Planta 1 — Fábrica;1º turno;;-21.083559;-47.767924;CC-5020 Manutenção
+50235;Fernando Barbosa;Av. Industrial;763;Jardim Operário;Planta 2 — Centro de distribuição;1º turno;;-21.170646;-47.831215;CC-4090 Administrativo
+50236;Renata Teixeira;Estrada do Contorno;173;Vila Industrial;Planta 1 — Fábrica;turno 1;;-21.149668;-47.798743;CC-4090 Administrativo
+50237;Leandro Cardoso;Av. dos Trabalhadores;s/n;Centro;Escritório administrativo;COMERCIAL;;;;CC-4090 Administrativo
+50238;Kátia Duarte;Rua das Palmeiras;107;Distrito de Bonfim;Planta 1 — Fábrica;T2;;-21.191193;-47.845528;CC-2040 Logística
+50239;Márcia Queiroz;Rua Projetada B;804;Zona Rural Norte;Escritório administrativo;Escritório;;-21.129261;-47.752921;CC-1010 Produção
+50240;Márcia Teixeira;Av. Industrial;1162;Jardim Operário;Planta 1 — Fábrica;C;;-21.172143;-47.799798;CC-1010 Produção
+50241;Vagner Gonçalves;Travessa da Fábrica;s/n;Vila Industrial;Escritório administrativo;COMERCIAL;;;;CC-2040 Logística
+50242;Edna Moreira;Av. Industrial;1129;Centro;Planta 1 — Fábrica;2 TURNO;;-21.151541;-47.802574;CC-5020 Manutenção
+50243;Adriana Teixeira;Av. dos Trabalhadores;74;Distrito de Bonfim;Escritório administrativo;COMERCIAL;;-21.198957;-47.882938;CC-4090 Administrativo
+50244;Iara Moreira;Rua das Palmeiras;979;Zona Rural Norte;Planta 1 — Fábrica;turno 1;não;-21.08279;-47.730002;CC-5020 Manutenção
+50245;Nilton Nunes;Travessa da Fábrica;98;Jardim Operário;Planta 2 — Centro de distribuição;A;;-21.175088;-47.818427;CC-4090 Administrativo
+50246;Nilton Cardoso;Travessa da Fábrica;218;Vila Industrial;Planta 1 — Fábrica;turno 3;;-21.134923;-47.78569;CC-2040 Logística
+50247;MÁRCIA FARIAS;Rua das Palmeiras;926;Centro;Planta 2 — Centro de distribuição;A;-;-21.163628;-47.812091;CC-4090 Administrativo
+50248;Jonas Nunes;Rua 7 de Setembro;661;Distrito de Bonfim;Planta 1 — Fábrica;3º turno;;-21.192469;-47.878856;CC-3070 Qualidade
+50249;Adriana Lima;Travessa da Fábrica;866;Zona Rural Norte;Escritório administrativo;ADM;;-21.063358;-47.738524;CC-3070 Qualidade
+50250;Gisele Cardoso;Estrada do Contorno;694;Jardim Operário;Escritório administrativo;Escritório;;-21.153568;-47.805448;CC-1010 Produção
+50251;Nilton Farias;Av. dos Trabalhadores;381;Vila Industrial;Planta 2 — Centro de distribuição;1 TURNO;;-21.155135;-47.790209;CC-4090 Administrativo
+50252;Leandro Gonçalves;Travessa da Fábrica;930;Centro;Planta 1 — Fábrica;1 TURNO;;-21.153804;-47.793749;CC-5020 Manutenção
+50253;Sérgio Teixeira;Rua das Palmeiras;276;Distrito de Bonfim;Planta 2 — Centro de distribuição;2º turno;;-21.185477;-47.850232;CC-5020 Manutenção
+50254;Gisele Barbosa;Travessa da Fábrica;167;Zona Rural Norte;Planta 1 — Fábrica;2º turno;-;-21.067589;-47.763367;CC-4090 Administrativo
+50255;Nilton Farias;Rua Dom Pedro;s/n;Jardim Operário;Escritório administrativo;ADM;;;;CC-3070 Qualidade
+50256;Hélio Gonçalves;Rua 7 de Setembro;640;Vila Industrial;Escritório administrativo;Administrativo;;-21.14089;-47.781977;CC-4090 Administrativo
+50257;Adriana Barbosa;Rua das Palmeiras;s/n;Centro;Escritório administrativo;Escritório;;;;CC-4090 Administrativo
+50258;Douglas Esteves;Estrada do Contorno;312;Distrito de Bonfim;Escritório administrativo;Geral;;-21.17625;-47.861537;CC-1010 Produção
+50259;Paulo Barbosa;Rua Projetada B;728;Zona Rural Norte;Planta 2 — Centro de distribuição;1º turno;;-21.114122;-47.755011;CC-1010 Produção
+50260;Gisele Duarte;Rua Dom Pedro;91;Jardim Operário;Planta 1 — Fábrica;1º turno;;-21.174666;-47.830766;CC-3070 Qualidade
+50261;Renata Henriques;Estrada do Contorno;418;Vila Industrial;Planta 2 — Centro de distribuição;C;;-21.160127;-47.779873;CC-3070 Qualidade
+50262;Douglas Barbosa;Rua 7 de Setembro;617;Centro;Escritório administrativo;Administrativo;?;-21.160609;-47.793846;CC-3070 Qualidade
+50263;Hélio Duarte;Av. Industrial;29;Distrito de Bonfim;Escritório administrativo;Geral;NÃO;-21.225865;-47.856364;CC-2040 Logística
+50264;Kátia Santos;Rua Projetada B;250;Zona Rural Norte;Planta 1 — Fábrica;C;;-21.138354;-47.779681;CC-3070 Qualidade
+50265;Gisele Barbosa;Av. Industrial;169;Jardim Operário;Planta 2 — Centro de distribuição;T2;;-21.164998;-47.808685;CC-4090 Administrativo
+50266;EDNA NUNES;Rua Dom Pedro;217;Vila Industrial;Planta 1 — Fábrica;turno 1;;-21.154551;-47.780426;CC-1010 Produção
+50267;Cláudia Farias;Rua Projetada B;s/n;Centro;Planta 2 — Centro de distribuição;C;;;;CC-3070 Qualidade
+50268;Leandro Lima;Estrada do Contorno;562;Distrito de Bonfim;Planta 1 — Fábrica;T3;;-21.227095;-47.8584;CC-2040 Logística
+50269;Tânia Moreira;Av. Industrial;s/n;Zona Rural Norte;Planta 2 — Centro de distribuição;A;;;;CC-1010 Produção
+50270;Cláudia Lima;Rua das Palmeiras;600;Jardim Operário;Planta 1 — Fábrica;T2;;-21.165044;-47.830635;CC-3070 Qualidade
+50271;Tânia Cardoso;Rua das Palmeiras;133;Vila Industrial;Escritório administrativo;Geral;;-21.153748;-47.79744;CC-5020 Manutenção
+50272;Márcia Nunes;Rua 7 de Setembro;318;Centro;Planta 1 — Fábrica;T1;não;-21.162931;-47.80913;CC-3070 Qualidade
+50273;Bruno Santos;Travessa da Fábrica;48;Distrito de Bonfim;Planta 2 — Centro de distribuição;2 TURNO;;-21.188746;-47.843364;CC-4090 Administrativo
+50274;Kátia Queiroz;Av. Industrial;41;Zona Rural Norte;Planta 1 — Fábrica;A;;-21.103808;-47.774204;CC-3070 Qualidade
+50275;Hélio Barbosa;Av. Industrial;706;Jardim Operário;Planta 2 — Centro de distribuição;2º turno;;-21.171834;-47.819608;CC-1010 Produção
+50276;Adriana Duarte;Rua Dom Pedro;s/n;Vila Industrial;Planta 1 — Fábrica;2 TURNO;;;;CC-5020 Manutenção
+50277;Tânia Moreira;Estrada do Contorno;181;Centro;Planta 2 — Centro de distribuição;2º turno;;-21.158894;-47.797924;CC-5020 Manutenção
+50278;Adriana Almeida;Rua das Palmeiras;1151;Distrito de Bonfim;Planta 1 — Fábrica;T3;;-21.228273;-47.84856;CC-5020 Manutenção
+50279;Kátia Gonçalves;Av. Industrial;s/n;Zona Rural Norte;Planta 2 — Centro de distribuição;2º turno;;;;CC-3070 Qualidade
+50280;Vagner Queiroz;Travessa da Fábrica;s/n;Jardim Operário;Planta 1 — Fábrica;C;;;;CC-1010 Produção
+50281;Odete Lima;Travessa da Fábrica;959;Vila Industrial;Planta 2 — Centro de distribuição;2º turno;;-21.140448;-47.78013;CC-3070 Qualidade
+50282;Paulo Nunes;Rodovia SP-330 km 12;s/n;Centro;Escritório administrativo;Administrativo;;;;CC-2040 Logística
+50283;Jonas Pires;Travessa da Fábrica;704;Distrito de Bonfim;Planta 2 — Centro de distribuição;T1;;-21.188389;-47.836864;CC-4090 Administrativo
+50284;Gisele Lima;Rodovia SP-330 km 12;211;Zona Rural Norte;Planta 1 — Fábrica;1 TURNO;;-21.0721;-47.732823;CC-3070 Qualidade
+50285;CLÁUDIA BARBOSA;Av. Industrial;340;Jardim Operário;Planta 2 — Centro de distribuição;1º turno;-;-21.171941;-47.828969;CC-5020 Manutenção
+50286;Adriana Nunes;Estrada do Contorno;776;Vila Industrial;Escritório administrativo;Administrativo;;-21.15076;-47.804811;CC-3070 Qualidade
+50287;Jonas Ramos;Travessa da Fábrica;262;Centro;Escritório administrativo;ADM;;-21.169842;-47.803085;CC-3070 Qualidade
+50288;Douglas Ramos;Av. dos Trabalhadores;14;Distrito de Bonfim;Escritório administrativo;COMERCIAL;;-21.189125;-47.846331;CC-4090 Administrativo
+50289;Kátia Cardoso;Rua Projetada B;731;Zona Rural Norte;Planta 2 — Centro de distribuição;3º turno;;-21.097708;-47.723744;CC-3070 Qualidade
+50290;Sérgio Esteves;Estrada do Contorno;s/n;Jardim Operário;Planta 1 — Fábrica;1 TURNO;;;;CC-4090 Administrativo
+50291;Kátia Pires;Rua Projetada B;76;Vila Industrial;Planta 2 — Centro de distribuição;2º turno;;-21.146079;-47.775654;CC-2040 Logística
+50291;Kátia Pires;Rua Projetada B;76;Vila Industrial;Planta 1 — Fábrica;2º turno;;-21.146079;-47.775654;CC-2040 Logística
+50292;Vagner Queiroz;Travessa da Fábrica;157;Centro;Escritório administrativo;ADM;-;-47.797569;-21.150849;CC-2040 Logística
+50293;Iara Duarte;Rua Dom Pedro;281;Distrito de Bonfim;Planta 2 — Centro de distribuição;B;;-21.222955;-47.863317;CC-2040 Logística
+50294;Vagner Nunes;Rua Dom Pedro;288;Zona Rural Norte;Planta 1 — Fábrica;turno 2;;-21.132032;-47.789191;CC-2040 Logística
+50295;Douglas Barbosa;Rua das Palmeiras;285;Jardim Operário;Planta 2 — Centro de distribuição;turno 2;;-21.15593;-47.808419;CC-3070 Qualidade
+50296;Edna Cardoso;Rua Projetada B;s/n;Vila Industrial;Escritório administrativo;ADM;;;;CC-2040 Logística
+50297;Vagner Nunes;Rua Projetada B;311;Centro;Planta 2 — Centro de distribuição;T3;;-21.147492;-47.80453;CC-3070 Qualidade
+50298;Sérgio Nunes;Estrada do Contorno;1142;Distrito de Bonfim;Escritório administrativo;Escritório;;-21.206376;-47.847108;CC-2040 Logística
+50299;Kátia Queiroz;Rua das Palmeiras;s/n;Zona Rural Norte;Planta 2 — Centro de distribuição;turno 3;não;;;CC-1010 Produção
+50300;Gisele Pires;Rodovia SP-330 km 12;s/n;Jardim Operário;Planta 1 — Fábrica;turno 1;;;;CC-4090 Administrativo
+50301;Sérgio Barbosa;Av. dos Trabalhadores;1160;Vila Industrial;Planta 2 — Centro de distribuição;turno 1;;-21.162691;-47.787138;CC-3070 Qualidade
+50302;Edna Queiroz;Av. Industrial;282;Centro;Escritório administrativo;ADM;não;-21.162019;-47.811149;CC-3070 Qualidade
+50303;Cláudia Teixeira;Rua Dom Pedro;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;1 TURNO;;;;CC-1010 Produção
+50304;ODETE NUNES;Rua das Palmeiras;1159;Zona Rural Norte;Planta 1 — Fábrica;3º turno;-;-21.071149;-47.780603;CC-1010 Produção
+50305;Adriana Almeida;Rodovia SP-330 km 12;792;Jardim Operário;Planta 2 — Centro de distribuição;T1;;-21.16961;-47.826491;CC-1010 Produção
+50306;Tânia Queiroz;Av. Industrial;1070;Vila Industrial;Planta 1 — Fábrica;1 TURNO;;-21.14836;-47.804055;CC-1010 Produção
+50307;Iara Nunes;Rua Dom Pedro;174;Centro;Planta 2 — Centro de distribuição;T1;;-21.161733;-47.797149;CC-3070 Qualidade
+50308;Adriana Pires;Rua 7 de Setembro;342;Distrito de Bonfim;Planta 1 — Fábrica;T1;;-21.228723;-47.873055;CC-5020 Manutenção
+50309;Paulo Almeida;Av. dos Trabalhadores;979;Zona Rural Norte;Planta 2 — Centro de distribuição;A;;-21.114977;-47.725375;CC-5020 Manutenção
+50310;Iara Queiroz;Rodovia SP-330 km 12;853;Jardim Operário;Planta 1 — Fábrica;C;;-21.165198;-47.828312;CC-1010 Produção
+50311;Nilton Pires;Travessa da Fábrica;576;Vila Industrial;Planta 2 — Centro de distribuição;B;;-21.152018;-47.798007;CC-1010 Produção
+50312;Vagner Teixeira;Rua Projetada B;668;Centro;Planta 1 — Fábrica;B;-;-21.150585;-47.80199;CC-4090 Administrativo
+50313;Kátia Moreira;Estrada do Contorno;513;Distrito de Bonfim;Escritório administrativo;Geral;;-21.188957;-47.850893;CC-2040 Logística
+50314;Odete Nunes;Estrada do Contorno;554;Zona Rural Norte;Planta 1 — Fábrica;turno 1;;-21.085144;-47.734288;CC-5020 Manutenção
+50315;Sérgio Queiroz;Rua 7 de Setembro;1049;Jardim Operário;Planta 2 — Centro de distribuição;turno 1;;-21.180235;-47.830058;CC-2040 Logística
+50316;Iara Cardoso;Rua das Palmeiras;s/n;Vila Industrial;Planta 1 — Fábrica;2º turno;;;;CC-4090 Administrativo
+50317;Bruno Ramos;Estrada do Contorno;356;Centro;Planta 2 — Centro de distribuição;turno 2;não;-21.154913;-47.812058;CC-5020 Manutenção
+50318;Edna Teixeira;Rua Dom Pedro;s/n;Distrito de Bonfim;Planta 1 — Fábrica;A;;;;CC-5020 Manutenção
+50319;Márcia Ramos;Travessa da Fábrica;76;Zona Rural Norte;Planta 2 — Centro de distribuição;2 TURNO;;-21.093529;-47.783834;CC-3070 Qualidade
+50320;Kátia Lima;Av. dos Trabalhadores;6;Jardim Operário;Planta 1 — Fábrica;turno 1;;-21.155479;-47.823487;CC-2040 Logística
+50321;Tânia Esteves;Rua das Palmeiras;99;Vila Industrial;Planta 2 — Centro de distribuição;1 TURNO;;-21.148416;-47.784757;CC-3070 Qualidade
+50322;Paulo Duarte;Rodovia SP-330 km 12;708;Centro;Planta 1 — Fábrica;T2;;-21.162606;-47.804477;CC-2040 Logística
+50323;IARA FARIAS;Av. Industrial;1086;Distrito de Bonfim;Escritório administrativo;Escritório;;-21.187217;-47.857894;CC-2040 Logística
+50324;Leandro Farias;Av. Industrial;301;Zona Rural Norte;Planta 1 — Fábrica;turno 2;;-21.114085;-47.752418;CC-4090 Administrativo
+50325;Tânia Farias;Rua 7 de Setembro;518;Jardim Operário;Planta 2 — Centro de distribuição;turno 2;;-21.158;-47.80709;CC-1010 Produção
+50326;Fernando Farias;Av. Industrial;947;Vila Industrial;Planta 1 — Fábrica;2º turno;;-21.155183;-47.789663;CC-2040 Logística
+50327;Cláudia Lima;Av. dos Trabalhadores;s/n;Centro;Escritório administrativo;COMERCIAL;;;;CC-4090 Administrativo
+50328;Adriana Almeida;Rua Dom Pedro;s/n;Distrito de Bonfim;Planta 1 — Fábrica;3º turno;;;;CC-3070 Qualidade
+50329;Kátia Ramos;Rua 7 de Setembro;305;Zona Rural Norte;Planta 2 — Centro de distribuição;1 TURNO;;-21.102302;-47.721112;CC-2040 Logística
+50330;Adriana Duarte;Rua 7 de Setembro;436;Jardim Operário;Escritório administrativo;Administrativo;;-21.174772;-47.821218;CC-3070 Qualidade
+50331;Iara Nunes;Rodovia SP-330 km 12;294;Vila Industrial;Escritório administrativo;Administrativo;;-21.146311;-47.796699;CC-2040 Logística
+50332;Renata Henriques;Av. Industrial;358;Centro;Planta 1 — Fábrica;2º turno;;-21.150535;-47.804665;CC-2040 Logística
+50333;Fernando Moreira;Rua 7 de Setembro;892;Distrito de Bonfim;Planta 2 — Centro de distribuição;2 TURNO;;-21.200836;-47.874426;CC-5020 Manutenção
+50334;Bruno Gonçalves;Rua 7 de Setembro;905;Zona Rural Norte;Planta 1 — Fábrica;B;;-21.126042;-47.767284;CC-5020 Manutenção
+50335;Jonas Pires;Rua das Palmeiras;1041;Jardim Operário;Planta 2 — Centro de distribuição;1 TURNO;;-21.181125;-47.826166;CC-4090 Administrativo
+50336;Jonas Moreira;Av. dos Trabalhadores;508;Vila Industrial;Planta 1 — Fábrica;turno 1;;-21.14526;-47.780079;CC-1010 Produção
+50337;Jonas Ramos;Rua 7 de Setembro;162;Centro;Escritório administrativo;Geral;?;-21.154489;-47.808567;CC-4090 Administrativo
+50338;Bruno Ramos;Estrada do Contorno;713;Distrito de Bonfim;Planta 1 — Fábrica;2º turno;;-21.230465;-47.860291;CC-4090 Administrativo
+50339;Douglas Santos;Av. dos Trabalhadores;108;Zona Rural Norte;Escritório administrativo;Escritório;;-21.071302;-47.732956;CC-1010 Produção
+50340;Hélio Gonçalves;Rua 7 de Setembro;666;Jardim Operário;Planta 1 — Fábrica;A;;-21.170797;-47.804159;CC-4090 Administrativo
+50341;Douglas Cardoso;Rodovia SP-330 km 12;813;Vila Industrial;Planta 2 — Centro de distribuição;B;-;-21.148943;-47.786231;CC-2040 Logística
+50342;FERNANDO MOREIRA;Rua das Palmeiras;680;Centro;Planta 1 — Fábrica;T1;;-21.162281;-47.80761;CC-4090 Administrativo
+50343;Edna Almeida;Av. Industrial;270;Distrito de Bonfim;Escritório administrativo;Administrativo;;-21.205347;-47.871705;CC-3070 Qualidade
+50344;Bruno Cardoso;Rua Dom Pedro;s/n;Zona Rural Norte;Planta 1 — Fábrica;turno 3;;;;CC-2040 Logística
+50345;Gisele Queiroz;Rodovia SP-330 km 12;119;Jardim Operário;Planta 2 — Centro de distribuição;turno 2;;-21.181547;-47.828072;CC-1010 Produção
+50346;Hélio Moreira;Rua 7 de Setembro;254;Vila Industrial;Planta 1 — Fábrica;turno 1;;-21.16214;-47.78499;CC-4090 Administrativo
+50347;Edna Pires;Travessa da Fábrica;899;Centro;Escritório administrativo;Escritório;;-21.151637;-47.808142;CC-3070 Qualidade
+50348;Iara Duarte;Av. Industrial;1105;Distrito de Bonfim;Planta 1 — Fábrica;turno 1;;-21.218804;-47.866527;CC-3070 Qualidade
+50349;Jonas Moreira;Rua Dom Pedro;1185;Zona Rural Norte;Planta 2 — Centro de distribuição;2 TURNO;;-21.077998;-47.762687;CC-1010 Produção
+50350;Hélio Barbosa;Travessa da Fábrica;s/n;Jardim Operário;Planta 1 — Fábrica;1º turno;?;;;CC-3070 Qualidade
+50351;Paulo Farias;Estrada do Contorno;795;Vila Industrial;Planta 2 — Centro de distribuição;1º turno;;-21.137118;-47.787696;CC-2040 Logística
+50352;Bruno Moreira;Rodovia SP-330 km 12;s/n;Centro;Planta 1 — Fábrica;turno 2;;;;CC-3070 Qualidade
+50353;Cláudia Nunes;Rua Projetada B;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;2º turno;;;;CC-5020 Manutenção
+50354;Fernando Ramos;Av. Industrial;643;Zona Rural Norte;Planta 1 — Fábrica;1 TURNO;;-21.081716;-47.769774;CC-4090 Administrativo
+50355;Douglas Esteves;Rua Dom Pedro;294;Jardim Operário;Planta 2 — Centro de distribuição;T3;;-21.176109;-47.796266;CC-2040 Logística
+50356;Vagner Nunes;Av. dos Trabalhadores;179;Vila Industrial;Escritório administrativo;ADM;;-21.138464;-47.792812;CC-2040 Logística
+50357;Sérgio Henriques;Rodovia SP-330 km 12;491;Centro;Planta 2 — Centro de distribuição;1 TURNO;;-21.163809;-47.805806;CC-1010 Produção
+50358;Jonas Ramos;Rua 7 de Setembro;481;Distrito de Bonfim;Planta 1 — Fábrica;turno 3;;-21.190709;-47.863612;CC-5020 Manutenção
+50359;Jonas Teixeira;Rua 7 de Setembro;135;Zona Rural Norte;Escritório administrativo;COMERCIAL;;-21.116615;-47.77763;CC-5020 Manutenção
+50360;Cláudia Cardoso;Travessa da Fábrica;s/n;Jardim Operário;Escritório administrativo;Escritório;;;;CC-4090 Administrativo
+50361;EDNA MOREIRA;Estrada do Contorno;751;Vila Industrial;Planta 2 — Centro de distribuição;1 TURNO;;-21.150254;-47.777464;CC-4090 Administrativo
+50362;Fernando Almeida;Estrada do Contorno;s/n;Centro;Planta 1 — Fábrica;turno 3;;;;CC-5020 Manutenção
+50363;Edna Ramos;Av. dos Trabalhadores;1134;Distrito de Bonfim;Planta 2 — Centro de distribuição;1º turno;;-21.202838;-47.846788;CC-3070 Qualidade
+50364;Douglas Nunes;Rua 7 de Setembro;s/n;Zona Rural Norte;Planta 1 — Fábrica;turno 1;;;;CC-2040 Logística
+50365;Sérgio Moreira;Travessa da Fábrica;s/n;Jardim Operário;Planta 2 — Centro de distribuição;1º turno;-;;;CC-5020 Manutenção
+50366;Gisele Ramos;Rua Dom Pedro;s/n;Vila Industrial;Planta 1 — Fábrica;2º turno;;;;CC-1010 Produção
+50367;Bruno Esteves;Travessa da Fábrica;1075;Centro;Planta 2 — Centro de distribuição;2 TURNO;;-21.151426;-47.805805;CC-3070 Qualidade
+50368;Fernando Cardoso;Av. dos Trabalhadores;s/n;Distrito de Bonfim;Escritório administrativo;Geral;;;;CC-2040 Logística
+50369;Tânia Esteves;Rua das Palmeiras;226;Zona Rural Norte;Planta 2 — Centro de distribuição;turno 3;;-21.060783;-47.768581;CC-3070 Qualidade
+50370;Sérgio Moreira;Av. dos Trabalhadores;94;Jardim Operário;Planta 1 — Fábrica;3 TURNO;;-21.184309;-47.805715;CC-4090 Administrativo
+50371;Cláudia Santos;Rua Projetada B;486;Vila Industrial;Planta 2 — Centro de distribuição;T1;;-21.136675;-47.787444;CC-3070 Qualidade
+50372;Sérgio Lima;Av. Industrial;397;Centro;Planta 1 — Fábrica;1 TURNO;;-21.148768;-47.802273;CC-1010 Produção
+50373;Hélio Cardoso;Estrada do Contorno;s/n;Distrito de Bonfim;Planta 2 — Centro de distribuição;1º turno;;;;CC-4090 Administrativo
+50374;Adriana Gonçalves;Rua Projetada B;454;Zona Rural Norte;Planta 1 — Fábrica;1º turno;-;-21.100988;-47.787902;CC-3070 Qualidade
+50375;Leandro Teixeira;Rua Dom Pedro;561;Jardim Operário;Planta 2 — Centro de distribuição;T2;;-21.154945;-47.814976;CC-3070 Qualidade
+50376;Renata Gonçalves;Travessa da Fábrica;s/n;Vila Industrial;Escritório administrativo;Geral;-;;;CC-3070 Qualidade
+50377;Edna Moreira;Travessa da Fábrica;1034;Centro;Planta 2 — Centro de distribuição;1º turno;;-21.168216;-47.798176;CC-3070 Qualidade
+50378;Bruno Pires;Rua 7 de Setembro;41;Distrito de Bonfim;Planta 1 — Fábrica;T1;;-21.187734;-47.883417;CC-1010 Produção
+50379;Vagner Moreira;Rua 7 de Setembro;s/n;Zona Rural Norte;Planta 2 — Centro de distribuição;T3;;;;CC-5020 Manutenção
+50380;PAULO MOREIRA;Rua das Palmeiras;249;Jardim Operário;Planta 1 — Fábrica;turno 1;;-21.158403;-47.817344;CC-3070 Qualidade
+50381;Douglas Santos;Rua das Palmeiras;s/n;Vila Industrial;Planta 2 — Centro de distribuição;T2;;;;CC-5020 Manutenção
+50382;Jonas Farias;Rua 7 de Setembro;243;Centro;Planta 1 — Fábrica;turno 2;;-21.149734;-47.809738;CC-2040 Logística
+50383;Odete Barbosa;Rua Projetada B;616;Distrito de Bonfim;Planta 2 — Centro de distribuição;C;;-21.230762;-47.875134;CC-5020 Manutenção
+50384;Edna Nunes;Av. dos Trabalhadores;s/n;Zona Rural Norte;Escritório administrativo;Geral;;;;CC-4090 Administrativo
+50385;Bruno Farias;Rua 7 de Setembro;682;Jardim Operário;Escritório administrativo;ADM;;-21.175774;-47.798668;CC-4090 Administrativo
+50386;Márcia Barbosa;Rua Dom Pedro;1001;Vila Industrial;Planta 1 — Fábrica;turno 1;-;-21.160851;-47.77973;CC-3070 Qualidade
+50387;Douglas Pires;Rua Dom Pedro;967;Centro;Planta 2 — Centro de distribuição;turno 1;;-21.164563;-47.801938;CC-5020 Manutenção
+50388;Hélio Esteves;Rodovia SP-330 km 12;473;Distrito de Bonfim;Planta 1 — Fábrica;1 TURNO;;-21.220054;-47.870815;CC-3070 Qualidade
+50388;Hélio Esteves;Rodovia SP-330 km 12;473;Distrito de Bonfim;Planta 2 — Centro de distribuição;1 TURNO;;-21.220054;-47.870815;CC-3070 Qualidade
+50389;Paulo Farias;Estrada do Contorno;756;Zona Rural Norte;Escritório administrativo;COMERCIAL;-;-21.09773;-47.721736;CC-3070 Qualidade
+50390;Gisele Duarte;Rua das Palmeiras;362;Jardim Operário;Planta 1 — Fábrica;1º turno;;-21.179091;-47.798906;CC-4090 Administrativo
+50391;Paulo Santos;Av. dos Trabalhadores;603;Vila Industrial;Planta 2 — Centro de distribuição;turno 2;;-21.162661;-47.781483;CC-2040 Logística
+50392;Leandro Ramos;Travessa da Fábrica;46;Centro;Planta 1 — Fábrica;T3;não;-21.166755;-47.804129;CC-3070 Qualidade
+50393;Bruno Esteves;Av. dos Trabalhadores;215;Distrito de Bonfim;Escritório administrativo;Escritório;;-21.196307;-47.884212;CC-5020 Manutenção
+50394;Odete Moreira;Rua das Palmeiras;s/n;Zona Rural Norte;Planta 1 — Fábrica;T2;;;;CC-3070 Qualidade
+50395;Gisele Teixeira;Av. Industrial;1164;Jardim Operário;Planta 2 — Centro de distribuição;T2;;-21.186066;-47.821119;CC-1010 Produção
+50396;Fernando Santos;Av. Industrial;440;Vila Industrial;Planta 1 — Fábrica;T2;;-21.155792;-47.796049;CC-4090 Administrativo
+50397;Douglas Teixeira;Rua das Palmeiras;107;Centro;Planta 2 — Centro de distribuição;turno 2;;-21.159068;-47.810774;CC-2040 Logística
+50398;Hélio Moreira;Rua Dom Pedro;94;Distrito de Bonfim;Planta 1 — Fábrica;1º turno;;-21.196875;-47.840869;CC-2040 Logística
+50399;HÉLIO ESTEVES;Travessa da Fábrica;585;Zona Rural Norte;Planta 2 — Centro de distribuição;T1;;-21.144401;-47.764958;CC-1010 Produção
+50400;Odete Teixeira;Travessa da Fábrica;293;Jardim Operário;Planta 1 — Fábrica;1º turno;;-21.181011;-47.819481;CC-2040 Logística
+50401;Hélio Cardoso;Rua 7 de Setembro;26;Vila Industrial;Planta 2 — Centro de distribuição;1 TURNO;-;-21.144888;-47.792282;CC-3070 Qualidade
+50402;Paulo Queiroz;Travessa da Fábrica;121;Centro;Planta 1 — Fábrica;turno 2;;-21.152738;-47.807028;CC-5020 Manutenção
+50403;Adriana Pires;Rua das Palmeiras;406;Distrito de Bonfim;Planta 2 — Centro de distribuição;2 TURNO;;-21.205206;-47.837631;CC-5020 Manutenção
+50404;Odete Ramos;Av. Industrial;708;Zona Rural Norte;Planta 1 — Fábrica;T3;;-21.123543;-47.732008;CC-3070 Qualidade
+50405;Adriana Santos;Rua 7 de Setembro;416;Jardim Operário;Escritório administrativo;Escritório;não;-21.157001;-47.802363;CC-4090 Administrativo
+50406;Odete Lima;Rua Dom Pedro;1136;Vila Industrial;Planta 1 — Fábrica;1º turno;;-21.155459;-47.799349;CC-4090 Administrativo
+50407;Fernando Cardoso;Travessa da Fábrica;312;Centro;Planta 2 — Centro de distribuição;2 TURNO;;-21.14874;-47.802279;CC-4090 Administrativo
+50408;Gisele Santos;Rodovia SP-330 km 12;s/n;Distrito de Bonfim;Escritório administrativo;COMERCIAL;;;;CC-3070 Qualidade
+50409;Fernando Teixeira;Rua Dom Pedro;871;Zona Rural Norte;Planta 2 — Centro de distribuição;2 TURNO;;-21.129652;-47.793767;CC-1010 Produção
+50410;Gisele Nunes;Rua Projetada B;1028;Jardim Operário;Planta 1 — Fábrica;1º turno;;-21.174361;-47.803389;CC-2040 Logística
+50411;Adriana Almeida;Av. dos Trabalhadores;s/n;Vila Industrial;Planta 2 — Centro de distribuição;T1;;;;CC-4090 Administrativo
+50412;Leandro Henriques;Rodovia SP-330 km 12;s/n;Centro;Planta 1 — Fábrica;turno 3;;;;CC-1010 Produção
+50413;Douglas Pires;Av. dos Trabalhadores;349;Distrito de Bonfim;Planta 2 — Centro de distribuição;1º turno;;-21.203119;-47.834728;CC-5020 Manutenção
+50414;Bruno Queiroz;Travessa da Fábrica;562;Zona Rural Norte;Planta 1 — Fábrica;2º turno;;-21.070327;-47.771508;CC-1010 Produção
+50415;Odete Ramos;Av. dos Trabalhadores;1154;Jardim Operário;Planta 2 — Centro de distribuição;T2;;-21.162788;-47.79899;CC-4090 Administrativo
+50416;Márcia Lima;Rua Projetada B;470;Vila Industrial;Planta 1 — Fábrica;T3;sim;-21.155283;-47.779824;CC-3070 Qualidade
+50417;Leandro Duarte;Rua 7 de Setembro;835;Centro;Planta 2 — Centro de distribuição;1 TURNO;;-21.152231;-47.794447;CC-2040 Logística
+50418;SÉRGIO TEIXEIRA;Rua das Palmeiras;s/n;Distrito de Bonfim;Escritório administrativo;Escritório;;;;CC-4090 Administrativo
+50419;Edna Lima;Av. dos Trabalhadores;546;Zona Rural Norte;Planta 2 — Centro de distribuição;turno 1;;-21.07669;-47.754241;CC-1010 Produção

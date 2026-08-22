@@ -1,0 +1,24 @@
+﻿QUADRO DE LINHAS EM OPERAÇÃO — Empresa Modelo S.A.
+
+Linha;Turno;Destino;Tipo de veículo;Km/dia;Passageiros transportados;Cadeirantes
+L01;2º turno;Planta 2 — Centro de distribuição;Micro-ônibus executivo 28 lugares;59.3;12;0
+L02;3º turno;Escritório administrativo;Van executiva 16 lugares;51.9;10;0
+L03;ADM;Escritório administrativo;Ônibus rodoviário 46 lugares;79.7;27;0
+L04;1º turno;Planta 2 — Centro de distribuição;Ônibus rodoviário 46 lugares;93.2;13;0
+L05;2º turno;Escritório administrativo;Micro-ônibus executivo 28 lugares;86.2;7;0
+L06;3º turno;Planta 1 — Fábrica;Ônibus rodoviário 46 lugares;53.6;13;0
+L07;ADM;Escritório administrativo;Van acessível 12 lugares;123.6;6;1
+L08;1º turno;Escritório administrativo;Ônibus rodoviário 46 lugares;66.2;15;0
+L09;2º turno;Planta 1 — Fábrica;Ônibus rodoviário 46 lugares;135.0;30;0
+L10;3º turno;Planta 2 — Centro de distribuição;Van executiva 16 lugares;82.7;10;0
+L11;ADM;Escritório administrativo;Van acessível 12 lugares;49.4;10;1
+L12;1º turno;Planta 1 — Fábrica;Ônibus rodoviário 46 lugares;72.5;37;0
+L13;2º turno;Planta 2 — Centro de distribuição;Micro-ônibus executivo 28 lugares;56.2;9;0
+L14;3º turno;Escritório administrativo;Van executiva 16 lugares;122.5;7;0
+L15;ADM;Escritório administrativo;Ônibus rodoviário 46 lugares;100.3;16;0
+L16;1º turno;Planta 2 — Centro de distribuição;Ônibus rodoviário 46 lugares;80.4;30;0
+L17;2º turno;Escritório administrativo;Micro-ônibus executivo 28 lugares;51.0;16;0
+L18;3º turno;Planta 1 — Fábrica;Ônibus rodoviário 46 lugares;64.6;13;0
+L19;ADM;Escritório administrativo;Van acessível 12 lugares;85.6;8;1
+L20;1º turno;Escritório administrativo;Ônibus rodoviário 46 lugares;100.6;20;0
+L21;2º turno;Planta 1 — Fábrica;Ônibus rodoviário 46 lugares;73.5;25;0
