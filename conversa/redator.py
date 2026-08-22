@@ -123,6 +123,23 @@ def operacao(d: dict) -> str:
             if chave in reot:
                 texto.append(_linha(rotulo,
                                     f"{numero(reot[chave], casas)}{sufixo}"))
+    rodadas = d.get("rodadas_do_dia") or {}
+    politica = d.get("politica_das_rodadas") or {}
+    if rodadas:
+        texto += ["", f"Reotimização contínua (rodada a cada "
+                      f"{politica.get('intervalo_min', '?')} min):"]
+        for rotulo, chave, casas, sufixo in (
+                ("Rodadas", "rodadas", 0, ""),
+                ("Rodadas com alguma mudança", "rodadas_com_acao", 0, ""),
+                ("Km economizados", "km_economizados", 1, " km"),
+                ("Km vindos de remanejar corrida", "km_do_remanejamento", 1, " km"),
+                ("Faltas absorvidas", "faltas_absorvidas", 0, ""),
+                ("Pedidos novos aceitos", "pedidos_aceitos", 0, ""),
+                ("Corridas que trocaram de veículo", "corridas_remanejadas", 0, ""),
+                ("Horários combinados quebrados", "promessas_quebradas", 0, "")):
+            if chave in rodadas:
+                texto.append(_linha(rotulo,
+                                    f"{numero(rodadas[chave], casas)}{sufixo}"))
     return "\n".join(texto)
 
 

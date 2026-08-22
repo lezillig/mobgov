@@ -61,6 +61,8 @@ RELATORIO_IMPORTACAO = os.path.join(
     os.path.dirname(RELATORIO_PADRAO), "importacao.json")
 RELATORIO_ELEGIBILIDADE = os.path.join(
     os.path.dirname(RELATORIO_PADRAO), "elegibilidade.json")
+RELATORIO_RODADAS = os.path.join(
+    os.path.dirname(RELATORIO_PADRAO), "rodadas.json")
 
 
 def carregar_relatorio(caminho: str = RELATORIO_PADRAO) -> dict:
@@ -397,6 +399,8 @@ def montar_painel(rel: dict, premissas: Premissas = None,
         painel["importacao"] = rel["importacao"]
     if rel.get("elegibilidade"):
         painel["elegibilidade"] = rel["elegibilidade"]
+    if rel.get("rodadas"):
+        painel["rodadas"] = rel["rodadas"]
     if com_cenarios:
         painel["cenarios"] = grade_de_cenarios(rel, premissas)
     return painel

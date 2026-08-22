@@ -1,0 +1,341 @@
+{
+ "politica": {
+  "intervalo_min": 5,
+  "horizonte_compromisso_min": 20,
+  "janela_de_aviso_min": 60,
+  "max_atraso_promessa_min": 5,
+  "remocoes_por_rodada": 3,
+  "ganho_minimo_km": 0.3,
+  "limite_km_extra": 15.0
+ },
+ "rodadas": [
+  {
+   "minuto": 365,
+   "hora": "06h05",
+   "km_antes": 579.18,
+   "km_depois": 579.18,
+   "km_liberados_por_falta": 0.0,
+   "km_de_demanda_nova": 0,
+   "km_economizados": 0.0,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [],
+   "pedidos_aceitos": [],
+   "pedidos_recusados": [
+    {
+     "usuario": "U086",
+     "motivo": "atrasaria horário já combinado de 3 usuário(s)"
+    }
+   ],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "a melhoria quebraria 4 horário já combinado — plano anterior mantido",
+   "segundos": 0.093,
+   "diff": [
+    "Pedido de U086 recusado: caberia na rota PP03, mas atrasaria horário já combinado. U009: embarque combinado às 06h34 iria para 06h27.",
+    "Melhoria descartada: a melhoria quebraria 4 horário já combinado — plano anterior mantido. Exemplo: U047: embarque combinado às 06h42 iria para 06h34."
+   ]
+  },
+  {
+   "minuto": 370,
+   "hora": "06h10",
+   "km_antes": 579.18,
+   "km_depois": 575.31,
+   "km_liberados_por_falta": 0.0,
+   "km_de_demanda_nova": 0,
+   "km_economizados": 3.87,
+   "ganho_do_remanejamento_km": 3.87,
+   "saidas": [],
+   "pedidos_aceitos": [],
+   "pedidos_recusados": [],
+   "movimentos": [
+    {
+     "usuario": "U040",
+     "de": "PP04",
+     "para": "PP11"
+    }
+   ],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "",
+   "segundos": 0.07,
+   "diff": [
+    "U040 passou da rota PP04 para a PP11.",
+    "Remanejamento economizou 3.87 km sem mexer em nenhum horário já combinado."
+   ]
+  },
+  {
+   "minuto": 375,
+   "hora": "06h15",
+   "km_antes": 575.31,
+   "km_depois": 575.97,
+   "km_liberados_por_falta": -0.01,
+   "km_de_demanda_nova": 0.65,
+   "km_economizados": -0.01,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [],
+   "pedidos_aceitos": [
+    {
+     "usuario": "U088",
+     "rota": "PP07",
+     "km_extra": 0.65
+    }
+   ],
+   "pedidos_recusados": [],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar",
+   "segundos": 0.094,
+   "diff": [
+    "Pedido de U088 aceito na rota PP07 com 0.65 km a mais.",
+    "Melhoria descartada: ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar."
+   ]
+  },
+  {
+   "minuto": 395,
+   "hora": "06h35",
+   "km_antes": 575.97,
+   "km_depois": 576.19,
+   "km_liberados_por_falta": 0.0,
+   "km_de_demanda_nova": 0.22,
+   "km_economizados": -0.0,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [],
+   "pedidos_aceitos": [
+    {
+     "usuario": "U085",
+     "rota": "PP11",
+     "km_extra": 0.22
+    }
+   ],
+   "pedidos_recusados": [],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar",
+   "segundos": 0.097,
+   "diff": [
+    "Pedido de U085 aceito na rota PP11 com 0.22 km a mais.",
+    "Melhoria descartada: ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar."
+   ]
+  },
+  {
+   "minuto": 415,
+   "hora": "06h55",
+   "km_antes": 576.19,
+   "km_depois": 573.22,
+   "km_liberados_por_falta": 2.97,
+   "km_de_demanda_nova": 0,
+   "km_economizados": 2.97,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [
+    "U029"
+   ],
+   "pedidos_aceitos": [],
+   "pedidos_recusados": [],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar",
+   "segundos": 0.062,
+   "diff": [
+    "U029 saiu da rota PP10 (falta informada).",
+    "Melhoria descartada: ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar."
+   ]
+  },
+  {
+   "minuto": 425,
+   "hora": "07h05",
+   "km_antes": 573.22,
+   "km_depois": 573.22,
+   "km_liberados_por_falta": 0.0,
+   "km_de_demanda_nova": 0,
+   "km_economizados": 0.0,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [],
+   "pedidos_aceitos": [],
+   "pedidos_recusados": [
+    {
+     "usuario": "U084",
+     "motivo": "atrasaria horário já combinado de 1 usuário(s)"
+    }
+   ],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar",
+   "segundos": 0.077,
+   "diff": [
+    "Pedido de U084 recusado: caberia na rota PP01, mas atrasaria horário já combinado. U016: embarque combinado às 07h26 iria para 07h19.",
+    "Melhoria descartada: ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar."
+   ]
+  },
+  {
+   "minuto": 430,
+   "hora": "07h10",
+   "km_antes": 573.22,
+   "km_depois": 579.87,
+   "km_liberados_por_falta": 4.89,
+   "km_de_demanda_nova": 11.54,
+   "km_economizados": 4.89,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [
+    "U042"
+   ],
+   "pedidos_aceitos": [
+    {
+     "usuario": "U082",
+     "rota": "PP01",
+     "km_extra": 11.54
+    }
+   ],
+   "pedidos_recusados": [],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "a melhoria quebraria 1 horário já combinado — plano anterior mantido",
+   "segundos": 0.07,
+   "diff": [
+    "U042 saiu da rota PP05 (falta informada).",
+    "Pedido de U082 aceito na rota PP01 com 11.54 km a mais.",
+    "Melhoria descartada: a melhoria quebraria 1 horário já combinado — plano anterior mantido. Exemplo: U075: embarque combinado às 08h10 iria para 07h59."
+   ]
+  },
+  {
+   "minuto": 435,
+   "hora": "07h15",
+   "km_antes": 579.87,
+   "km_depois": 563.04,
+   "km_liberados_por_falta": 16.83,
+   "km_de_demanda_nova": 0,
+   "km_economizados": 16.83,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [
+    "U077",
+    "U055"
+   ],
+   "pedidos_aceitos": [],
+   "pedidos_recusados": [],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "a melhoria quebraria 1 horário já combinado — plano anterior mantido",
+   "segundos": 0.047,
+   "diff": [
+    "U077 saiu da rota PP09 (falta informada).",
+    "U055 saiu da rota PP03 (falta informada).",
+    "Melhoria descartada: a melhoria quebraria 1 horário já combinado — plano anterior mantido. Exemplo: U075: embarque combinado às 08h10 iria para 07h59."
+   ]
+  },
+  {
+   "minuto": 440,
+   "hora": "07h20",
+   "km_antes": 563.04,
+   "km_depois": 541.55,
+   "km_liberados_por_falta": 10.38,
+   "km_de_demanda_nova": 0,
+   "km_economizados": 21.49,
+   "ganho_do_remanejamento_km": 11.11,
+   "saidas": [
+    "U021",
+    "U053"
+   ],
+   "pedidos_aceitos": [],
+   "pedidos_recusados": [
+    {
+     "usuario": "U083",
+     "motivo": "desvio de 18.3 km acima do limite"
+    }
+   ],
+   "movimentos": [
+    {
+     "usuario": "U065",
+     "de": "PP03",
+     "para": "PP01"
+    },
+    {
+     "usuario": "U043",
+     "de": "PP06",
+     "para": "PP05"
+    }
+   ],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "",
+   "segundos": 0.056,
+   "diff": [
+    "U021 saiu da rota PP03 (falta informada).",
+    "U053 saiu da rota PP06 (falta informada).",
+    "Pedido de U083 recusado: caberia na rota PP05, mas custaria 18.3 km — acima do limite de 15.0 km por encaixe.",
+    "U065 passou da rota PP03 para a PP01.",
+    "U043 passou da rota PP06 para a PP05.",
+    "Remanejamento economizou 11.11 km sem mexer em nenhum horário já combinado."
+   ]
+  },
+  {
+   "minuto": 445,
+   "hora": "07h25",
+   "km_antes": 541.55,
+   "km_depois": 541.55,
+   "km_liberados_por_falta": 0.0,
+   "km_de_demanda_nova": 0,
+   "km_economizados": 0.0,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [],
+   "pedidos_aceitos": [],
+   "pedidos_recusados": [
+    {
+     "usuario": "U087",
+     "motivo": "desvio de 20.3 km acima do limite"
+    }
+   ],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar",
+   "segundos": 0.055,
+   "diff": [
+    "Pedido de U087 recusado: caberia na rota PP08, mas custaria 20.3 km — acima do limite de 15.0 km por encaixe.",
+    "Melhoria descartada: ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar."
+   ]
+  },
+  {
+   "minuto": 460,
+   "hora": "07h40",
+   "km_antes": 541.55,
+   "km_depois": 544.57,
+   "km_liberados_por_falta": -0.01,
+   "km_de_demanda_nova": 3.01,
+   "km_economizados": -0.01,
+   "ganho_do_remanejamento_km": 0.0,
+   "saidas": [],
+   "pedidos_aceitos": [
+    {
+     "usuario": "U081",
+     "rota": "PP02",
+     "km_extra": 3.01
+    }
+   ],
+   "pedidos_recusados": [],
+   "movimentos": [],
+   "promessas_preservadas": true,
+   "melhoria_descartada": "ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar",
+   "segundos": 0.045,
+   "diff": [
+    "Pedido de U081 aceito na rota PP02 com 3.01 km a mais.",
+    "Melhoria descartada: ganho de 0.0 km abaixo do mínimo de 0.3 km — não vale remanejar."
+   ]
+  }
+ ],
+ "resumo": {
+  "rodadas": 37,
+  "rodadas_com_acao": 11,
+  "km_economizados": 50.03,
+  "km_de_demanda_nova": 15.42,
+  "km_liberados_por_falta": 35.05,
+  "km_do_remanejamento": 14.98,
+  "faltas_absorvidas": 6,
+  "pedidos_aceitos": 4,
+  "pedidos_recusados": 4,
+  "corridas_remanejadas": 3,
+  "melhorias_descartadas": 35,
+  "promessas_quebradas": 0,
+  "tempo_max_s": 0.097,
+  "tempo_medio_s": 0.048
+ },
+ "gerado_em": "2026-08-22 19:59",
+ "km_planejados": 731.6,
+ "origem": "simulacao",
+ "perfil_transito": "com trânsito"
+}

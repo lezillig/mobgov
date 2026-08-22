@@ -473,6 +473,64 @@ def bloco_reotimizacao(evt: dict) -> str:
     )
 
 
+def bloco_rodadas(rod: dict) -> str:
+    """Reotimização contínua: o plano do dia revisto de tempos em tempos."""
+    if not rod or not rod.get("resumo"):
+        return ""
+    r, pol = rod["resumo"], rod.get("politica", {})
+    cartoes = "".join(
+        f'<div class="card-evento"><div class="rotulo">{esc(x["hora"])}</div>'
+        f'<div class="tempo">{numero(x["segundos"], 3)} s</div>'
+        f'<ul class="lista">{_lista_diff(x["diff"][:4])}</ul></div>'
+        for x in rod.get("rodadas", [])[:6])
+
+    return (
+        '<section><h2>Reotimização contínua — o dia em rodadas</h2>'
+        '<p class="chamada">De '
+        f'{pol.get("intervalo_min", "?")} em {pol.get("intervalo_min", "?")} '
+        'minutos o plano do dia é revisto inteiro: as faltas saem, os pedidos '
+        'novos entram na rota mais barata e uma corrida pode <b>mudar de '
+        'veículo</b> quando a combinação ficou melhor. Cada informação entra '
+        'na rodada em que chegaria de verdade — o sistema não decide com o que '
+        'ainda não sabe.</p>'
+        '<div class="kpis">'
+        + _kpi("Rodadas no período", numero(r["rodadas"]),
+               f'{numero(r["rodadas_com_acao"])} com alguma mudança')
+        + _kpi("Quilômetros poupados", f'−{numero(r["km_economizados"], 1)} km',
+               f'{numero(r["km_do_remanejamento"], 1)} km vieram de remanejar '
+               f'corrida entre veículos', destaque=True)
+        + _kpi("Corridas remanejadas", numero(r["corridas_remanejadas"]),
+               f'{numero(r["pedidos_aceitos"])} pedidos novos aceitos, '
+               f'{numero(r["pedidos_recusados"])} recusados')
+        + _kpi("Horários combinados quebrados", numero(r["promessas_quebradas"]),
+               f'{numero(r["melhorias_descartadas"])} melhorias foram '
+               f'descartadas para manter a palavra dada',
+               piora=r["promessas_quebradas"] > 0)
+        + '</div>'
+        '<ul class="lista" style="margin-top:16px">'
+        f'<li><b>Horizonte de compromisso: '
+        f'{pol.get("horizonte_compromisso_min", "?")} minutos.</b> Quem embarca '
+        f'dentro desse prazo não é remarcado — a família já foi avisada, e '
+        f'economia nenhuma paga a confiança de quem está no portão com a '
+        f'criança.</li>'
+        f'<li>O horário vira firme {pol.get("janela_de_aviso_min", "?")} minutos '
+        f'antes; daí em diante só muda dentro de '
+        f'{pol.get("max_atraso_promessa_min", "?")} minutos de tolerância.</li>'
+        f'<li>Remanejamento só acontece se poupar pelo menos '
+        f'{numero(pol.get("ganho_minimo_km", 0), 1)} km: mexer na rota por '
+        f'duzentos metros gera retrabalho de despacho sem retorno.</li>'
+        f'<li>Resposta mais lenta: {numero(r["tempo_max_s"], 3)} s '
+        f'(média de {numero(r["tempo_medio_s"], 3)} s) — a rodada roda em '
+        f'Python puro, sem solver.</li>'
+        '</ul>'
+        f'<div class="eventos">{cartoes}</div>'
+        '<div class="aviso"><b>Leia com atenção:</b> os acontecimentos do dia '
+        '(faltas e pedidos novos) são simulados. O mecanismo é o real, e os '
+        'tempos de resposta foram medidos nesta execução.</div>'
+        '</section>'
+    )
+
+
 def bloco_transito(pcd: dict) -> str:
     """Como o trânsito entrou na conta — e de onde vieram os fatores."""
     pr = (pcd or {}).get("premissas", {})
@@ -720,6 +778,7 @@ def renderizar(p: dict, serie: dict, viagens: list, origem: str) -> str:
   {bloco_mapa(p)}
   {bloco_porta_a_porta(p.get("porta_a_porta"))}
   {bloco_reotimizacao(p.get("reotimizacao"))}
+  {bloco_rodadas(p.get("rodadas"))}
   {bloco_transito(p.get("porta_a_porta"))}
   {bloco_cenarios(p)}
   {bloco_aprendizado(serie)}
@@ -762,6 +821,9 @@ def montar_html(caminho_relatorio: str = economia_mod.RELATORIO_PADRAO,
     rel.setdefault("elegibilidade",
                    economia_mod.carregar_opcional(
                        economia_mod.RELATORIO_ELEGIBILIDADE))
+    rel.setdefault("rodadas",
+                   economia_mod.carregar_opcional(
+                       economia_mod.RELATORIO_RODADAS))
     premissas = economia_mod.premissas_do_relatorio(rel).substituir(
         preco_diesel_l=diesel, dias_letivos_mes=dias)
     p = economia_mod.montar_painel(rel, premissas)

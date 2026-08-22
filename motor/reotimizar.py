@@ -252,13 +252,18 @@ def _viavel(agenda, pedidos_por_id) -> bool:
 
 
 def melhor_insercao_em_rota(agenda, candidato, dist, tempo, pedidos_por_id,
-                            capacidade, posicoes_cadeira, inicio_min):
+                            capacidade, posicoes_cadeira, inicio_min,
+                            posicao_minima: int = 0):
     """Melhor posição para encaixar um pedido numa rota — ou None se não cabe.
 
     Testa todas as combinações de posição de embarque e desembarque
     (mantendo a precedência) e devolve a de menor quilometragem que respeita
     janela, tempo a bordo e capacidade. É a "inserção mais barata" clássica,
     a mesma mecânica que RideCo e Spare usam para aceitar pedido do dia.
+
+    `posicao_minima` protege o trecho já comprometido da rota: a reotimização
+    contínua (motor/rodadas.py) usa isso para não mexer no que o veículo está
+    prestes a fazer — quem já foi avisado da hora não pode ser reprogramado.
     """
     p = pedidos_por_id[candidato["usuario"]]
     if p.posicoes_cadeira > posicoes_cadeira:
@@ -269,7 +274,7 @@ def melhor_insercao_em_rota(agenda, candidato, dist, tempo, pedidos_por_id,
            "servico": candidato["servico"], "direto": candidato["direto"]}
 
     melhor = None
-    for i in range(len(agenda) + 1):
+    for i in range(max(0, posicao_minima), len(agenda) + 1):
         for j in range(i + 1, len(agenda) + 2):
             tentativa = list(agenda)
             tentativa.insert(i, emb)

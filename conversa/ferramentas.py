@@ -157,7 +157,10 @@ def estado_da_operacao() -> dict:
     from operacao import registro
     resumo = registro.resumo()
     reot = _opcional("reotimizacao.json").get("resumo", {})
-    return {"eventos_recebidos": resumo, "reotimizacoes_do_dia": reot}
+    rodadas = _opcional("rodadas.json")
+    return {"eventos_recebidos": resumo, "reotimizacoes_do_dia": reot,
+            "rodadas_do_dia": rodadas.get("resumo", {}),
+            "politica_das_rodadas": rodadas.get("politica", {})}
 
 
 def qualidade_da_importacao() -> dict:
