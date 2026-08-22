@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Testes da camada de cálculo do painel de economia (Sprint 2).
 
-Rodar da pasta mobgov/:  python -m unittest discover -s testes -v
+Rodar da raiz do repositório:  python -m unittest discover -s testes -v
 """
 import os
 import sys

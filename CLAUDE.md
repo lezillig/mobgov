@@ -1,9 +1,10 @@
 # MOBGOV — memória do projeto
 
 > Resumo operacional do prompt-mestre (`prompt-sistema-mobgov-mvp.md`) mais o
-> estado real do código. Leia antes de mexer em qualquer coisa dentro de
-> `mobgov/`. O restante do repositório é o sistema de gestão de motoristas da
-> Azul Mob (Next.js) — projeto diferente, não misturar.
+> estado real do código. Leia antes de mexer em qualquer coisa deste
+> repositório. O MOBGOV nasceu dentro do repositório `gestao-motoristas` (o
+> sistema operacional da Azul Mob, em Next.js) e mudou-se para cá nas Sprints
+> 1–2; os dois projetos são separados e não devem se misturar.
 
 ## O que é
 
@@ -63,7 +64,7 @@ ocupação média 91,1%, tempo máximo 63 min (limite 75).
 ## Estrutura
 
 ```
-mobgov/
+mobgov/                          (raiz deste repositório)
   dados/municipio_modelo.py      esquema do domínio + gerador sintético (seed 42)
   motor/dimensionar.py           CVRP por escola, frota heterogênea, relatório JSON
   painel/economia.py             recálculo auditável + cenários + memória de cálculo

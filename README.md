@@ -2,8 +2,8 @@
 
 Plataforma de roteirização e **dimensionamento de frota** com IA para
 secretarias estaduais e municipais (transporte escolar, transporte PCD e
-fretamento governamental). Este diretório é o MVP de demonstração, separado do
-sistema operacional da Azul Mob que vive no resto do repositório.
+fretamento governamental). Este repositório é o MVP de demonstração — projeto
+separado do sistema operacional da Azul Mob (`gestao-motoristas`).
 
 O diferencial que a demonstração precisa provar: dada a demanda real, **quantos
 veículos são de fato necessários** e quanto isso economiza — com premissas
