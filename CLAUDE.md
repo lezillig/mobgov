@@ -21,10 +21,10 @@ restrições de acessibilidade) e responde: quantos veículos são de fato
 necessários, de que tipo, em quais rotas — comparando com a frota atual e
 quantificando a economia em R$, km, litros, CO₂ e veículos ociosos.
 
-Formato de saída obrigatório:
-> "Sua frota atual: 25 veículos. Necessário: 17 (16 ônibus de 31 lugares + 1 van
-> acessível). Economia estimada: R$ X/mês, Y km/dia, Z litros/dia, W tCO₂/ano" —
-> com todas as premissas listadas.
+Formato de saída obrigatório (com os números que o motor produz hoje):
+> "Sua frota atual: 30 veículos. Necessário: 22 (18 ônibus de 31 lugares +
+> 3 vans acessíveis + 1 micro-ônibus). Economia estimada: R$ X/mês, Y km/dia,
+> Z litros/dia, W tCO₂/ano" — com todas as premissas listadas.
 
 ### Diferencial nº 2 — IA que aprende
 Cada dia de operação (GPS real, atrasos, ausências, tempo de embarque)
@@ -52,21 +52,24 @@ previu X, aconteceu Y, ajustou Z".
 | 1 | `dados/` — esquema + Município Modelo sintético | ✅ pronto |
 | 1 | `motor/` — CVRP escolar (OR-Tools) + dimensionamento + relatório JSON | ✅ pronto |
 | 2 | `painel/` — painel de economia (a tela da demo) | ✅ pronto |
-| 3–4 | Tela de planejamento (importar → otimizar → aprovar) e mapa MapLibre | ⬜ |
+| 3 | `motor/escala.py` — roteirização multiviagem + demanda real (~2.900 alunos, 2 turnos) | ✅ pronto |
+| 4 | Tela de planejamento (importar → otimizar → aprovar) e mapa MapLibre | ⬜ |
 | 5–6 | App do motorista (React Native) → aprendizado contínuo real | ⬜ |
 | 7 | Camada conversacional + roteiro de demo ensaiado | ⬜ |
 | 8 | Elegibilidade PCD (ou pós-MVP, conforme o edital-alvo) | ⬜ |
 
-Resultado atual no Município Modelo: **25 → 17 veículos (−32%)**,
-R$ 125.099/mês, R$ 1,50 mi/ano, −707 km/dia, −169 l/dia, −119,5 tCO₂/ano,
-ocupação média 91,1%, tempo máximo 63 min (limite 75).
+Resultado atual no Município Modelo: **30 → 22 veículos (−26,7%)**,
+R$ 151.535/mês, R$ 1,82 mi/ano, −1.244 km/dia, −242 l/dia, −171,5 tCO₂/ano,
+com 106 viagens/dia (2,72 por veículo/turno), ocupação média 93,4% e tempo
+máximo de 57 min dentro do veículo (limite 75).
 
 ## Estrutura
 
 ```
 mobgov/                          (raiz deste repositório)
   dados/municipio_modelo.py      esquema do domínio + gerador sintético (seed 42)
-  motor/dimensionar.py           CVRP por escola, frota heterogênea, relatório JSON
+  motor/dimensionar.py           fase 1: CVRP por escola e turno (OR-Tools)
+  motor/escala.py                fase 2: escala multiviagem (heurística, sem OR-Tools)
   painel/economia.py             recálculo auditável + cenários + memória de cálculo
   painel/aprendizado.py          série "o que o sistema aprendeu" (real ou demonstração)
   painel/graficos.py             gráficos SVG gerados no servidor
@@ -117,14 +120,19 @@ python -m unittest discover -s testes -v
 
 - **OR-Tools não vem instalado** no ambiente remoto; sem ele o motor não roda,
   mas o painel funciona a partir do `dimensionamento.json` já gravado.
-- **Demanda do Município Modelo é de 466 alunos**, não dos ~3.000 do roteiro de
-  demonstração. O motor assume **uma rota por veículo por turno**; subir a
-  demanda sem roteirização multiviagem produziria uma frota necessária irreal.
-  Multiviagem é o próximo item do motor — está declarado no painel e no README.
-- **Tempos de percurso** vêm de distância em linha reta com fator rural 1,35,
-  ainda não de OSRM nem de GPS.
+- **Rodar o motor leva ~5 minutos** (6 solves de 30 s + matrizes). Rode em
+  segundo plano e não conclua que travou.
+- **PATH_CHEAPEST_ARC sozinho não resolve** a escola do centro: o motor tenta
+  PARALLEL_CHEAPEST_INSERTION primeiro e só depois cai nas outras estratégias.
+  Se mexer nisso, confira que as três escolas e os dois turnos ainda fecham.
+- **A frota atual do município fictício é derivada**, não informada
+  (`frota_atual_sintetica`): ocupação de 85%, 2,5 viagens por veículo/turno e
+  rotas 25% mais longas. Trocar essas premissas muda a economia — por isso elas
+  aparecem na tela. Num município real, esse dado é entrada, não estimativa.
+- **Tempos de percurso** vêm de distância em linha reta com fator rural 1,35
+  mais o tempo de embarque por parada, ainda não de OSRM nem de GPS.
 - **km/dia da frota atual é rateado** entre os tipos, porque a prefeitura declara
-  só o total.
+  só o total; o da frota otimizada vem da jornada real de cada veículo.
 - O gerador usa `random.seed(42)`: a demanda é reprodutível, e deve continuar
   sendo — a demo depende disso.
 
@@ -154,7 +162,7 @@ que o FastAPI as reaproveite sem reescrita.
 
 ## Métricas de sucesso do MVP
 
-- Redução de frota ≥ 20% no Município Modelo, com premissas auditáveis. ✅ (32%)
+- Redução de frota ≥ 20% no Município Modelo, com premissas auditáveis. ✅ (26,7%)
 - Reotimização após imprevisto em < 30 segundos. ⬜
 - Erro de previsão de tempo caindo semana a semana no painel. ⬜ (série ainda ilustrativa)
 - Planilha real de prefeitura → rotas publicadas em < 1 hora. ⬜

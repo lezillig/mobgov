@@ -52,11 +52,22 @@ class TestAvaliacaoDeFrota(BaseRelatorio):
             self.assertAlmostEqual(
                 frota["custo_mes"] * ec.MESES_POR_ANO, frota["custo_ano"], places=0)
 
-    def test_km_da_frota_otimizada_vem_das_rotas(self):
-        """km/dia = soma do km das rotas × viagens por dia (ida e volta)."""
-        esperado = sum(r["km_viagem"] for r in self.rel["frota_otimizada"]["rotas"])
-        esperado *= self.premissas.viagens_por_dia
+    def test_km_da_frota_otimizada_vem_das_jornadas(self):
+        """km/dia = soma da jornada de cada veículo × (coleta + dispersão).
+
+        A jornada já inclui o deslocamento entre uma viagem e a seguinte, que
+        é justamente o custo escondido da multiviagem.
+        """
+        esperado = sum(v["km_turno"] for v in self.rel["frota_otimizada"]["veiculos"])
+        esperado *= self.premissas.viagens_por_rota
         self.assertAlmostEqual(self.painel["otimizada"]["km_dia"], esperado, places=0)
+
+    def test_km_das_jornadas_cobre_o_km_das_viagens(self):
+        so_viagens = sum(v["km_viagem"]
+                         for v in self.rel["frota_otimizada"]["viagens"])
+        com_deslocamento = sum(v["km_turno"]
+                               for v in self.rel["frota_otimizada"]["veiculos"])
+        self.assertGreaterEqual(round(com_deslocamento, 1), round(so_viagens, 1))
 
     def test_km_da_frota_atual_e_o_declarado_pela_prefeitura(self):
         self.assertAlmostEqual(self.painel["atual"]["km_dia"],
@@ -68,10 +79,16 @@ class TestAvaliacaoDeFrota(BaseRelatorio):
                         * ec.MESES_POR_ANO * self.premissas.fator_co2_kg_l / 1000)
             self.assertAlmostEqual(frota["tco2_ano"], esperado, places=0)
 
-    def test_assentos_cobrem_a_demanda(self):
-        """Frota menor não pode significar aluno sem assento."""
-        self.assertGreaterEqual(self.painel["otimizada"]["assentos"],
-                                self.rel["demanda"]["alunos"])
+    def test_lugares_cobrem_a_demanda_de_cada_turno(self):
+        """Frota menor não pode significar aluno sem lugar.
+
+        Com multiviagem o que conta é o lugar-viagem: capacidade do veículo
+        vezes o número de viagens que ele faz naquele turno.
+        """
+        for turno in self.painel["qualidade"]["por_turno"]:
+            self.assertGreaterEqual(turno["lugares_ofertados"], turno["alunos"],
+                                    turno["turno"])
+            self.assertGreaterEqual(turno["lugares_folga"], 0, turno["turno"])
 
 
 class TestEconomia(BaseRelatorio):
@@ -103,10 +120,21 @@ class TestEconomia(BaseRelatorio):
 
     def test_qualidade_do_servico_dentro_dos_limites(self):
         q = self.painel["qualidade"]
-        self.assertLessEqual(q["tempo_max_rota_min"],
+        self.assertLessEqual(q["tempo_max_viagem_min"],
                              self.premissas.tempo_max_trajeto_min)
         self.assertLessEqual(q["ocupacao_max_pct"], 100)
         self.assertTrue(q["atende_cadeirantes"])
+
+    def test_jornada_de_cada_turno_cabe_no_limite(self):
+        for turno in self.painel["qualidade"]["por_turno"]:
+            self.assertLessEqual(turno["jornada_max_min"],
+                                 turno["jornada_limite_min"], turno["turno"])
+
+    def test_multiviagem_de_fato_acontece(self):
+        """O ganho da Sprint 3: mais de uma viagem por veículo por turno."""
+        q = self.painel["qualidade"]
+        self.assertGreater(q["viagens_por_veiculo_turno"], 1.0)
+        self.assertGreater(q["viagens"], self.painel["otimizada"]["total_veiculos"])
 
 
 class TestCenarios(BaseRelatorio):

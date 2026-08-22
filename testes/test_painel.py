@@ -84,6 +84,16 @@ class TestPaginaDoPainel(unittest.TestCase):
         self.assertIn(f"Sua frota atual: <b>{atual} veículos</b>", self.html)
         self.assertIn(f"<b>{otim} veículos</b>", self.html)
 
+    def test_explica_a_multiviagem(self):
+        self.assertIn("multiviagem", self.html)
+        self.assertIn("Viagens por veículo", self.html)
+        self.assertIn("Jornada média / máx", self.html)
+
+    def test_declara_como_a_frota_atual_foi_estimada(self):
+        """O 'antes' é gerado no município fictício — a página tem que dizer."""
+        self.assertIn("não é um número escolhido a dedo", self.html)
+        self.assertIn("vem do cadastro da secretaria", self.html)
+
     def test_traz_premissas_e_memoria_de_calculo(self):
         self.assertIn("Premissas e memória de cálculo", self.html)
         self.assertIn("Limitações declaradas desta versão", self.html)

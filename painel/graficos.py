@@ -141,15 +141,18 @@ def barras_frota(atual: dict, otimizada: dict) -> str:
     return _svg(L, A, "".join(corpo), "Composição da frota atual e da frota necessária")
 
 
-# ------------------------------------------------- ocupação das rotas novas ---
-def barras_ocupacao(rotas: list) -> str:
-    """Uma barra por rota otimizada — prova de que a frota menor não deixou
+# ---------------------------------------------- ocupação das viagens novas ---
+def barras_ocupacao(viagens: list) -> str:
+    """Uma barra por viagem otimizada — prova de que a frota menor não deixou
     veículo estourado nem rodando vazio."""
     L, A = 720, 260
     base, topo = A - 56, 44
-    if not rotas:
-        return _svg(L, A, _texto(L / 2, A / 2, "Sem rotas", "g-rotulo"), "Ocupação")
+    if not viagens:
+        return _svg(L, A, _texto(L / 2, A / 2, "Sem viagens", "g-rotulo"),
+                    "Ocupação")
+    rotas = viagens
     largura = min(38, (L - 90) / len(rotas))
+    vao = 4 if largura > 10 else max(0.6, largura * 0.18)  # muitas viagens: fresta fina
     x0 = 60
     media = sum(r["ocupacao_pct"] for r in rotas) / len(rotas)
     escala = (base - topo) / 100.0
@@ -164,19 +167,20 @@ def barras_ocupacao(rotas: list) -> str:
         h = min(r["ocupacao_pct"], 110) * escala
         x = x0 + i * largura
         corpo.append(
-            f'<rect x="{x:.1f}" y="{base - h:.1f}" width="{largura - 4:.1f}" '
+            f'<rect x="{x:.1f}" y="{base - h:.1f}" width="{largura - vao:.1f}" '
             f'height="{h:.1f}" rx="2" class="g-otim">'
-            f'<title>{esc(r["escola"])} · {esc(r["tipo_nome"])} · '
-            f'{r["alunos"]} alunos · {r["ocupacao_pct"]}% de ocupação</title></rect>')
+            f'<title>{esc(r["escola"])} · {esc(r.get("turno_nome", ""))} · '
+            f'{esc(r["tipo_nome"])} · {r["alunos"]} alunos · '
+            f'{r["ocupacao_pct"]}% de ocupação</title></rect>')
     y_media = base - media * escala
     corpo.append(f'<line x1="52" y1="{y_media:.1f}" x2="{L - 30}" y2="{y_media:.1f}" '
                  f'class="g-media"/>')
     corpo.append(_texto(L - 32, y_media - 10,
                         f"média {numero(media, 1)}%", "g-destaque", "end"))
     corpo.append(_texto(L / 2, A - 16,
-                        f"{len(rotas)} rotas otimizadas — ocupação de assentos",
+                        f"{len(rotas)} viagens otimizadas — ocupação de assentos",
                         "g-rotulo-fraco"))
-    return _svg(L, A, "".join(corpo), "Ocupação de assentos por rota otimizada")
+    return _svg(L, A, "".join(corpo), "Ocupação de assentos por viagem otimizada")
 
 
 # ---------------------------------------------------- evolução do aprendizado ---

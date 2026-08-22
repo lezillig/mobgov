@@ -72,6 +72,9 @@ h1{font-size:clamp(28px,3.4vw,40px);line-height:1.15;margin:14px 0 8px;letter-sp
 .kpi .detalhe{font-size:14.5px;color:var(--tinta-fraca);margin-top:6px}
 .kpi.destaque{border-left-color:var(--institucional);background:#F7FAFD}
 .kpi.destaque .valor{color:var(--institucional)}
+/* indicador que PIOROU — o painel também precisa saber mostrar resultado ruim */
+.kpi.piora{border-left-color:var(--atual);background:#FDF7F3}
+.kpi.piora .valor{color:var(--atual)}
 
 /* ------------------------------------------------------------- seções --- */
 section{

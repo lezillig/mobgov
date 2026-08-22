@@ -40,9 +40,10 @@ class Premissas:
     """Premissas auditáveis do cálculo. Todas aparecem no relatório em PDF."""
     preco_diesel_l: float
     dias_letivos_mes: int
-    viagens_por_dia: int
+    viagens_por_rota: int        # coleta de manhã + dispersão no fim do turno
     fator_co2_kg_l: float
     tempo_max_trajeto_min: int
+    tempo_virada_min: int        # manobra entre duas viagens do mesmo veículo
     preco_diesel_base_l: float   # preço usado quando o motor calibrou custo_km
     fonte_tempos: str
 
@@ -62,9 +63,10 @@ def premissas_do_relatorio(rel: dict) -> Premissas:
     return Premissas(
         preco_diesel_l=float(p["preco_diesel_l"]),
         dias_letivos_mes=int(p["dias_letivos_mes"]),
-        viagens_por_dia=int(p["viagens_por_dia"]),
+        viagens_por_rota=int(p["viagens_por_rota"]),
         fator_co2_kg_l=float(p.get("fator_co2_kg_l", 2.68)),
         tempo_max_trajeto_min=int(p["tempo_max_trajeto_min"]),
+        tempo_virada_min=int(p.get("tempo_virada_min", 0)),
         preco_diesel_base_l=float(p["preco_diesel_l"]),
         fonte_tempos=p.get("fonte_tempos", "não informada"),
     )
@@ -83,12 +85,18 @@ def custo_km(tipo: dict, premissas: Premissas) -> float:
 
 
 # ------------------------------------------------------- avaliação de frota ---
-def _km_por_tipo_das_rotas(rotas: list, viagens_por_dia: int) -> dict:
-    """Frota otimizada: sabemos o km real de cada rota, então cada tipo carrega
-    exatamente o km que ele roda (mais fiel que ratear pela quantidade)."""
+def _km_por_tipo_dos_veiculos(veiculos: list, viagens_por_rota: int) -> dict:
+    """Frota otimizada: cada veículo tem a jornada dele (as viagens do turno
+    mais o deslocamento entre elas), então cada tipo carrega exatamente o km
+    que roda — mais fiel que ratear pela quantidade de veículos.
+
+    Um mesmo veículo físico aparece uma vez por turno; somar os turnos dá o
+    km do dia. O fator viagens_por_rota cobre a dispersão no fim do turno,
+    espelhada da coleta.
+    """
     km = {}
-    for r in rotas:
-        km[r["tipo"]] = km.get(r["tipo"], 0.0) + float(r["km_viagem"]) * viagens_por_dia
+    for v in veiculos:
+        km[v["tipo"]] = km.get(v["tipo"], 0.0) + float(v["km_turno"]) * viagens_por_rota
     return km
 
 
@@ -179,24 +187,61 @@ def comparar(atual: dict, otimizada: dict) -> dict:
 # --------------------------------------------------------------- qualidade ---
 def qualidade_do_servico(rel: dict, otimizada: dict) -> dict:
     """Contrapeso honesto da economia: mostrar que cortar frota não piorou o
-    serviço (ocupação, tempo dentro do limite legal, assentos sobrando)."""
-    rotas = rel["frota_otimizada"]["rotas"]
-    ocupacoes = [r["ocupacao_pct"] for r in rotas]
-    tempos = [r["min_viagem"] for r in rotas]
-    alunos = rel["demanda"]["alunos"]
+    serviço (ocupação, tempo dentro do limite legal, lugares sobrando e
+    jornada dos veículos dentro do que cabe antes do sinal).
+
+    Com multiviagem, o que atende o aluno não é o assento do veículo e sim o
+    LUGAR-VIAGEM: um ônibus de 31 lugares que faz 3 viagens oferece 93 lugares
+    naquele turno.
+    """
+    viagens = rel["frota_otimizada"]["viagens"]
+    veiculos = rel["frota_otimizada"]["veiculos"]
+    tipos = rel["premissas"]["custos_por_tipo"]
+    ocupacoes = [v["ocupacao_pct"] for v in viagens]
+    tempos = [v["min_viagem"] for v in viagens]
+
+    por_turno = []
+    for t in rel["demanda"]["turnos"]:
+        vgs = [v for v in viagens if v["turno"] == t["id"]]
+        vcs = [v for v in veiculos if v["turno"] == t["id"]]
+        if not vcs:
+            continue
+        lugares = sum(v["capacidade"] * len(v["viagens"]) for v in vcs)
+        alunos_turno = rel["demanda"]["alunos_por_turno"][t["id"]]
+        jornadas = [v["min_turno"] for v in vcs]
+        por_turno.append({
+            "turno": t["nome"],
+            "alunos": alunos_turno,
+            "viagens": len(vgs),
+            "veiculos": len(vcs),
+            "viagens_por_veiculo": round(len(vgs) / len(vcs), 2),
+            "lugares_ofertados": lugares,
+            "lugares_folga": lugares - alunos_turno,
+            "jornada_limite_min": t["jornada_max_min"],
+            "jornada_media_min": round(sum(jornadas) / len(jornadas), 1),
+            "jornada_max_min": max(jornadas),
+        })
+
+    # toda viagem com cadeirante precisa ter caído em veículo acessível
+    cadeirantes_ok = all(
+        v["cadeirantes"] <= int(tipos[v["tipo"]].get("posicoes_cadeirante", 0))
+        for v in viagens
+    )
     return {
-        "rotas": len(rotas),
+        "viagens": len(viagens),
+        "viagens_por_veiculo_turno": rel["frota_otimizada"].get(
+            "viagens_por_veiculo_turno"),
+        "viagens_por_veiculo_atual": rel["frota_atual"].get(
+            "viagens_por_veiculo_turno"),
         "ocupacao_media_pct": round(sum(ocupacoes) / len(ocupacoes), 1),
         "ocupacao_min_pct": min(ocupacoes),
         "ocupacao_max_pct": max(ocupacoes),
-        "tempo_medio_rota_min": round(sum(tempos) / len(tempos), 1),
-        "tempo_max_rota_min": max(tempos),
-        "assentos_ofertados": otimizada["assentos"],
-        "assentos_folga": otimizada["assentos"] - alunos,
+        "tempo_medio_viagem_min": round(sum(tempos) / len(tempos), 1),
+        "tempo_max_viagem_min": max(tempos),
+        "por_turno": por_turno,
         "cadeirantes": rel["demanda"]["cadeirantes"],
         "posicoes_cadeirante": otimizada["posicoes_cadeirante"],
-        "atende_cadeirantes": (otimizada["posicoes_cadeirante"]
-                               >= rel["demanda"]["cadeirantes"]),
+        "atende_cadeirantes": cadeirantes_ok,
     }
 
 
@@ -260,8 +305,8 @@ def _economia_com(rel: dict, premissas: Premissas) -> dict:
         tipos, premissas)
     otim = avaliar_frota(
         "Frota necessária", rel["frota_otimizada"]["composicao"],
-        _km_por_tipo_das_rotas(rel["frota_otimizada"]["rotas"],
-                               premissas.viagens_por_dia),
+        _km_por_tipo_dos_veiculos(rel["frota_otimizada"]["veiculos"],
+                                  premissas.viagens_por_rota),
         tipos, premissas)
     return {"atual": atual, "otimizada": otim, "economia": comparar(atual, otim)}
 
@@ -312,6 +357,7 @@ def montar_painel(rel: dict, premissas: Premissas = None,
         "premissas": asdict(premissas),
         "demanda": rel["demanda"],
         "atual": r["atual"],
+        "atual_origem": rel["frota_atual"].get("como_foi_estimada"),
         "otimizada": r["otimizada"],
         "economia": r["economia"],
         "qualidade": qualidade_do_servico(rel, r["otimizada"]),

@@ -16,6 +16,12 @@ auditáveis, nada de número mágico.
 | 1 | `dados/` (agent-dados) | Esquema do domínio e gerador do "Município Modelo" sintético (Ribeirão Modelo) |
 | 1 | `motor/` (agent-rotas) | CVRP escolar com frota heterogênea (OR-Tools) + dimensionamento de frota e relatório antes/depois em JSON |
 | 2 | `painel/` (agent-painel) | **Painel de economia** — a tela da demo: antes vs depois em R$, km, litros, CO₂ e veículos, simulador de cenários, memória de cálculo e exportação em PDF |
+| 3 | `motor/escala.py` + `dados/` | **Roteirização multiviagem**: cada veículo encadeia várias viagens por turno, como a prefeitura opera de verdade. Destrava a demanda real (~3.000 alunos, dois turnos) e a frota atual passa a ser derivada de premissas declaradas |
+
+Resultado atual do Município Modelo: **30 → 22 veículos (−26,7%)**, R$ 151.535/mês,
+R$ 1,82 mi/ano, −1.244 km/dia, −242 litros/dia, −171,5 tCO₂/ano — com 106 viagens
+diárias, ocupação média de 93,4% e nenhum aluno mais de 57 min dentro do veículo
+(o limite da secretaria é 75).
 
 ## Como rodar
 
@@ -50,9 +56,11 @@ Seções, na ordem da demonstração:
 
 1. **Manchete** — veículos a menos, R$/mês, R$/ano, km/dia, litros/dia, tCO₂/ano.
 2. **Antes e depois** — custo fixo e variável das duas frotas, veículo a veículo.
-3. **Dimensionamento** — "sua frota atual: 25 veículos; necessário: 17 (…)".
-4. **Qualidade do serviço** — ocupação por rota, tempo dentro do veículo,
-   posições de cadeirante: a prova de que a frota menor não piorou o serviço.
+3. **Dimensionamento** — "sua frota atual: 30 veículos; necessário: 22 (…)",
+   com quantas viagens cada veículo encadeia por turno.
+4. **Qualidade do serviço** — ocupação por viagem, tempo dentro do veículo,
+   posições de cadeirante e a jornada de cada turno: a prova de que a frota
+   menor não piorou o serviço.
 5. **Simulador de cenários** — preço do diesel e dias letivos.
 6. **O que o sistema aprendeu** — evolução do erro de tempo estimado.
 7. **Premissas, limitações e memória de cálculo** — o passo a passo da conta.
@@ -86,24 +94,51 @@ front em React e o `agent-conversa` vão consumir:
 | `GET /api/aprendizado` | série de aprendizado com o selo de origem |
 | `GET /api/relatorio` | relatório bruto do motor |
 
+## A roteirização multiviagem (Sprint 3)
+
+O motor trabalha em duas fases:
+
+1. **Roteirizar** (`motor/dimensionar.py`, OR-Tools): para cada escola e cada
+   turno, resolve o CVRP com frota heterogênea, tempo de embarque por parada e
+   limite de 75 min por aluno. Cada "veículo" do solver é uma **viagem**.
+2. **Escalar** (`motor/escala.py`, heurística pura): encaixa as viagens de um
+   turno em veículos físicos — a mais longa primeiro, no veículo que ficar com
+   menos folga — respeitando a jornada disponível antes do sinal, o
+   deslocamento até a próxima escola, o tempo de virada e a compatibilidade de
+   tipo (assentos e posições de cadeirante).
+
+A frota necessária é o **maior número de veículos de cada tipo entre os
+turnos**, não a soma: o mesmo ônibus atende manhã e tarde.
+
+A separação das fases não é estética: a fase 2 roda sem OR-Tools e por isso é
+testada isoladamente (`testes/test_escala.py`), inclusive quanto ao
+determinismo — mesma entrada, mesma escala, requisito para a demo ser
+reprodutível.
+
 ## Limitações conhecidas (declaradas também dentro do painel)
 
-- A demanda é sintética. O Município Modelo hoje gera **466 alunos**, e não os
-  ~3.000 previstos no roteiro de demonstração: o modelo atual assume **uma rota
-  por veículo por turno**, então uma demanda maior explodiria a frota
-  necessária. Encadear duas ou três viagens por veículo (multiviagem) é
-  pré-requisito para subir a demanda — está no backlog do motor de rotas.
+- A demanda é sintética (~2.900 alunos/dia em dois turnos). Com a planilha real
+  da prefeitura os números mudam.
+- **A frota atual do município fictício é derivada**, não informada: sai de
+  ocupação média de 85%, 2,5 viagens por veículo/turno e rotas 25% mais longas
+  que as otimizadas, aplicadas ao turno mais cheio. Num município real este
+  dado vem do cadastro da secretaria — e é assim que o painel diz na tela.
+- O encaixe das viagens é heurístico, não ótimo: a escala é sempre válida, mas
+  pode existir arranjo um pouco melhor.
 - Tempos de percurso saem de distância em linha reta com fator de sinuosidade
-  rural (1,35), ainda não de malha viária real (OSRM) nem de GPS.
+  rural (1,35) mais o tempo de embarque por parada, ainda não de malha viária
+  real (OSRM) nem de GPS.
 - O km/dia da frota atual é rateado entre os tipos de veículo, porque a
   prefeitura declara apenas o total.
+- A dispersão no fim do turno é considerada espelhada da coleta, não
+  roteirizada separadamente.
 - O PDF sai pela impressão do navegador. Geração de PDF no servidor (para
   agendar envio ao tribunal de contas) fica para quando houver backend
   definitivo.
 
 ## Próximos passos
 
-- **Motor**: roteirização multiviagem para sustentar a demanda de 3.000 alunos.
+- **Motor**: malha viária real (OSRM) no lugar da distância em linha reta.
 - **Painel**: mapa das rotas (MapLibre) e tela de planejamento (importar
   planilha → otimizar → aprovar e publicar).
 - **App do motorista**: GPS real alimentando o ciclo de aprendizado, que troca

@@ -45,31 +45,49 @@ def _ativo(nome: str) -> str:
 
 
 # ------------------------------------------------------------------ blocos ---
-def _kpi(rotulo, valor, detalhe, destaque=False):
-    return (f'<div class="kpi{" destaque" if destaque else ""}">'
+def _kpi(rotulo, valor, detalhe, destaque=False, piora=False):
+    classe = "kpi" + (" destaque" if destaque and not piora else "") + (
+        " piora" if piora else "")
+    return (f'<div class="{classe}">'
             f'<div class="rotulo">{esc(rotulo)}</div>'
             f'<div class="valor">{esc(valor)}</div>'
             f'<div class="detalhe">{esc(detalhe)}</div></div>')
 
 
+def _delta(valor: float, texto: str) -> str:
+    """Sinal explícito: − quando economiza, + quando piora.
+
+    Sem isso, um indicador que piora sairia como "−-49,1 t" na tela — e um
+    painel que não sabe mostrar resultado ruim não serve para auditoria.
+    """
+    return ("−" if valor > 0 else "+") + texto
+
+
 def bloco_kpis(p: dict) -> str:
     e, atual, otim = p["economia"], p["atual"], p["otimizada"]
     return '<div class="kpis">' + "".join([
-        _kpi("Veículos a menos", f'−{e["veiculos"]}',
+        _kpi("Veículos a menos", _delta(e["veiculos"], str(abs(e["veiculos"]))),
              f'de {atual["total_veiculos"]} para {otim["total_veiculos"]} '
-             f'({pct(e["reducao_frota_pct"])} de redução)', destaque=True),
+             f'({pct(abs(e["reducao_frota_pct"]))} de redução)',
+             destaque=True, piora=e["veiculos"] < 0),
         _kpi("Economia por mês", reais_curto(e["custo_mes"]),
              f'{reais(atual["custo_mes"])} → {reais(otim["custo_mes"])} '
-             f'({pct(e["reducao_custo_pct"])})', destaque=True),
+             f'({pct(e["reducao_custo_pct"])})',
+             destaque=True, piora=e["custo_mes"] < 0),
         _kpi("Economia por ano", reais_curto(e["custo_ano"]),
-             f'{reais(e["custo_mes"])} × 12 meses'),
-        _kpi("Quilômetros por dia", f'−{numero(e["km_dia"])} km',
+             f'{reais(e["custo_mes"])} × 12 meses',
+             piora=e["custo_ano"] < 0),
+        _kpi("Quilômetros por dia",
+             _delta(e["km_dia"], f'{numero(abs(e["km_dia"]))} km'),
              f'de {numero(atual["km_dia"])} para {numero(otim["km_dia"])} km/dia '
-             f'({pct(e["reducao_km_pct"])})'),
-        _kpi("Diesel por dia", f'−{numero(e["litros_dia"])} l',
-             f'{numero(e["litros_ano"])} litros por ano'),
-        _kpi("Emissões evitadas", f'−{numero(e["tco2_ano"], 1)} t',
-             'toneladas de CO₂ por ano'),
+             f'({pct(e["reducao_km_pct"])})', piora=e["km_dia"] < 0),
+        _kpi("Diesel por dia",
+             _delta(e["litros_dia"], f'{numero(abs(e["litros_dia"]))} l'),
+             f'{numero(abs(e["litros_ano"]))} litros por ano',
+             piora=e["litros_dia"] < 0),
+        _kpi("Emissões evitadas",
+             _delta(e["tco2_ano"], f'{numero(abs(e["tco2_ano"]), 1)} t'),
+             'toneladas de CO₂ por ano', piora=e["tco2_ano"] < 0),
     ]) + "</div>"
 
 
@@ -117,43 +135,79 @@ def bloco_antes_depois(p: dict) -> str:
 
 
 def bloco_frota(p: dict) -> str:
-    otim, atual = p["otimizada"], p["atual"]
+    otim, atual, q = p["otimizada"], p["atual"], p["qualidade"]
     detalhe = " + ".join(f'{l["qtd"]} {l["nome"].lower()}' for l in otim["composicao"])
     return (
         '<section><h2>Dimensionamento da frota</h2>'
         f'<p class="chamada">Sua frota atual: <b>{atual["total_veiculos"]} veículos</b>. '
         f'Necessário para atender a mesma demanda: <b>{otim["total_veiculos"]} veículos</b> '
-        f'({esc(detalhe)}). Cada veículo da frota necessária existe porque há uma rota '
+        f'({esc(detalhe)}). Cada veículo da frota necessária existe porque há uma viagem '
         f'que não cabe nos demais dentro do limite de '
         f'{p["premissas"]["tempo_max_trajeto_min"]} minutos por aluno.</p>'
+        f'<p class="chamada">O ganho não vem de cortar aluno, vem de <b>multiviagem</b>: '
+        f'cada veículo faz {numero(q["viagens_por_veiculo_turno"] or 0, 2)} viagens por '
+        f'turno na proposta, contra {numero(q["viagens_por_veiculo_atual"] or 0, 1)} na '
+        f'operação de hoje — sempre respeitando a jornada disponível antes do sinal e o '
+        f'tempo de virada de {p["premissas"]["tempo_virada_min"]} minutos entre uma '
+        f'viagem e a seguinte.</p>'
         + graficos.barras_frota(atual, otim)
         + '</section>'
     )
 
 
-def bloco_qualidade(p: dict, rotas: list) -> str:
+def _tabela_turnos(q: dict) -> str:
+    linhas = "".join(
+        f'<tr><td>{esc(t["turno"])}</td>'
+        f'<td class="num">{numero(t["alunos"])}</td>'
+        f'<td class="num">{t["viagens"]}</td>'
+        f'<td class="num">{t["veiculos"]}</td>'
+        f'<td class="num">{numero(t["viagens_por_veiculo"], 2)}</td>'
+        f'<td class="num">{numero(t["lugares_ofertados"])}</td>'
+        f'<td class="num">{numero(t["lugares_folga"])}</td>'
+        f'<td class="num">{numero(t["jornada_media_min"], 1)} / '
+        f'{t["jornada_max_min"]} min</td>'
+        f'<td class="num">{t["jornada_limite_min"]} min</td></tr>'
+        for t in q["por_turno"]
+    )
+    return (
+        '<div class="rolagem"><table>'
+        '<caption>Cada turno tem que fechar sozinho — a frota é a mesma nos dois</caption>'
+        '<thead><tr><th>Turno</th><th class="num">Alunos</th>'
+        '<th class="num">Viagens</th><th class="num">Veículos</th>'
+        '<th class="num">Viagens por veículo</th>'
+        '<th class="num">Lugares ofertados</th><th class="num">Folga</th>'
+        '<th class="num">Jornada média / máx</th>'
+        '<th class="num">Limite</th></tr></thead>'
+        f'<tbody>{linhas}</tbody></table></div>'
+    )
+
+
+def bloco_qualidade(p: dict, viagens: list) -> str:
     q = p["qualidade"]
     d = p["demanda"]
-    atende = ("atendidos" if q["atende_cadeirantes"]
-              else "ATENÇÃO: posições insuficientes")
+    atende = ("todas as viagens com cadeirante em veículo acessível"
+              if q["atende_cadeirantes"]
+              else "ATENÇÃO: há viagem com cadeirante sem veículo acessível")
     return (
         '<section><h2>A frota menor continua atendendo todo mundo</h2>'
         f'<p class="chamada">Cortar veículo só vale se o serviço não piorar. '
-        f'As {q["rotas"]} rotas propostas transportam os {numero(d["alunos"])} alunos '
-        f'em {numero(d["pontos_embarque"])} pontos de embarque, com '
-        f'{numero(q["assentos_folga"])} assentos de folga e nenhuma rota acima do '
-        f'limite de {p["premissas"]["tempo_max_trajeto_min"]} minutos.</p>'
-        + graficos.barras_ocupacao(rotas)
+        f'As {q["viagens"]} viagens propostas transportam os '
+        f'{numero(d["alunos"])} alunos em {numero(d["pontos_embarque"])} pontos de '
+        f'embarque, com folga de lugares nos dois turnos e nenhuma viagem acima do '
+        f'limite de {p["premissas"]["tempo_max_trajeto_min"]} minutos por aluno.</p>'
+        + graficos.barras_ocupacao(viagens)
         + '<ul class="lista">'
         f'<li>Ocupação média de {pct(q["ocupacao_media_pct"])} '
-        f'(menor rota {q["ocupacao_min_pct"]}%, maior rota {q["ocupacao_max_pct"]}%) — '
+        f'(menor viagem {q["ocupacao_min_pct"]}%, maior {q["ocupacao_max_pct"]}%) — '
         f'sem veículo rodando vazio nem aluno em pé.</li>'
-        f'<li>Tempo dentro do veículo: {numero(q["tempo_medio_rota_min"], 1)} min em média, '
-        f'máximo de {q["tempo_max_rota_min"]} min — o limite da secretaria é '
-        f'{p["premissas"]["tempo_max_trajeto_min"]} min.</li>'
+        f'<li>Tempo dentro do veículo: {numero(q["tempo_medio_viagem_min"], 1)} min em '
+        f'média, máximo de {q["tempo_max_viagem_min"]} min — o limite da secretaria '
+        f'é {p["premissas"]["tempo_max_trajeto_min"]} min.</li>'
         f'<li>Alunos cadeirantes: {d["cadeirantes"]} · posições em veículo acessível na '
         f'frota proposta: {q["posicoes_cadeirante"]} — {esc(atende)}.</li>'
-        '</ul></section>'
+        '</ul>'
+        '<div style="margin-top:20px">' + _tabela_turnos(q) + '</div>'
+        '</section>'
     )
 
 
@@ -229,6 +283,22 @@ def bloco_aprendizado(serie: dict) -> str:
 
 def bloco_premissas(p: dict) -> str:
     pr = p["premissas"]
+    jornadas = " · ".join(
+        f'{t["nome"]}: {t["jornada_max_min"]} min' for t in p["demanda"]["turnos"])
+
+    o = p.get("atual_origem")
+    if o:
+        origem_frota_atual = esc(
+            f'A frota atual deste município fictício não é um número escolhido a dedo: '
+            f'sai de ocupação média de {round(o["ocupacao_media"] * 100)}%, '
+            f'{numero(o["viagens_por_veiculo_turno"], 1)} viagens por veículo/turno e '
+            f'rotas {round((o["fator_km_roteiro"] - 1) * 100)}% mais longas que as '
+            f'otimizadas, aplicados ao turno mais cheio '
+            f'({numero(o["turno_critico_alunos"])} alunos). '
+            f'Num município real, este dado vem do cadastro da secretaria.')
+    else:
+        origem_frota_atual = esc(
+            'A frota atual foi informada pela secretaria e usada como está.')
     passos = "".join(
         f'<tr><td>{esc(m["passo"])}</td><td>{esc(m["formula"])}</td>'
         f'<td>{esc(m["valores"])}</td></tr>'
@@ -243,8 +313,10 @@ def bloco_premissas(p: dict) -> str:
         '<tbody>'
         f'<tr><td>Preço do diesel</td><td class="num">{esc(reais(pr["preco_diesel_l"], 2))}/litro</td></tr>'
         f'<tr><td>Dias letivos no mês</td><td class="num">{pr["dias_letivos_mes"]}</td></tr>'
-        f'<tr><td>Viagens por dia (ida e volta)</td><td class="num">{pr["viagens_por_dia"]}</td></tr>'
+        f'<tr><td>Viagens por rota (coleta e dispersão)</td><td class="num">{pr["viagens_por_rota"]}</td></tr>'
         f'<tr><td>Tempo máximo do aluno no veículo</td><td class="num">{pr["tempo_max_trajeto_min"]} min</td></tr>'
+        f'<tr><td>Virada entre duas viagens do mesmo veículo</td><td class="num">{pr["tempo_virada_min"]} min</td></tr>'
+        f'<tr><td>Jornada disponível por turno</td><td class="num">{jornadas}</td></tr>'
         f'<tr><td>Fator de emissão do diesel</td><td class="num">{numero(pr["fator_co2_kg_l"], 2)} kg CO₂/litro</td></tr>'
         f'<tr><td>Origem dos tempos de percurso</td><td>{esc(pr["fonte_tempos"])}</td></tr>'
         '</tbody></table></div></div>'
@@ -252,12 +324,20 @@ def bloco_premissas(p: dict) -> str:
         '<tbody>'
         '<tr><td>Demanda usada é sintética (município fictício gerado para a demonstração); '
         'com a planilha real da prefeitura os números mudam.</td></tr>'
-        '<tr><td>Cada veículo faz uma rota por turno. Municípios que encadeiam duas ou três '
-        'viagens por veículo precisam do modelo multiviagem (backlog do motor de rotas).</td></tr>'
+        f'<tr><td>{origem_frota_atual}</td></tr>'
+        '<tr><td>As viagens de um turno são encaixadas nos veículos por heurística '
+        '(a mais longa primeiro, no veículo com menos folga), não por otimização exata: '
+        'a escala é sempre válida, mas pode existir arranjo um pouco melhor.</td></tr>'
+        '<tr><td>A frota necessária toma o maior número de veículos de cada tipo entre os '
+        'turnos. É o lado seguro — garante cobrir manhã e tarde, e pode sobrar veículo de '
+        'um tipo em um dos turnos.</td></tr>'
         '<tr><td>Tempos de percurso vêm de distância em linha reta com fator de sinuosidade '
-        'rural, ainda não de malha viária real nem de GPS.</td></tr>'
+        'rural mais o tempo de embarque por parada, ainda não de malha viária real nem de '
+        'GPS.</td></tr>'
         '<tr><td>Custo por km da frota atual é rateado pelo número de veículos, porque a '
         'prefeitura declara apenas o km/dia total.</td></tr>'
+        '<tr><td>A dispersão no fim do turno é considerada espelhada da coleta (mesmo '
+        'percurso, sentido inverso), e não roteirizada separadamente.</td></tr>'
         '</tbody></table></div></div>'
         '</div>'
         '<div class="rolagem" style="margin-top:22px"><table>'
@@ -269,10 +349,13 @@ def bloco_premissas(p: dict) -> str:
 
 
 # ------------------------------------------------------------------ página ---
-def renderizar(p: dict, serie: dict, rotas: list, origem: str) -> str:
+def renderizar(p: dict, serie: dict, viagens: list, origem: str) -> str:
     css, js = _ativo("painel.css"), _ativo("painel.js")
     d = p["demanda"]
     titulo = f'Painel de Economia · {p["municipio"]}'
+    turnos = " · ".join(
+        f'{t["nome"]} {numero(d["alunos_por_turno"][t["id"]])}'
+        for t in d["turnos"])
     return f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -291,7 +374,8 @@ def renderizar(p: dict, serie: dict, rotas: list, origem: str) -> str:
   a mesma demanda, quanto isso economiza por mês e por quê — com todas as
   premissas abertas para auditoria.</p>
   <div class="identificacao">
-    <span>Demanda atendida: <b>{numero(d["alunos"])} alunos</b></span>
+    <span>Demanda atendida: <b>{numero(d["alunos"])} alunos/dia</b></span>
+    <span>Por turno: <b>{esc(turnos)}</b></span>
     <span>Pontos de embarque: <b>{numero(d["pontos_embarque"])}</b></span>
     <span>Escolas: <b>{d["escolas"]}</b></span>
     <span>Relatório gerado em: <b>{esc(p["gerado_em"])}</b></span>
@@ -306,7 +390,7 @@ def renderizar(p: dict, serie: dict, rotas: list, origem: str) -> str:
   {bloco_kpis(p)}
   {bloco_antes_depois(p)}
   {bloco_frota(p)}
-  {bloco_qualidade(p, rotas)}
+  {bloco_qualidade(p, viagens)}
   {bloco_cenarios(p)}
   {bloco_aprendizado(serie)}
   {bloco_premissas(p)}
@@ -342,7 +426,7 @@ def montar_html(caminho_relatorio: str = economia_mod.RELATORIO_PADRAO,
     p = economia_mod.montar_painel(rel, premissas)
     serie = aprendizado_mod.carregar_serie(
         caminho_serie or aprendizado_mod.SERIE_PADRAO)
-    html = renderizar(p, serie, rel["frota_otimizada"]["rotas"],
+    html = renderizar(p, serie, rel["frota_otimizada"]["viagens"],
                       os.path.basename(caminho_relatorio))
     return html, p
 
