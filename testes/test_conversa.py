@@ -69,6 +69,8 @@ class TestRoteador(unittest.TestCase):
              "qualidade_da_importacao"),
             ("Quantos erros teve na importação?", "qualidade_da_importacao"),
             ("O que o sistema aprendeu?", "o_que_o_sistema_aprendeu"),
+            ("Como está a fila do porta a porta?", "elegibilidade_pcd"),
+            ("Quantos pedidos de PCD estão atrasados?", "elegibilidade_pcd"),
             ("Como está a operação hoje?", "estado_da_operacao"),
             ("Me explica a viagem E1-manha-03", "explicar_rota"),
             ("Gere o relatório para o tribunal de contas",

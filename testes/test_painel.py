@@ -94,6 +94,18 @@ class TestPaginaDoPainel(unittest.TestCase):
         self.assertIn("não é um número escolhido a dedo", self.html)
         self.assertIn("vem do cadastro da secretaria", self.html)
 
+    def test_bloco_de_elegibilidade_diz_a_origem_do_dado(self):
+        if "Elegibilidade ao porta a porta" not in self.html:
+            self.skipTest("relatorios/elegibilidade.json ainda não foi gerado")
+        self.assertIn("Decisões com analista identificado", self.html)
+        # fila simulada tem que aparecer como simulada, com selo na tela
+        if (self.painel.get("elegibilidade") or {}).get("origem") != "operacao_real":
+            self.assertIn("FILA SIMULADA", self.html)
+
+    def test_bloco_de_elegibilidade_some_quando_nao_ha_relatorio(self):
+        self.assertEqual(render.bloco_elegibilidade({}), "")
+        self.assertEqual(render.bloco_elegibilidade(None), "")
+
     def test_traz_premissas_e_memoria_de_calculo(self):
         self.assertIn("Premissas e memória de cálculo", self.html)
         self.assertIn("Limitações declaradas desta versão", self.html)

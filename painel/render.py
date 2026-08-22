@@ -270,6 +270,83 @@ def bloco_importacao(imp: dict) -> str:
     )
 
 
+def bloco_elegibilidade(el: dict) -> str:
+    """Elegibilidade ao porta a porta — a fila que costuma levar meses."""
+    if not el or not el.get("resumo"):
+        return ""
+    r = el["resumo"]
+    classe_selo = "selo" if el.get("origem") != "operacao_real" else "selo medido"
+
+    estados = "".join(
+        f'<tr><td>{esc(rotulo)}</td>'
+        f'<td class="num">{numero(r["por_estado"].get(chave, 0))}</td></tr>'
+        for chave, rotulo in (
+            ("recebido", "Recebido, aguardando análise"),
+            ("em_analise", "Em análise"),
+            ("pendente_de_informacao", "Esperando informação da família"),
+            ("aprovado", "Aprovado"),
+            ("negado", "Negado"),
+        ))
+    fontes = "".join(
+        f'<tr><td>{esc(f["rotulo"])}</td>'
+        f'<td class="num">{numero(f["decisoes"])}</td></tr>'
+        for f in el.get("fontes", []))
+    aviso = ""
+    if el.get("origem") != "operacao_real":
+        aviso = ('<div class="aviso"><b>Leia com atenção:</b> esta fila é '
+                 'simulada para a demonstração. O fluxo é o real — formulário, '
+                 'leitura assistida do documento, decisão com nome do analista '
+                 'e registro que não se apaga —, mas nenhuma pessoa aqui '
+                 'existe.</div>')
+
+    return (
+        '<section><h2>Elegibilidade ao porta a porta '
+        f'<span class="{classe_selo}">{esc(el.get("selo", ""))}</span></h2>'
+        '<p class="chamada">Hoje a família consegue um laudo, tira cópia, vai '
+        'até a secretaria, protocola e espera sem informação — e no ano '
+        'seguinte repete tudo, mesmo quando a condição é permanente. Aqui ela '
+        'responde ao formulário pelo celular, anexa o que já tiver e acompanha '
+        'o protocolo. A análise continua humana: o que some é o papel e a '
+        'espera no escuro.</p>'
+        '<div class="kpis">'
+        + _kpi("Pedidos na fila", numero(r["pedidos"]),
+               f'{numero(r["em_aberto"])} em aberto')
+        + _kpi("Dias em aberto (média)", numero(r["dias_em_aberto_media"], 1),
+               f'prazo assumido: {r["prazo_dias"]} dias')
+        + _kpi("Fora do prazo", numero(r["atrasados"]),
+               'aparecem no topo da fila do analista',
+               piora=r["atrasados"] > 0)
+        + _kpi("Decisões com analista identificado",
+               pct(el.get("decisoes_com_analista_pct", 0)),
+               'aprovar sem nome é impossível no sistema', destaque=True)
+        + '</div>'
+        '<div class="colunas" style="margin-top:18px">'
+        '<div><table><caption>Situação dos pedidos</caption>'
+        '<thead><tr><th>Estado</th><th class="num">Pedidos</th></tr></thead>'
+        f'<tbody>{estados}</tbody></table></div>'
+        '<div><table><caption>Em que a decisão se baseou</caption>'
+        '<thead><tr><th>Fonte</th><th class="num">Decisões</th></tr></thead>'
+        f'<tbody>{fontes}</tbody></table></div>'
+        '</div>'
+        '<ul class="lista">'
+        f'<li><b>{pct(el.get("aprovacoes_sem_laudo_pct", 0))} das aprovações '
+        f'não exigiram laudo em papel</b>: o município usou o cadastro que já '
+        f'tinha, a declaração da escola ou a avaliação presencial.</li>'
+        f'<li>{numero(r.get("permanentes", 0))} concessão(ões) marcada(s) como '
+        f'permanente — essas famílias não voltam para a fila todo ano.</li>'
+        f'<li>{numero(r.get("a_vencer_30_dias", 0))} concessão(ões) vencendo '
+        f'nos próximos 30 dias: o sistema avisa antes, e não depois de o '
+        f'veículo deixar de encostar na porta.</li>'
+        f'<li>{numero(el.get("usuarios_para_roteirizacao", 0))} usuários '
+        f'aprovados alimentam a roteirização porta a porta — só com restrição '
+        f'operacional: nome, endereço e diagnóstico ficam no processo, nunca '
+        f'no dado de rota.</li>'
+        '</ul>'
+        + aviso
+        + '</section>'
+    )
+
+
 def bloco_mapa(p: dict) -> str:
     """Mapa das rotas — desenhado em SVG, sem tiles e sem internet."""
     geografia = p.get("geografia") or {}
@@ -639,6 +716,7 @@ def renderizar(p: dict, serie: dict, viagens: list, origem: str) -> str:
   {bloco_frota(p)}
   {bloco_qualidade(p, viagens)}
   {bloco_importacao(p.get("importacao"))}
+  {bloco_elegibilidade(p.get("elegibilidade"))}
   {bloco_mapa(p)}
   {bloco_porta_a_porta(p.get("porta_a_porta"))}
   {bloco_reotimizacao(p.get("reotimizacao"))}
@@ -681,6 +759,9 @@ def montar_html(caminho_relatorio: str = economia_mod.RELATORIO_PADRAO,
     rel.setdefault("importacao",
                    economia_mod.carregar_opcional(
                        economia_mod.RELATORIO_IMPORTACAO))
+    rel.setdefault("elegibilidade",
+                   economia_mod.carregar_opcional(
+                       economia_mod.RELATORIO_ELEGIBILIDADE))
     premissas = economia_mod.premissas_do_relatorio(rel).substituir(
         preco_diesel_l=diesel, dias_letivos_mes=dias)
     p = economia_mod.montar_painel(rel, premissas)

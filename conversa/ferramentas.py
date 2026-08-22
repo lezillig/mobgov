@@ -181,6 +181,24 @@ def qualidade_da_importacao() -> dict:
     return resposta
 
 
+def elegibilidade_pcd() -> dict:
+    """Como está a fila de quem pede o porta a porta."""
+    el = _opcional("elegibilidade.json")
+    if not el.get("resumo"):
+        return {"aviso": "Ainda não há fila de elegibilidade. Rode: "
+                         "python elegibilidade/relatorio.py"}
+    resumo = dict(el["resumo"])
+    resumo.update({
+        "selo": el.get("selo"),
+        "origem": el.get("origem"),
+        "decisoes_com_analista_pct": el.get("decisoes_com_analista_pct"),
+        "aprovacoes_sem_laudo_pct": el.get("aprovacoes_sem_laudo_pct"),
+        "usuarios_para_roteirizacao": el.get("usuarios_para_roteirizacao"),
+        "fontes": el.get("fontes", []),
+    })
+    return resumo
+
+
 def o_que_o_sistema_aprendeu() -> dict:
     """Evolução do erro de previsão e o que mudou no modelo."""
     from painel import aprendizado as aprendizado_mod
@@ -264,6 +282,15 @@ CATALOGO = [
         {"type": "object", "properties": {}, "required": []},
         lambda **_: qualidade_da_importacao(),
         ["a planilha entrou direito?", "quantos erros teve na importação?"]),
+    Ferramenta(
+        "elegibilidade_pcd",
+        "Fila de elegibilidade ao transporte porta a porta: pedidos em "
+        "aberto, atrasados, aprovados, negados, concessões permanentes e "
+        "quantas aprovações dispensaram laudo em papel.",
+        {"type": "object", "properties": {}, "required": []},
+        lambda **_: elegibilidade_pcd(),
+        ["como está a fila do porta a porta?",
+         "quantos pedidos de PCD estão atrasados?"]),
     Ferramenta(
         "o_que_o_sistema_aprendeu",
         "Evolução do aprendizado: erro de previsão de tempo, versão do modelo, "

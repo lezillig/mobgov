@@ -152,6 +152,34 @@ def importacao(d: dict) -> str:
     return "\n".join(linhas)
 
 
+def elegibilidade(d: dict) -> str:
+    if d.get("aviso"):
+        return d["aviso"]
+    estados = d.get("por_estado") or {}
+    linhas = [
+        f"[{d.get('selo')}] {numero(d['pedidos'])} pedidos de porta a porta, "
+        f"{numero(d['em_aberto'])} em aberto e {numero(d['atrasados'])} fora "
+        f"do prazo de {d['prazo_dias']} dias.", "",
+        _linha("Média de dias em aberto", numero(d["dias_em_aberto_media"], 1)),
+        _linha("Aprovados", numero(d.get("aprovados", 0))),
+        _linha("Negados", numero(d.get("negados", 0))),
+        _linha("Concessões permanentes (não renovam todo ano)",
+               numero(d.get("permanentes", 0))),
+        _linha("Vencendo em 30 dias", numero(d.get("a_vencer_30_dias", 0))),
+    ]
+    if d.get("decisoes_com_analista_pct") is not None:
+        linhas.append(_linha("Decisões com analista identificado",
+                             pct(d["decisoes_com_analista_pct"])))
+    if d.get("aprovacoes_sem_laudo_pct") is not None:
+        linhas.append(_linha("Aprovações sem laudo em papel",
+                             pct(d["aprovacoes_sem_laudo_pct"])))
+    if estados:
+        linhas += ["", "Por situação:"]
+        linhas += [_linha(estado, numero(qtd))
+                   for estado, qtd in sorted(estados.items())]
+    return "\n".join(linhas)
+
+
 def aprendizado(d: dict) -> str:
     if d.get("erro_atual_min") is None:
         return "Ainda não há série de aprendizado para mostrar."
@@ -183,6 +211,7 @@ ESCRITORES = {
     "explicar_rota": rota,
     "estado_da_operacao": operacao,
     "qualidade_da_importacao": importacao,
+    "elegibilidade_pcd": elegibilidade,
     "o_que_o_sistema_aprendeu": aprendizado,
     "gerar_relatorio": relatorio,
 }

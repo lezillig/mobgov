@@ -32,6 +32,11 @@ REGRAS = [
         "aprend": 6, "erro de previsao": 5, "melhorou": 3, "historico": 3,
         "modelo": 3, "rollback": 5, "acuracia": 4,
     }),
+    ("elegibilidade_pcd", {
+        "elegib": 6, "porta a porta": 5, "pcd": 5, "deficien": 5,
+        "cadeira de rodas": 4, "laudo": 5, "protocolo": 4, "fila": 3,
+        "concessao": 4, "acessivel": 3,
+    }),
     ("estado_da_operacao", {
         "hoje": 4, "agora": 3, "operacao": 4, "falta": 4, "ausencia": 4,
         "motorista": 3, "reotimiz": 5, "atraso": 3, "imprevisto": 4,
