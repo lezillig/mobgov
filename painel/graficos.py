@@ -183,6 +183,71 @@ def barras_ocupacao(viagens: list) -> str:
     return _svg(L, A, "".join(corpo), "Ocupação de assentos por viagem otimizada")
 
 
+# ------------------------------------------- linha do tempo do porta a porta ---
+def linha_do_tempo_rota(rota: dict) -> str:
+    """Mostra a relação n:n de uma rota porta a porta.
+
+    É o gráfico que explica o vertical PCD numa olhada: os triângulos para
+    cima são embarques, para baixo são desembarques, e a escada é quanta gente
+    está dentro do veículo em cada momento. Um roteirizador de entrega
+    desenharia uma linha só descendo; aqui ela sobe e desce várias vezes.
+    """
+    L, A = 720, 240
+    esq, dir_ = 60, L - 40
+    base, topo = A - 56, 56
+    eventos = rota.get("eventos", [])
+    if len(eventos) < 2:
+        return _svg(L, A, _texto(L / 2, A / 2, "Rota sem eventos", "g-rotulo"),
+                    "Linha do tempo da rota")
+
+    inicio = eventos[0]["minuto"]
+    fim = max(e["minuto"] for e in eventos)
+    span = max(1, fim - inicio)
+    pico = max(1, max(e["ocupacao_apos"] for e in eventos))
+
+    def x(minuto):
+        return esq + (dir_ - esq) * (minuto - inicio) / span
+
+    def y(ocupacao):
+        return base - (base - topo) * ocupacao / pico
+
+    corpo = [f'<line x1="{esq - 8}" y1="{base}" x2="{dir_}" y2="{base}" '
+             f'class="g-eixo"/>']
+
+    # escada de ocupação
+    pontos, anterior = [], base
+    for e in eventos:
+        px, py = x(e["minuto"]), y(e["ocupacao_apos"])
+        pontos.append(f"L{px:.1f},{anterior:.1f} L{px:.1f},{py:.1f}")
+        anterior = py
+    caminho = (f"M{esq:.1f},{base:.1f} " + " ".join(pontos)
+               + f" L{dir_:.1f},{anterior:.1f}")
+    corpo.append(f'<path d="{caminho}" class="g-linha"/>')
+
+    for e in eventos:
+        px, py = x(e["minuto"]), y(e["ocupacao_apos"])
+        embarque = e["tipo"] == "embarque"
+        sinal = -1 if embarque else 1
+        corpo.append(
+            f'<polygon points="{px:.1f},{py + sinal * -9:.1f} '
+            f'{px - 5:.1f},{py + sinal * 3:.1f} {px + 5:.1f},{py + sinal * 3:.1f}" '
+            f'class="{"g-otim" if embarque else "g-atual"}">'
+            f'<title>{esc(e["hora"])} · {"embarque" if embarque else "desembarque"} '
+            f'de {esc(e["usuario"])}'
+            f'{" (cadeirante)" if e.get("cadeirante") else ""} · '
+            f'{e["ocupacao_apos"]} a bordo</title></polygon>')
+
+    corpo.append(_texto(esq - 8, topo - 22, "Pessoas dentro do veículo",
+                        "g-rotulo-fraco", "start"))
+    corpo.append(_texto(esq, base + 26, eventos[0]["hora"], "g-rotulo-fraco"))
+    corpo.append(_texto(dir_, base + 26, eventos[-1]["hora"], "g-rotulo-fraco"))
+    corpo.append(_texto(L / 2, A - 12,
+                        f"▲ embarque   ▼ desembarque   ·   pico de {pico} a bordo",
+                        "g-rotulo-fraco"))
+    return _svg(L, A, "".join(corpo),
+                f"Linha do tempo da rota {rota.get('id', '')} porta a porta")
+
+
 # ---------------------------------------------------- evolução do aprendizado ---
 def linha_erro(semanas: list) -> str:
     """Erro médio (min) do tempo estimado vs realizado, semana a semana."""

@@ -19,6 +19,8 @@ import math
 import random
 from dataclasses import dataclass, field
 
+from dados import tempos
+
 random.seed(42)  # reprodutível para a demo
 
 
@@ -220,28 +222,19 @@ def gerar_pontos() -> list:
     return pontos
 
 
-def haversine_km(a, b) -> float:
-    R = 6371.0
-    la1, lo1, la2, lo2 = map(math.radians, [a[0], a[1], b[0], b[1]])
-    h = (math.sin((la2 - la1) / 2) ** 2
-         + math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2)
-    return 2 * R * math.asin(math.sqrt(h))
+# Geometria e matrizes vivem em dados/tempos.py desde a Sprint 4, junto com o
+# perfil de trânsito. Estes dois nomes continuam aqui porque meio código já os
+# importa daqui — e porque a matriz sem trânsito ainda é o piso do sistema.
+haversine_km = tempos.haversine_km
 
 
 def matriz_tempo_dist(locais, fator_rural=1.35, vel_kmh=42.0):
-    """Matriz de distância (km) e tempo (min) aproximada por haversine * fator
-    de sinuosidade. No produto real, substituída por OSRM sobre OSM — o
-    agent-aprendizado depois corrige esses tempos com GPS real."""
-    n = len(locais)
-    dist = [[0.0] * n for _ in range(n)]
-    tempo = [[0] * n for _ in range(n)]
-    for i in range(n):
-        for j in range(n):
-            if i != j:
-                d = haversine_km(locais[i], locais[j]) * fator_rural
-                dist[i][j] = d
-                tempo[i][j] = max(1, round(d / vel_kmh * 60))
-    return dist, tempo
+    """Matriz de distância (km) e tempo (min) SEM trânsito.
+
+    Para tempos com trânsito variável por horário, use
+    `dados.tempos.provedor_padrao().matriz(locais, partida_min=...)`.
+    """
+    return tempos.ProvedorHaversine(fator_rural, vel_kmh).matriz(locais)
 
 
 if __name__ == "__main__":

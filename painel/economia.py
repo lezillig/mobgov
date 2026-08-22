@@ -53,7 +53,25 @@ class Premissas:
         return Premissas(**base)
 
 
+RELATORIO_PCD = os.path.join(
+    os.path.dirname(RELATORIO_PADRAO), "porta_a_porta.json")
+RELATORIO_REOTIMIZACAO = os.path.join(
+    os.path.dirname(RELATORIO_PADRAO), "reotimizacao.json")
+
+
 def carregar_relatorio(caminho: str = RELATORIO_PADRAO) -> dict:
+    with open(caminho, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def carregar_opcional(caminho: str) -> dict:
+    """Relatórios que podem não existir ainda (porta a porta, reotimização).
+
+    O painel do escolar tem que abrir mesmo sem eles — o município que só
+    contratou o vertical escolar não vê seções vazias.
+    """
+    if not os.path.exists(caminho):
+        return {}
     with open(caminho, "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -364,6 +382,10 @@ def montar_painel(rel: dict, premissas: Premissas = None,
         "memoria_calculo": memoria_de_calculo(
             r["atual"], r["otimizada"], premissas, tipos),
     }
+    if rel.get("porta_a_porta"):
+        painel["porta_a_porta"] = rel["porta_a_porta"]
+    if rel.get("reotimizacao"):
+        painel["reotimizacao"] = rel["reotimizacao"]
     if com_cenarios:
         painel["cenarios"] = grade_de_cenarios(rel, premissas)
     return painel

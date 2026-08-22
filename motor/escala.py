@@ -9,21 +9,26 @@ padrão e por isso pode ser testada — e explicada — isoladamente.
 """
 from __future__ import annotations
 
-from dados.municipio_modelo import ESCOLAS, matriz_tempo_dist
+from dados import tempos as tempos_mod
+from dados.municipio_modelo import ESCOLAS
 
 TEMPO_VIRADA_MIN = 5   # manobra/espera entre duas viagens do mesmo veículo
 
 
-def matriz_entre_escolas(escolas=None):
+def matriz_entre_escolas(escolas=None, provedor=None, partida_min=None):
+    """Deslocamento entre escolas — também sujeito ao trânsito do horário."""
     escolas = escolas or ESCOLAS
+    provedor = provedor or tempos_mod.provedor_padrao()
     locais = [(e.lat, e.lon) for e in escolas]
-    dist, tempo = matriz_tempo_dist(locais)
+    zonas = [tempos_mod.zona_de(l) for l in locais]
+    dist, tempo = provedor.matriz(locais, partida_min=partida_min, zonas=zonas)
     indice = {e.id: i for i, e in enumerate(escolas)}
     return dist, tempo, indice
 
 
 def montar_jornadas(viagens, turno, tipos_por_id, jornada_max=None,
-                    escolas=None, tempo_virada_min=TEMPO_VIRADA_MIN):
+                    escolas=None, tempo_virada_min=TEMPO_VIRADA_MIN,
+                    provedor=None, partida_min=None):
     """Encaixa as viagens de um turno em veículos físicos (multiviagem).
 
     Regras, na ordem em que um gestor as explicaria:
@@ -39,7 +44,7 @@ def montar_jornadas(viagens, turno, tipos_por_id, jornada_max=None,
     para a demonstração ser reprodutível e auditável.
     """
     jornada_max = jornada_max or turno.jornada_max_min
-    dist_e, tempo_e, idx_e = matriz_entre_escolas(escolas)
+    dist_e, tempo_e, idx_e = matriz_entre_escolas(escolas, provedor, partida_min)
     veiculos = []
 
     def deslocamento(de_escola, para_escola):

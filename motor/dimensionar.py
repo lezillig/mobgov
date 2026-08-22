@@ -33,10 +33,15 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 from motor.escala import montar_jornadas, compor_frota, TEMPO_VIRADA_MIN
+from dados import tempos as tempos_mod
 from dados.municipio_modelo import (
     ESCOLAS, TIPOS_VEICULO, TURNOS, gerar_pontos, frota_atual_sintetica,
-    matriz_tempo_dist, tempo_parada_min,
+    tempo_parada_min,
 )
+
+# O trânsito é apanhado no MIOLO DA COLETA, não no horário do sinal: é quando
+# os veículos estão de fato na rua. Meia hora antes da janela de chegada.
+MINUTOS_ANTES_DA_JANELA = 30
 
 TEMPO_MAX_TRAJETO_MIN = 75   # parâmetro da secretaria: aluno no veículo <= 75 min
 DIAS_LETIVOS_MES = 22
@@ -48,14 +53,17 @@ TEMPO_LIMITE_SOLVER_S = 30
 
 # ------------------------------------------------------------ fase 1: rotas ---
 def resolver_viagens(escola, turno, pontos, tipos,
-                     tempo_limite_s=TEMPO_LIMITE_SOLVER_S):
+                     tempo_limite_s=TEMPO_LIMITE_SOLVER_S, provedor=None):
     """Resolve as viagens de coleta de uma escola em um turno."""
     pontos = [p for p in pontos if p.alunos.get(turno.id, 0) > 0]
     if not pontos:
         return []
 
     locais = [(escola.lat, escola.lon)] + [(p.lat, p.lon) for p in pontos]
-    dist, tempo = matriz_tempo_dist(locais)
+    provedor = provedor or tempos_mod.provedor_padrao()
+    partida = turno.janela_chegada[0] - MINUTOS_ANTES_DA_JANELA
+    zonas = [tempos_mod.zona_de(l) for l in locais]
+    dist, tempo = provedor.matriz(locais, partida_min=partida, zonas=zonas)
 
     demandas = [0] + [p.alunos[turno.id] for p in pontos]
     cadeirantes = [0] + [p.alunos_cadeirantes.get(turno.id, 0) for p in pontos]
@@ -195,7 +203,8 @@ def main():
             pts_e = [p for p in pontos if p.escola_id == e.id]
             viagens_turno += resolver_viagens(e, turno, pts_e, TIPOS_VEICULO)
         veiculos_por_turno[turno.id] = montar_jornadas(
-            viagens_turno, turno, tipos_por_id)
+            viagens_turno, turno, tipos_por_id,
+            partida_min=turno.janela_chegada[0] - MINUTOS_ANTES_DA_JANELA)
         todas_viagens += viagens_turno
         print(f"  {turno.nome}: {len(viagens_turno)} viagens em "
               f"{len(veiculos_por_turno[turno.id])} veículos", flush=True)

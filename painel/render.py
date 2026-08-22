@@ -211,6 +211,143 @@ def bloco_qualidade(p: dict, viagens: list) -> str:
     )
 
 
+def bloco_porta_a_porta(pcd: dict) -> str:
+    """Vertical PCD: a rota que encosta na porta, com n embarques e n desembarques."""
+    if not pcd or not pcd.get("rotas"):
+        return ""
+    ind = pcd.get("indicadores", {})
+    pr = pcd.get("premissas", {})
+    # a rota com mais eventos é a que melhor mostra o n:n
+    rota = max(pcd["rotas"], key=lambda r: len(r.get("eventos", [])))
+    cadeirantes = sum(r.get("cadeirantes", 0) for r in pcd["rotas"])
+
+    return (
+        '<section><h2>Transporte porta a porta (PCD)</h2>'
+        f'<p class="chamada">O escolar leva todo mundo ao mesmo destino; o porta '
+        f'a porta não. Cada usuário tem origem e destino próprios, e a mesma rota '
+        f'intercala <b>n embarques e n desembarques</b> — sem que ninguém passe do '
+        f'tempo máximo a bordo. São {numero(pcd["pedidos"])} viagens do dia '
+        f'atendidas por {pcd["total_veiculos"]} veículos, '
+        f'{numero(ind.get("usuarios_por_veiculo", 0), 2)} usuários por veículo.</p>'
+        '<div class="kpis">'
+        + _kpi("Viagens no dia", numero(pcd["pedidos"]),
+               f'{cadeirantes} em cadeira de rodas')
+        + _kpi("Veículos", str(pcd["total_veiculos"]),
+               f'{numero(pcd["km_dia"])} km/dia · '
+               f'{numero(ind.get("km_por_usuario", 0), 2)} km por usuário')
+        + _kpi("Tempo a bordo", f'{numero(ind.get("tempo_bordo_medio_min", 0), 1)} min',
+               f'máximo de {ind.get("tempo_bordo_max_min", 0)} min')
+        + _kpi("Dentro do limite", pct(ind.get("dentro_do_limite_pct", 0)),
+               f'limite = tempo direto × {pr.get("fator_tempo_bordo", "—")} + '
+               f'{pr.get("folga_tempo_bordo_min", "—")} min',
+               piora=ind.get("dentro_do_limite_pct", 100) < 100)
+        + '</div>'
+        + graficos.linha_do_tempo_rota(rota)
+        + f'<p class="chamada" style="margin-top:6px">Rota {esc(rota["id"])}: '
+        f'{rota["usuarios"]} usuários, {numero(rota["km"])} km, das '
+        f'{esc(rota["inicio"])} às {esc(rota["fim"])} — o veículo chega a levar '
+        f'{rota["ocupacao_maxima"]} pessoas ao mesmo tempo e volta a esvaziar '
+        f'antes de encher de novo.</p>'
+        '<ul class="lista">'
+        f'<li>Janela de chegada de {pr.get("janela_embarque_min", "—")} minutos por '
+        f'usuário — o padrão do <i>dial-a-ride</i>: se a consulta é 9h, o veículo '
+        f'chega entre 8h40 e 9h.</li>'
+        f'<li>Quem embarca com um veículo desembarca com o mesmo, e o embarque vem '
+        f'antes do desembarque — restrição do próprio modelo, não confere manual.</li>'
+        f'<li>Posição de cadeira de rodas conta separado do assento; acompanhante '
+        f'ocupa assento.</li>'
+        '</ul></section>'
+    )
+
+
+def _lista_diff(itens: list) -> str:
+    return "".join(f'<li>{esc(x)}</li>' for x in itens)
+
+
+def bloco_reotimizacao(evt: dict) -> str:
+    """O dia depois do plano: faltas, cancelamentos e pedidos novos."""
+    if not evt or not evt.get("resumo"):
+        return ""
+    r = evt["resumo"]
+    cartoes = []
+    for e in evt.get("escolar", [])[:2]:
+        cartoes.append(
+            f'<div class="card-evento"><div class="rotulo">Falta informada · '
+            f'viagem {esc(e["viagem"])}</div>'
+            f'<div class="tempo">respondido em {numero(e["segundos"], 3)} s</div>'
+            f'<ul class="lista">{_lista_diff(e["diff"])}</ul></div>')
+    for e in evt.get("porta_a_porta", [])[:2]:
+        cartoes.append(
+            f'<div class="card-evento"><div class="rotulo">Cancelamento porta a '
+            f'porta · {esc(e["cancelado"])}</div>'
+            f'<div class="tempo">respondido em {numero(e["segundos"], 3)} s</div>'
+            f'<ul class="lista">{_lista_diff(e["diff"])}</ul></div>')
+    for e in evt.get("pedidos_novos", [])[:3]:
+        estado = "aceito" if e.get("aceito") else "recusado"
+        cartoes.append(
+            f'<div class="card-evento"><div class="rotulo">Pedido novo · '
+            f'{esc(e["usuario"])} ({estado})</div>'
+            f'<div class="tempo">decidido em {numero(e["segundos"], 3)} s</div>'
+            f'<ul class="lista">{_lista_diff(e["diff"])}</ul></div>')
+
+    return (
+        '<section><h2>O dia depois do plano — reotimização</h2>'
+        '<p class="chamada">Planejar à noite é metade do trabalho. O que separa um '
+        'sistema de uma planilha é o que acontece quando o responsável avisa que o '
+        'aluno não vai, quando o usuário cancela a consulta e quando chega pedido '
+        'novo às 8h da manhã. Cada evento abaixo foi processado agora, com o tempo '
+        'de resposta medido.</p>'
+        '<div class="kpis">'
+        + _kpi("Eventos processados", str(r["eventos"]),
+               f'tempo médio de {numero(r["tempo_medio_s"], 3)} s')
+        + _kpi("Resposta mais lenta", f'{numero(r["tempo_max_s"], 3)} s',
+               'a meta do MVP é reagir em menos de 30 s', destaque=True)
+        + _kpi("Quilômetros poupados", f'−{numero(r["km_economizados"], 1)} km',
+               'só com os eventos deste lote')
+        + _kpi("Pedidos novos aceitos",
+               f'{r["pedidos_aceitos"]}/{r["pedidos_avaliados"]}',
+               'encaixados em rota existente, sem veículo extra')
+        + '</div>'
+        f'<div class="eventos">{"".join(cartoes)}</div>'
+        '</section>'
+    )
+
+
+def bloco_transito(pcd: dict) -> str:
+    """Como o trânsito entrou na conta — e de onde vieram os fatores."""
+    pr = (pcd or {}).get("premissas", {})
+    perfil = pr.get("perfil_transito") or []
+    if not perfil:
+        return ""
+    medido = pr.get("transito_origem") == "gps_real"
+    selo = ('<span class="selo medido">MEDIDO COM GPS</span>' if medido
+            else '<span class="selo">FATORES ESTIMADOS</span>')
+    linhas = "".join(
+        f'<tr><td>{esc(f["faixa"])}</td><td>{esc(f["inicio"])} — {esc(f["fim"])}</td>'
+        f'<td class="num">{numero(f["fator_urbano"], 2)}×</td>'
+        f'<td class="num">{numero(f["fator_rural"], 2)}×</td></tr>'
+        for f in perfil)
+    return (
+        f'<section><h2>Trânsito considerado {selo}</h2>'
+        '<p class="chamada">A mesma rota não leva o mesmo tempo às 6h40 e às 14h. '
+        'O tempo de cada trecho é multiplicado pelo fator da faixa horária e da '
+        'zona, e é por isso que o turno da manhã precisa de mais veículo que o da '
+        'tarde para a mesma quantidade de aluno.</p>'
+        '<div class="rolagem"><table>'
+        '<thead><tr><th>Faixa</th><th>Horário</th>'
+        '<th class="num">Fator urbano</th><th class="num">Fator rural</th></tr></thead>'
+        f'<tbody>{linhas}</tbody></table></div>'
+        + ('' if medido else
+           '<div class="aviso"><b>Fatores estimados:</b> são premissas de projeto '
+           'enquanto não houver GPS real na rua. Quando o app do motorista entrar '
+           '(Sprint 5), os fatores medidos substituem estes automaticamente, e o '
+           'selo acima muda sozinho. Trocar por malha viária real com trânsito ao '
+           'vivo (OSRM, Mapbox ou Google Routes) é implementar uma função — o motor '
+           'de rotas não muda.</div>')
+        + '</section>'
+    )
+
+
 def bloco_cenarios(p: dict) -> str:
     cenarios = p.get("cenarios") or []
     base = next((c for c in cenarios if c["padrao"]), None) or {}
@@ -391,6 +528,9 @@ def renderizar(p: dict, serie: dict, viagens: list, origem: str) -> str:
   {bloco_antes_depois(p)}
   {bloco_frota(p)}
   {bloco_qualidade(p, viagens)}
+  {bloco_porta_a_porta(p.get("porta_a_porta"))}
+  {bloco_reotimizacao(p.get("reotimizacao"))}
+  {bloco_transito(p.get("porta_a_porta"))}
   {bloco_cenarios(p)}
   {bloco_aprendizado(serie)}
   {bloco_premissas(p)}
@@ -421,6 +561,11 @@ def montar_html(caminho_relatorio: str = economia_mod.RELATORIO_PADRAO,
                 caminho_serie: str = None):
     """Devolve (html, painel) — usado pelo gerador de arquivo e pelo servidor."""
     rel = economia_mod.carregar_relatorio(caminho_relatorio)
+    rel.setdefault("porta_a_porta",
+                   economia_mod.carregar_opcional(economia_mod.RELATORIO_PCD))
+    rel.setdefault("reotimizacao",
+                   economia_mod.carregar_opcional(
+                       economia_mod.RELATORIO_REOTIMIZACAO))
     premissas = economia_mod.premissas_do_relatorio(rel).substituir(
         preco_diesel_l=diesel, dias_letivos_mes=dias)
     p = economia_mod.montar_painel(rel, premissas)

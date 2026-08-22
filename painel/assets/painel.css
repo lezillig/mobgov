@@ -150,6 +150,14 @@ tfoot td{font-weight:700;border-top:2px solid var(--linha)}
 .resultado-cenario .valor{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
 .sem-js{font-size:14.5px;color:var(--tinta-fraca);margin-top:14px}
 
+/* ------------------------------------------------- eventos do dia --- */
+.eventos{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:20px}
+.card-evento{background:var(--papel-2);border:1px solid var(--linha);border-radius:10px;padding:16px 18px}
+.card-evento .rotulo{font-weight:700;font-size:15px}
+.card-evento .tempo{font-size:13px;color:var(--otim);font-weight:600;margin-top:2px}
+.card-evento ul.lista{margin-top:8px}
+.card-evento ul.lista li{font-size:14px;padding:7px 0 7px 22px}
+
 /* ---------------------------------------------------- selo / avisos --- */
 .selo{
   display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
@@ -192,6 +200,10 @@ button.acao:hover{filter:brightness(1.08)}
   .acoes,.controles,.sem-js{display:none !important}
   header.topo{border-bottom-width:2px;padding-top:0}
   section{border:1px solid #C9D3DA;break-inside:avoid;page-break-inside:avoid;margin-bottom:12px;padding:16px}
+  /* seções longas (eventos do dia) podem quebrar entre páginas; os cartões não */
+  section:has(.eventos){break-inside:auto;page-break-inside:auto}
+  .eventos{grid-template-columns:1fr 1fr;gap:10px}
+  .card-evento{break-inside:avoid;page-break-inside:avoid}
   .kpi{break-inside:avoid}
   .kpis{gap:8px}
   .grafico{max-height:78mm}

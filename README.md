@@ -17,20 +17,24 @@ auditáveis, nada de número mágico.
 | 1 | `motor/` (agent-rotas) | CVRP escolar com frota heterogênea (OR-Tools) + dimensionamento de frota e relatório antes/depois em JSON |
 | 2 | `painel/` (agent-painel) | **Painel de economia** — a tela da demo: antes vs depois em R$, km, litros, CO₂ e veículos, simulador de cenários, memória de cálculo e exportação em PDF |
 | 3 | `motor/escala.py` + `dados/` | **Roteirização multiviagem**: cada veículo encadeia várias viagens por turno, como a prefeitura opera de verdade. Destrava a demanda real (~3.000 alunos, dois turnos) e a frota atual passa a ser derivada de premissas declaradas |
+| 4 | `dados/tempos.py`, `motor/porta_a_porta.py`, `motor/reotimizar.py` | **Trânsito variável** por faixa horária e zona (com provedor externo plugável), **porta a porta n:n** para o vertical PCD (PDPTW) e **reotimização do dia**: falta informada, cancelamento e inserção dinâmica de pedido novo |
 
-Resultado atual do Município Modelo: **30 → 22 veículos (−26,7%)**, R$ 151.535/mês,
-R$ 1,82 mi/ano, −1.244 km/dia, −242 litros/dia, −171,5 tCO₂/ano — com 106 viagens
-diárias, ocupação média de 93,4% e nenhum aluno mais de 57 min dentro do veículo
-(o limite da secretaria é 75).
+Resultado atual do Município Modelo: **30 → 22 veículos (−26,7%)**, R$ 160.112/mês,
+R$ 1,92 mi/ano, −1.374 km/dia, −281 litros/dia, −199,1 tCO₂/ano — com 106 viagens
+diárias, ocupação média de 93,7% e nenhum aluno mais de 63 min dentro do veículo
+(o limite da secretaria é 75). No porta a porta, 80 viagens/dia em 11 veículos com
+100% dentro do limite de tempo a bordo; e a reotimização do dia responde em
+menos de 0,1 segundo.
 
 ## Como rodar
 
 ```bash
 pip install -r requirements.txt      # só o motor precisa de dependência (OR-Tools)
 
-python motor/dimensionar.py          # 1) otimiza e grava relatorios/dimensionamento.json
-python -m painel.render              # 2) gera relatorios/painel-economia.html
-python -m painel.servidor            # 3) ou sirva em http://127.0.0.1:8000/
+python motor/dimensionar.py          # 1) planejamento escolar (~5 min)
+python motor/rodar_dia.py            # 2) porta a porta + eventos do dia (~40 s)
+python -m painel.render              # 3) gera relatorios/painel-economia.html
+python -m painel.servidor            # 4) ou sirva em http://127.0.0.1:8000/
 ```
 
 O painel também aceita premissas pela linha de comando:
@@ -135,6 +139,43 @@ reprodutível.
 - O PDF sai pela impressão do navegador. Geração de PDF no servidor (para
   agendar envio ao tribunal de contas) fica para quando houver backend
   definitivo.
+
+## Os dois tipos de rota
+
+| | Ponto de encontro (escolar) | Porta a porta (PCD) |
+|---|---|---|
+| Quem se desloca | o aluno caminha até o ponto | o veículo encosta na casa |
+| Destino | um por viagem (a escola) | um por usuário |
+| Relação | n embarques → 1 desembarque | **n embarques ↔ n desembarques** |
+| Janela | o sinal da escola | por usuário, 20 min (padrão *dial-a-ride*) |
+| Limite | tempo do aluno no veículo | tempo a bordo de cada usuário |
+| Motor | `motor/dimensionar.py` (CVRPTW) | `motor/porta_a_porta.py` (PDPTW) |
+
+## Trânsito variável
+
+`dados/tempos.py` isola o motor do fornecedor de tempos. Hoje roda offline
+(`ProvedorHaversine` + `ComTransito`, com fatores por faixa horária e zona
+declarados no painel). Trocar por malha viária real com trânsito — OSRM,
+Valhalla, Mapbox Matrix ou Google Routes `TRAFFIC_AWARE_OPTIMAL` — é
+implementar uma função `matriz()`; o motor de rotas não muda. Quando o app do
+motorista entrar (Sprint 5), os fatores medidos com GPS substituem os
+estimados sozinhos e o selo do painel muda de *FATORES ESTIMADOS* para
+*MEDIDO COM GPS*.
+
+## Reotimização do dia
+
+Planejar à noite é metade do trabalho. `motor/reotimizar.py` trata os eventos
+que acontecem depois:
+
+- **falta informada** no escolar: a parada some da rota, o percurso é refeito e
+  o sistema avisa se a viagem passou a caber num veículo menor;
+- **cancelamento** no porta a porta: os dois eventos saem e a capacidade
+  liberada volta ao pool na hora;
+- **pedido novo**: inserção mais barata entre todas as rotas do dia,
+  respeitando janela, tempo a bordo e capacidade — com limite de km por
+  encaixe, porque encaixar a qualquer custo não é economia.
+
+Tudo em Python puro, respondendo em milissegundos (a meta do MVP é 30 s).
 
 ## Próximos passos
 

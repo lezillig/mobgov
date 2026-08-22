@@ -1,6 +1,6 @@
 {
   "municipio": "Ribeirão Modelo (sintético)",
-  "gerado_em": "2026-08-22 14:28",
+  "gerado_em": "2026-08-22 14:58",
   "premissas": {
     "dias_letivos_mes": 22,
     "preco_diesel_l": 6.1,
@@ -98,9 +98,9 @@
       "MICRO20": 1
     },
     "total_veiculos": 22,
-    "km_dia": 3159.4,
-    "custo_mes": 505760,
-    "litros_dia": 911.5,
+    "km_dia": 3029.8,
+    "custo_mes": 497459,
+    "litros_dia": 874.1,
     "viagens": [
       {
         "id": "E1-manha-01",
@@ -119,8 +119,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 5.5,
-        "min_viagem": 16,
-        "veiculo": "VM18",
+        "min_viagem": 18,
+        "veiculo": "VM17",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -163,8 +163,8 @@
         "alunos": 29,
         "cadeirantes": 0,
         "km_viagem": 5.1,
-        "min_viagem": 15,
-        "veiculo": "VM19",
+        "min_viagem": 17,
+        "veiculo": "VM17",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 94
@@ -186,8 +186,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 4.1,
-        "min_viagem": 14,
-        "veiculo": "VM19",
+        "min_viagem": 16,
+        "veiculo": "VM20",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -208,8 +208,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 5.4,
-        "min_viagem": 15,
-        "veiculo": "VM19",
+        "min_viagem": 16,
+        "veiculo": "VM20",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -231,8 +231,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 4.5,
-        "min_viagem": 15,
-        "veiculo": "VM19",
+        "min_viagem": 17,
+        "veiculo": "VM18",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -253,8 +253,8 @@
         "alunos": 28,
         "cadeirantes": 0,
         "km_viagem": 3.7,
-        "min_viagem": 13,
-        "veiculo": "VM20",
+        "min_viagem": 15,
+        "veiculo": "VM18",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 90
@@ -274,8 +274,8 @@
         "alunos": 27,
         "cadeirantes": 0,
         "km_viagem": 3.9,
-        "min_viagem": 12,
-        "veiculo": "VM21",
+        "min_viagem": 13,
+        "veiculo": "VM20",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 87
@@ -297,8 +297,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 5.3,
-        "min_viagem": 18,
-        "veiculo": "VM16",
+        "min_viagem": 20,
+        "veiculo": "VM15",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -320,8 +320,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 5.7,
-        "min_viagem": 15,
-        "veiculo": "VM19",
+        "min_viagem": 17,
+        "veiculo": "VM18",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -344,8 +344,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 6.4,
-        "min_viagem": 18,
-        "veiculo": "VM16",
+        "min_viagem": 21,
+        "veiculo": "VM15",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -368,8 +368,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 7.1,
-        "min_viagem": 18,
-        "veiculo": "VM16",
+        "min_viagem": 20,
+        "veiculo": "VM15",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -390,8 +390,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 5.9,
-        "min_viagem": 16,
-        "veiculo": "VM18",
+        "min_viagem": 18,
+        "veiculo": "VM17",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -413,8 +413,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 5.2,
-        "min_viagem": 16,
-        "veiculo": "VM18",
+        "min_viagem": 19,
+        "veiculo": "VM15",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -435,7 +435,7 @@
         "alunos": 28,
         "cadeirantes": 0,
         "km_viagem": 3.0,
-        "min_viagem": 13,
+        "min_viagem": 14,
         "veiculo": "VM20",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -459,7 +459,7 @@
         "cadeirantes": 0,
         "km_viagem": 4.3,
         "min_viagem": 11,
-        "veiculo": "VM21",
+        "veiculo": "VM22",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 84
@@ -482,7 +482,7 @@
         "cadeirantes": 0,
         "km_viagem": 3.0,
         "min_viagem": 11,
-        "veiculo": "VM21",
+        "veiculo": "VM22",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 84
@@ -504,7 +504,7 @@
         "cadeirantes": 0,
         "km_viagem": 2.9,
         "min_viagem": 11,
-        "veiculo": "VM21",
+        "veiculo": "VM22",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 94
@@ -527,8 +527,8 @@
         "alunos": 28,
         "cadeirantes": 0,
         "km_viagem": 6.4,
-        "min_viagem": 17,
-        "veiculo": "VM16",
+        "min_viagem": 19,
+        "veiculo": "VM17",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 90
@@ -549,7 +549,7 @@
         "cadeirantes": 0,
         "km_viagem": 1.6,
         "min_viagem": 8,
-        "veiculo": "VM16",
+        "veiculo": "VM17",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 61
@@ -569,8 +569,8 @@
         "alunos": 13,
         "cadeirantes": 2,
         "km_viagem": 5.8,
-        "min_viagem": 18,
-        "veiculo": "VM04",
+        "min_viagem": 20,
+        "veiculo": "VM16",
         "tipo": "VAN15A",
         "tipo_nome": "Van acessível 15 lugares",
         "ocupacao_pct": 87
@@ -593,7 +593,7 @@
         "cadeirantes": 0,
         "km_viagem": 8.2,
         "min_viagem": 17,
-        "veiculo": "VM14",
+        "veiculo": "VM19",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 90
@@ -618,7 +618,7 @@
         "cadeirantes": 0,
         "km_viagem": 14.9,
         "min_viagem": 28,
-        "veiculo": "VM08",
+        "veiculo": "VM06",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 94
@@ -640,8 +640,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 11.8,
-        "min_viagem": 26,
-        "veiculo": "VM12",
+        "min_viagem": 28,
+        "veiculo": "VM11",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -663,7 +663,7 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 11.5,
-        "min_viagem": 22,
+        "min_viagem": 23,
         "veiculo": "VM14",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -687,8 +687,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 10.3,
-        "min_viagem": 23,
-        "veiculo": "VM14",
+        "min_viagem": 24,
+        "veiculo": "VM11",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -709,7 +709,7 @@
         "alunos": 28,
         "cadeirantes": 0,
         "km_viagem": 10.5,
-        "min_viagem": 22,
+        "min_viagem": 24,
         "veiculo": "VM14",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -733,7 +733,7 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 31.7,
-        "min_viagem": 52,
+        "min_viagem": 56,
         "veiculo": "VM05",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -758,8 +758,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 31.4,
-        "min_viagem": 54,
-        "veiculo": "VM03",
+        "min_viagem": 57,
+        "veiculo": "VM04",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -781,7 +781,7 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 16.6,
-        "min_viagem": 30,
+        "min_viagem": 33,
         "veiculo": "VM05",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -805,8 +805,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 25.8,
-        "min_viagem": 44,
-        "veiculo": "VM07",
+        "min_viagem": 47,
+        "veiculo": "VM09",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -829,8 +829,8 @@
         "alunos": 29,
         "cadeirantes": 0,
         "km_viagem": 26.2,
-        "min_viagem": 44,
-        "veiculo": "VM08",
+        "min_viagem": 46,
+        "veiculo": "VM09",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 94
@@ -852,7 +852,7 @@
         "alunos": 29,
         "cadeirantes": 0,
         "km_viagem": 14.6,
-        "min_viagem": 27,
+        "min_viagem": 28,
         "veiculo": "VM11",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -876,8 +876,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 28.9,
-        "min_viagem": 48,
-        "veiculo": "VM07",
+        "min_viagem": 52,
+        "veiculo": "VM06",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -900,8 +900,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 19.1,
-        "min_viagem": 36,
-        "veiculo": "VM03",
+        "min_viagem": 38,
+        "veiculo": "VM04",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -925,7 +925,7 @@
         "cadeirantes": 0,
         "km_viagem": 7.6,
         "min_viagem": 18,
-        "veiculo": "VM08",
+        "veiculo": "VM18",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -948,8 +948,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 8.0,
-        "min_viagem": 21,
-        "veiculo": "VM15",
+        "min_viagem": 22,
+        "veiculo": "VM14",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -970,7 +970,7 @@
         "cadeirantes": 0,
         "km_viagem": 6.7,
         "min_viagem": 16,
-        "veiculo": "VM18",
+        "veiculo": "VM14",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 65
@@ -991,10 +991,10 @@
         "cadeirantes": 0,
         "km_viagem": 6.3,
         "min_viagem": 13,
-        "veiculo": "VM20",
-        "tipo": "ONIBUS31",
-        "tipo_nome": "Ônibus escolar 31 lugares",
-        "ocupacao_pct": 55
+        "veiculo": "VM21",
+        "tipo": "MICRO20",
+        "tipo_nome": "Micro-ônibus 20 lugares",
+        "ocupacao_pct": 85
       },
       {
         "id": "E2-manha-19",
@@ -1011,7 +1011,7 @@
         "alunos": 15,
         "cadeirantes": 2,
         "km_viagem": 13.0,
-        "min_viagem": 28,
+        "min_viagem": 31,
         "veiculo": "VM10",
         "tipo": "VAN15A",
         "tipo_nome": "Van acessível 15 lugares",
@@ -1032,8 +1032,8 @@
         "alunos": 15,
         "cadeirantes": 1,
         "km_viagem": 7.6,
-        "min_viagem": 17,
-        "veiculo": "VM17",
+        "min_viagem": 18,
+        "veiculo": "VM03",
         "tipo": "VAN15A",
         "tipo_nome": "Van acessível 15 lugares",
         "ocupacao_pct": 100
@@ -1054,8 +1054,8 @@
         "alunos": 15,
         "cadeirantes": 2,
         "km_viagem": 30.7,
-        "min_viagem": 54,
-        "veiculo": "VM04",
+        "min_viagem": 58,
+        "veiculo": "VM03",
         "tipo": "VAN15A",
         "tipo_nome": "Van acessível 15 lugares",
         "ocupacao_pct": 100
@@ -1076,7 +1076,7 @@
         "cadeirantes": 0,
         "km_viagem": 2.4,
         "min_viagem": 8,
-        "veiculo": "VM05",
+        "veiculo": "VM06",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 48
@@ -1124,7 +1124,7 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 11.2,
-        "min_viagem": 24,
+        "min_viagem": 25,
         "veiculo": "VM13",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -1148,8 +1148,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 12.4,
-        "min_viagem": 27,
-        "veiculo": "VM11",
+        "min_viagem": 28,
+        "veiculo": "VM12",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -1171,8 +1171,8 @@
         "alunos": 27,
         "cadeirantes": 0,
         "km_viagem": 10.7,
-        "min_viagem": 21,
-        "veiculo": "VM15",
+        "min_viagem": 22,
+        "veiculo": "VM13",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 87
@@ -1194,8 +1194,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 16.4,
-        "min_viagem": 30,
-        "veiculo": "VM02",
+        "min_viagem": 32,
+        "veiculo": "VM01",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -1219,8 +1219,8 @@
         "alunos": 29,
         "cadeirantes": 0,
         "km_viagem": 14.2,
-        "min_viagem": 28,
-        "veiculo": "VM09",
+        "min_viagem": 30,
+        "veiculo": "VM02",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 94
@@ -1243,8 +1243,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 17.9,
-        "min_viagem": 34,
-        "veiculo": "VM01",
+        "min_viagem": 37,
+        "veiculo": "VM07",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -1268,8 +1268,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 24.7,
-        "min_viagem": 43,
-        "veiculo": "VM09",
+        "min_viagem": 46,
+        "veiculo": "VM08",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -1293,8 +1293,8 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 28.4,
-        "min_viagem": 49,
-        "veiculo": "VM06",
+        "min_viagem": 52,
+        "veiculo": "VM07",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 100
@@ -1317,7 +1317,7 @@
         "alunos": 29,
         "cadeirantes": 0,
         "km_viagem": 13.1,
-        "min_viagem": 27,
+        "min_viagem": 28,
         "veiculo": "VM12",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -1342,7 +1342,7 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 35.7,
-        "min_viagem": 57,
+        "min_viagem": 63,
         "veiculo": "VM01",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -1366,8 +1366,8 @@
         "alunos": 30,
         "cadeirantes": 0,
         "km_viagem": 26.1,
-        "min_viagem": 45,
-        "veiculo": "VM06",
+        "min_viagem": 48,
+        "veiculo": "VM08",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -1393,7 +1393,7 @@
         "cadeirantes": 0,
         "km_viagem": 11.2,
         "min_viagem": 26,
-        "veiculo": "VM13",
+        "veiculo": "VM12",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 97
@@ -1416,7 +1416,7 @@
         "alunos": 31,
         "cadeirantes": 0,
         "km_viagem": 33.5,
-        "min_viagem": 55,
+        "min_viagem": 61,
         "veiculo": "VM02",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
@@ -1437,7 +1437,7 @@
         "alunos": 14,
         "cadeirantes": 1,
         "km_viagem": 16.0,
-        "min_viagem": 29,
+        "min_viagem": 32,
         "veiculo": "VM10",
         "tipo": "VAN15A",
         "tipo_nome": "Van acessível 15 lugares",
@@ -1458,8 +1458,8 @@
         "alunos": 14,
         "cadeirantes": 0,
         "km_viagem": 8.6,
-        "min_viagem": 16,
-        "veiculo": "VM09",
+        "min_viagem": 17,
+        "veiculo": "VM19",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "ocupacao_pct": 45
@@ -2621,14 +2621,14 @@
         "capacidade": 31,
         "viagens": [
           "E3-manha-11",
-          "E3-manha-07"
+          "E3-manha-05"
         ],
-        "min_turno": 96,
-        "km_turno": 53.6,
+        "min_turno": 100,
+        "km_turno": 52.1,
         "alunos": 61,
         "ultima_escola": "E3",
         "ocupacao_media_pct": 98,
-        "folga_jornada_min": 4
+        "folga_jornada_min": 0
       },
       {
         "id": "VM02",
@@ -2639,17 +2639,35 @@
         "capacidade": 31,
         "viagens": [
           "E3-manha-14",
-          "E3-manha-05"
+          "E3-manha-06"
         ],
-        "min_turno": 90,
-        "km_turno": 49.9,
-        "alunos": 61,
+        "min_turno": 96,
+        "km_turno": 47.7,
+        "alunos": 60,
         "ultima_escola": "E3",
-        "ocupacao_media_pct": 98,
-        "folga_jornada_min": 10
+        "ocupacao_media_pct": 97,
+        "folga_jornada_min": 4
       },
       {
         "id": "VM03",
+        "turno": "manha",
+        "turno_nome": "Manhã",
+        "tipo": "VAN15A",
+        "tipo_nome": "Van acessível 15 lugares",
+        "capacidade": 15,
+        "viagens": [
+          "E2-manha-21",
+          "E2-manha-20"
+        ],
+        "min_turno": 81,
+        "km_turno": 38.3,
+        "alunos": 30,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 100,
+        "folga_jornada_min": 19
+      },
+      {
+        "id": "VM04",
         "turno": "manha",
         "turno_nome": "Manhã",
         "tipo": "ONIBUS31",
@@ -2659,30 +2677,12 @@
           "E2-manha-08",
           "E2-manha-14"
         ],
-        "min_turno": 95,
+        "min_turno": 100,
         "km_turno": 50.5,
         "alunos": 62,
         "ultima_escola": "E2",
         "ocupacao_media_pct": 100,
-        "folga_jornada_min": 5
-      },
-      {
-        "id": "VM04",
-        "turno": "manha",
-        "turno_nome": "Manhã",
-        "tipo": "VAN15A",
-        "tipo_nome": "Van acessível 15 lugares",
-        "capacidade": 15,
-        "viagens": [
-          "E2-manha-21",
-          "E1-manha-21"
-        ],
-        "min_turno": 90,
-        "km_turno": 45.5,
-        "alunos": 28,
-        "ultima_escola": "E1",
-        "ocupacao_media_pct": 93,
-        "folga_jornada_min": 10
+        "folga_jornada_min": 0
       },
       {
         "id": "VM05",
@@ -2693,15 +2693,14 @@
         "capacidade": 31,
         "viagens": [
           "E2-manha-07",
-          "E2-manha-09",
-          "E2-manha-22"
+          "E2-manha-09"
         ],
-        "min_turno": 100,
-        "km_turno": 50.7,
-        "alunos": 77,
+        "min_turno": 94,
+        "km_turno": 48.3,
+        "alunos": 62,
         "ultima_escola": "E2",
-        "ocupacao_media_pct": 83,
-        "folga_jornada_min": 0
+        "ocupacao_media_pct": 100,
+        "folga_jornada_min": 6
       },
       {
         "id": "VM06",
@@ -2711,15 +2710,16 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E3-manha-09",
-          "E3-manha-12"
+          "E2-manha-13",
+          "E2-manha-02",
+          "E2-manha-22"
         ],
-        "min_turno": 99,
-        "km_turno": 54.5,
-        "alunos": 61,
-        "ultima_escola": "E3",
-        "ocupacao_media_pct": 98,
-        "folga_jornada_min": 1
+        "min_turno": 98,
+        "km_turno": 46.2,
+        "alunos": 75,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 81,
+        "folga_jornada_min": 2
       },
       {
         "id": "VM07",
@@ -2729,15 +2729,15 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E2-manha-13",
-          "E2-manha-10"
+          "E3-manha-09",
+          "E3-manha-07"
         ],
-        "min_turno": 97,
-        "km_turno": 54.7,
-        "alunos": 62,
-        "ultima_escola": "E2",
-        "ocupacao_media_pct": 100,
-        "folga_jornada_min": 3
+        "min_turno": 94,
+        "km_turno": 46.3,
+        "alunos": 61,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 98,
+        "folga_jornada_min": 6
       },
       {
         "id": "VM08",
@@ -2747,16 +2747,15 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E2-manha-11",
-          "E2-manha-02",
-          "E2-manha-15"
+          "E3-manha-12",
+          "E3-manha-08"
         ],
-        "min_turno": 100,
-        "km_turno": 48.7,
-        "alunos": 89,
-        "ultima_escola": "E2",
-        "ocupacao_media_pct": 96,
-        "folga_jornada_min": 0
+        "min_turno": 99,
+        "km_turno": 50.8,
+        "alunos": 60,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 97,
+        "folga_jornada_min": 1
       },
       {
         "id": "VM09",
@@ -2766,16 +2765,15 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E3-manha-08",
-          "E3-manha-06",
-          "E3-manha-16"
+          "E2-manha-10",
+          "E2-manha-11"
         ],
-        "min_turno": 97,
-        "km_turno": 47.5,
-        "alunos": 73,
-        "ultima_escola": "E3",
-        "ocupacao_media_pct": 78,
-        "folga_jornada_min": 3
+        "min_turno": 98,
+        "km_turno": 52.0,
+        "alunos": 60,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 97,
+        "folga_jornada_min": 2
       },
       {
         "id": "VM10",
@@ -2788,12 +2786,12 @@
           "E3-manha-15",
           "E2-manha-19"
         ],
-        "min_turno": 89,
+        "min_turno": 98,
         "km_turno": 47.9,
         "alunos": 29,
         "ultima_escola": "E2",
         "ocupacao_media_pct": 97,
-        "folga_jornada_min": 11
+        "folga_jornada_min": 2
       },
       {
         "id": "VM11",
@@ -2803,15 +2801,16 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
+          "E2-manha-03",
           "E2-manha-12",
-          "E3-manha-03"
+          "E2-manha-05"
         ],
-        "min_turno": 86,
-        "km_turno": 45.9,
-        "alunos": 59,
-        "ultima_escola": "E3",
-        "ocupacao_media_pct": 95,
-        "folga_jornada_min": 14
+        "min_turno": 90,
+        "km_turno": 36.7,
+        "alunos": 90,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 97,
+        "folga_jornada_min": 10
       },
       {
         "id": "VM12",
@@ -2821,15 +2820,16 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
+          "E3-manha-03",
           "E3-manha-10",
-          "E2-manha-03"
+          "E3-manha-13"
         ],
-        "min_turno": 85,
-        "km_turno": 43.8,
-        "alunos": 59,
-        "ultima_escola": "E2",
-        "ocupacao_media_pct": 95,
-        "folga_jornada_min": 15
+        "min_turno": 92,
+        "km_turno": 36.7,
+        "alunos": 89,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 96,
+        "folga_jornada_min": 8
       },
       {
         "id": "VM13",
@@ -2839,16 +2839,16 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E3-manha-13",
           "E3-manha-01",
-          "E3-manha-02"
+          "E3-manha-02",
+          "E3-manha-04"
         ],
-        "min_turno": 85,
-        "km_turno": 34.4,
-        "alunos": 91,
+        "min_turno": 82,
+        "km_turno": 33.9,
+        "alunos": 88,
         "ultima_escola": "E3",
-        "ocupacao_media_pct": 98,
-        "folga_jornada_min": 15
+        "ocupacao_media_pct": 95,
+        "folga_jornada_min": 18
       },
       {
         "id": "VM14",
@@ -2858,17 +2858,17 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E2-manha-05",
-          "E2-manha-04",
           "E2-manha-06",
-          "E2-manha-01"
+          "E2-manha-04",
+          "E2-manha-16",
+          "E2-manha-17"
         ],
-        "min_turno": 99,
-        "km_turno": 40.5,
-        "alunos": 118,
+        "min_turno": 100,
+        "km_turno": 36.7,
+        "alunos": 110,
         "ultima_escola": "E2",
-        "ocupacao_media_pct": 95,
-        "folga_jornada_min": 1
+        "ocupacao_media_pct": 89,
+        "folga_jornada_min": 0
       },
       {
         "id": "VM15",
@@ -2878,53 +2878,55 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E2-manha-16",
-          "E3-manha-04"
+          "E1-manha-11",
+          "E1-manha-09",
+          "E1-manha-12",
+          "E1-manha-14"
         ],
-        "min_turno": 74,
-        "km_turno": 37.6,
-        "alunos": 58,
-        "ultima_escola": "E3",
-        "ocupacao_media_pct": 94,
-        "folga_jornada_min": 26
+        "min_turno": 95,
+        "km_turno": 24.0,
+        "alunos": 121,
+        "ultima_escola": "E1",
+        "ocupacao_media_pct": 98,
+        "folga_jornada_min": 5
       },
       {
         "id": "VM16",
-        "turno": "manha",
-        "turno_nome": "Manhã",
-        "tipo": "ONIBUS31",
-        "tipo_nome": "Ônibus escolar 31 lugares",
-        "capacidade": 31,
-        "viagens": [
-          "E1-manha-09",
-          "E1-manha-11",
-          "E1-manha-12",
-          "E1-manha-19",
-          "E1-manha-20"
-        ],
-        "min_turno": 99,
-        "km_turno": 26.8,
-        "alunos": 138,
-        "ultima_escola": "E1",
-        "ocupacao_media_pct": 89,
-        "folga_jornada_min": 1
-      },
-      {
-        "id": "VM17",
         "turno": "manha",
         "turno_nome": "Manhã",
         "tipo": "VAN15A",
         "tipo_nome": "Van acessível 15 lugares",
         "capacidade": 15,
         "viagens": [
-          "E2-manha-20"
+          "E1-manha-21"
         ],
-        "min_turno": 17,
-        "km_turno": 7.6,
-        "alunos": 15,
-        "ultima_escola": "E2",
-        "ocupacao_media_pct": 100,
-        "folga_jornada_min": 83
+        "min_turno": 20,
+        "km_turno": 5.8,
+        "alunos": 13,
+        "ultima_escola": "E1",
+        "ocupacao_media_pct": 87,
+        "folga_jornada_min": 80
+      },
+      {
+        "id": "VM17",
+        "turno": "manha",
+        "turno_nome": "Manhã",
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "capacidade": 31,
+        "viagens": [
+          "E1-manha-19",
+          "E1-manha-01",
+          "E1-manha-13",
+          "E1-manha-03",
+          "E1-manha-20"
+        ],
+        "min_turno": 100,
+        "km_turno": 24.5,
+        "alunos": 136,
+        "ultima_escola": "E1",
+        "ocupacao_media_pct": 88,
+        "folga_jornada_min": 0
       },
       {
         "id": "VM18",
@@ -2934,17 +2936,17 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E1-manha-01",
-          "E1-manha-13",
-          "E1-manha-14",
-          "E2-manha-17"
+          "E2-manha-15",
+          "E1-manha-06",
+          "E1-manha-10",
+          "E1-manha-07"
         ],
-        "min_turno": 92,
-        "km_turno": 32.3,
-        "alunos": 110,
-        "ultima_escola": "E2",
-        "ocupacao_media_pct": 89,
-        "folga_jornada_min": 8
+        "min_turno": 100,
+        "km_turno": 30.5,
+        "alunos": 119,
+        "ultima_escola": "E1",
+        "ocupacao_media_pct": 96,
+        "folga_jornada_min": 0
       },
       {
         "id": "VM19",
@@ -2954,18 +2956,15 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E1-manha-03",
-          "E1-manha-05",
-          "E1-manha-06",
-          "E1-manha-10",
-          "E1-manha-04"
+          "E2-manha-01",
+          "E3-manha-16"
         ],
-        "min_turno": 94,
-        "km_turno": 24.8,
-        "alunos": 150,
-        "ultima_escola": "E1",
-        "ocupacao_media_pct": 97,
-        "folga_jornada_min": 6
+        "min_turno": 69,
+        "km_turno": 35.7,
+        "alunos": 42,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 68,
+        "folga_jornada_min": 31
       },
       {
         "id": "VM20",
@@ -2975,37 +2974,54 @@
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E1-manha-07",
+          "E1-manha-04",
+          "E1-manha-05",
           "E1-manha-15",
-          "E2-manha-18",
+          "E1-manha-08",
           "E1-manha-02"
         ],
-        "min_turno": 92,
-        "km_turno": 33.5,
-        "alunos": 104,
+        "min_turno": 91,
+        "km_turno": 18.9,
+        "alunos": 147,
         "ultima_escola": "E1",
-        "ocupacao_media_pct": 84,
-        "folga_jornada_min": 8
+        "ocupacao_media_pct": 95,
+        "folga_jornada_min": 9
       },
       {
         "id": "VM21",
+        "turno": "manha",
+        "turno_nome": "Manhã",
+        "tipo": "MICRO20",
+        "tipo_nome": "Micro-ônibus 20 lugares",
+        "capacidade": 20,
+        "viagens": [
+          "E2-manha-18"
+        ],
+        "min_turno": 13,
+        "km_turno": 6.3,
+        "alunos": 17,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 85,
+        "folga_jornada_min": 87
+      },
+      {
+        "id": "VM22",
         "turno": "manha",
         "turno_nome": "Manhã",
         "tipo": "ONIBUS31",
         "tipo_nome": "Ônibus escolar 31 lugares",
         "capacidade": 31,
         "viagens": [
-          "E1-manha-08",
           "E1-manha-16",
           "E1-manha-17",
           "E1-manha-18"
         ],
-        "min_turno": 60,
-        "km_turno": 14.1,
-        "alunos": 108,
+        "min_turno": 43,
+        "km_turno": 10.2,
+        "alunos": 81,
         "ultima_escola": "E1",
         "ocupacao_media_pct": 87,
-        "folga_jornada_min": 40
+        "folga_jornada_min": 57
       },
       {
         "id": "VT01",
@@ -3343,11 +3359,11 @@
         "folga_jornada_min": 8
       }
     ],
-    "viagens_por_veiculo_turno": 2.72,
+    "viagens_por_veiculo_turno": 2.65,
     "por_turno": {
       "manha": {
         "viagens": 59,
-        "veiculos": 21
+        "veiculos": 22
       },
       "tarde": {
         "viagens": 47,
@@ -3358,10 +3374,10 @@
   "economia": {
     "veiculos": 8,
     "reducao_frota_pct": 26.7,
-    "custo_mes": 155920,
-    "custo_ano": 1871036,
-    "km_dia": 1244.2,
-    "litros_dia": 267.9,
-    "tco2_ano": 189.5
+    "custo_mes": 164221,
+    "custo_ano": 1970647,
+    "km_dia": 1373.8,
+    "litros_dia": 305.3,
+    "tco2_ano": 216.0
   }
 }

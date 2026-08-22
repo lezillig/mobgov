@@ -53,15 +53,21 @@ previu X, aconteceu Y, ajustou Z".
 | 1 | `motor/` — CVRP escolar (OR-Tools) + dimensionamento + relatório JSON | ✅ pronto |
 | 2 | `painel/` — painel de economia (a tela da demo) | ✅ pronto |
 | 3 | `motor/escala.py` — roteirização multiviagem + demanda real (~2.900 alunos, 2 turnos) | ✅ pronto |
-| 4 | Tela de planejamento (importar → otimizar → aprovar) e mapa MapLibre | ⬜ |
+| 4 | `dados/tempos.py` (trânsito variável), `motor/porta_a_porta.py` (PCD n:n), `motor/reotimizar.py` (falta, cancelamento, inserção dinâmica) | ✅ pronto |
+| 5 | Malha viária real (OSRM/Valhalla) + mapa MapLibre + tela de planejamento | ⬜ |
 | 5–6 | App do motorista (React Native) → aprendizado contínuo real | ⬜ |
 | 7 | Camada conversacional + roteiro de demo ensaiado | ⬜ |
 | 8 | Elegibilidade PCD (ou pós-MVP, conforme o edital-alvo) | ⬜ |
 
-Resultado atual no Município Modelo: **30 → 22 veículos (−26,7%)**,
-R$ 151.535/mês, R$ 1,82 mi/ano, −1.244 km/dia, −242 l/dia, −171,5 tCO₂/ano,
-com 106 viagens/dia (2,72 por veículo/turno), ocupação média 93,4% e tempo
-máximo de 57 min dentro do veículo (limite 75).
+Resultado atual no Município Modelo (escolar, já com trânsito variável):
+**30 → 22 veículos (−26,7%)**, R$ 160.112/mês, R$ 1,92 mi/ano, −1.374 km/dia,
+−281 l/dia, −199,1 tCO₂/ano, com 106 viagens/dia (2,65 por veículo/turno),
+ocupação média 93,7% e tempo máximo de 63 min dentro do veículo (limite 75).
+
+Porta a porta (PCD): 80 viagens/dia atendidas por 11 veículos, 716 km/dia,
+tempo a bordo médio de 38,9 min (máx 67) e 100% dentro do limite.
+Reotimização do dia: 10 eventos, resposta máxima de 0,069 s, 6 de 6 pedidos
+novos encaixados em rota existente.
 
 ## Estrutura
 
@@ -70,6 +76,11 @@ mobgov/                          (raiz deste repositório)
   dados/municipio_modelo.py      esquema do domínio + gerador sintético (seed 42)
   motor/dimensionar.py           fase 1: CVRP por escola e turno (OR-Tools)
   motor/escala.py                fase 2: escala multiviagem (heurística, sem OR-Tools)
+  motor/porta_a_porta.py         PDPTW do vertical PCD: n embarques e n desembarques
+  motor/reotimizar.py            dia em andamento: falta, cancelamento, inserção dinâmica
+  motor/rodar_dia.py             orquestra o porta a porta e os eventos do dia
+  dados/tempos.py                trânsito variável e provedores plugáveis de tempo
+  dados/demanda_pcd.py           demanda sintética do porta a porta (sem dado pessoal)
   painel/economia.py             recálculo auditável + cenários + memória de cálculo
   painel/aprendizado.py          série "o que o sistema aprendeu" (real ou demonstração)
   painel/graficos.py             gráficos SVG gerados no servidor
@@ -85,7 +96,8 @@ mobgov/                          (raiz deste repositório)
 
 ```bash
 pip install -r requirements.txt        # só o motor precisa (OR-Tools)
-python motor/dimensionar.py            # gera relatorios/dimensionamento.json
+python motor/dimensionar.py            # planejamento escolar (~5 min)
+python motor/rodar_dia.py              # porta a porta + eventos do dia (~40 s)
 python -m painel.render                # gera relatorios/painel-economia.html
 python -m painel.render --diesel 7.20 --dias 20
 python -m painel.servidor              # http://127.0.0.1:8000/
@@ -116,6 +128,17 @@ python -m unittest discover -s testes -v
   de ≥20% de redução de frota são cobertas por testes; se a economia cair abaixo
   disso, a suíte quebra de propósito.
 
+## Os dois tipos de rota (não confundir)
+
+| | Ponto de encontro (escolar) | Porta a porta (PCD) |
+|---|---|---|
+| Quem anda até onde | o aluno caminha até o ponto | o veículo encosta na casa |
+| Destino | único por viagem | um por usuário |
+| Relação | n embarques → 1 desembarque | **n embarques ↔ n desembarques** |
+| Janela | o sinal da escola | por usuário, ~20 min |
+| Limite de tempo | tempo do aluno no veículo | tempo A BORDO de cada usuário |
+| Motor | `motor/dimensionar.py` (CVRPTW) | `motor/porta_a_porta.py` (PDPTW) |
+
 ## Armadilhas conhecidas
 
 - **OR-Tools não vem instalado** no ambiente remoto; sem ele o motor não roda,
@@ -134,14 +157,25 @@ python -m unittest discover -s testes -v
 - **km/dia da frota atual é rateado** entre os tipos, porque a prefeitura declara
   só o total; o da frota otimizada vem da jornada real de cada veículo.
 - O gerador usa `random.seed(42)`: a demanda é reprodutível, e deve continuar
-  sendo — a demo depende disso.
+  sendo — a demo depende disso. O porta a porta tem gerador próprio
+  (`random.Random(2026)`) para não deslocar a sequência do escolar.
+- **No porta a porta, o veículo espera FORA, não com gente dentro.** A agenda é
+  montada em duas passadas (limite para trás, horários para frente) para
+  embarcar o mais tarde possível. Mexer nisso sem entender infla o tempo a
+  bordo e faz a reotimização recusar encaixes que na prática cabem — foi um bug
+  real da Sprint 4.
+- **Trânsito muda a frota.** Ligar o perfil de trânsito ao motor escolar somou
+  um veículo no turno da manhã. É o resultado certo: o pico existe.
 
 ## Módulos previstos (agentes do prompt-mestre)
 
 | Agente | Responsabilidade |
 |---|---|
 | `agent-dados` | Esquema PostGIS, importador de planilha de prefeitura, geocodificação com fallback, anonimização |
-| `agent-rotas` | CVRPTW escolar, dimensionamento de frota, paratransit dinâmico, reotimização diária |
+| `agent-rotas` | CVRPTW escolar, dimensionamento de frota, multiviagem |
+| `agent-porta-a-porta` | PDPTW do vertical PCD: par embarque/desembarque, janela por usuário, tempo máximo a bordo, cadeira de rodas |
+| `agent-transito` | Camada de tempos: perfil por faixa horária e zona, provedores externos (OSRM/Valhalla/Google/Mapbox), fatores aprendidos |
+| `agent-reotimizacao` | Operação do dia: falta informada, cancelamento, inserção dinâmica de pedido novo, diff legível em segundos |
 | `agent-aprendizado` | Tempo por trecho, tempo de parada, previsão de ausência, re-treino noturno com rollback |
 | `agent-painel` | Mapa vivo, planejamento, **painel de economia**, gestão de cadastros |
 | `agent-apps` | App do motorista (offline-first) e app do responsável/usuário (WCAG) |
@@ -163,7 +197,7 @@ que o FastAPI as reaproveite sem reescrita.
 ## Métricas de sucesso do MVP
 
 - Redução de frota ≥ 20% no Município Modelo, com premissas auditáveis. ✅ (26,7%)
-- Reotimização após imprevisto em < 30 segundos. ⬜
+- Reotimização após imprevisto em < 30 segundos. ✅ (máximo medido: 0,07 s)
 - Erro de previsão de tempo caindo semana a semana no painel. ⬜ (série ainda ilustrativa)
 - Planilha real de prefeitura → rotas publicadas em < 1 hora. ⬜
 
