@@ -60,6 +60,8 @@ previu X, aconteceu Y, ajustou Z".
 | 7 | `elegibilidade/` — porta a porta sem papel: formulário, leitura assistida, fila com decisão humana | ✅ pronto |
 | 7 | `motor/rodadas.py` — reotimização contínua em rodadas (ruin & recreate com horizonte de compromisso) | ✅ pronto |
 | 7 | `operacao/app_responsavel.html` — "onde está o ônibus" e aviso de falta (origem real da taxa de ausência) | ✅ pronto |
+| 8 | `painel/console.py` — a tela do sistema (Hoje, Elegibilidade, Assistente, Economia) | ✅ pronto |
+| 8 | `planejamento/` + `motor/planejar.py` + `dados/agrupar.py` — planilha → pontos → rotas → publicar | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -93,6 +95,12 @@ mobgov/                          (raiz deste repositório)
   dados/demanda_pcd.py           demanda sintética do porta a porta (sem dado pessoal)
   dados/planilha.py              lê csv/tsv/xlsx sem dependência (xlsx = zip + xml)
   dados/importador.py            colunas por sinônimo, dedup, geocodificação com plano B
+  dados/agrupar.py               alunos importados -> pontos de embarque (raio de caminhada)
+  motor/planejar.py              planilha -> importador -> agrupador -> motor -> plano
+  planejamento/servidor.py       a tela da roteirização: envia, confere, ajusta, publica
+  planejamento/tela.html         os cinco passos numa página só
+  planejamento/multipart.py      envio de arquivo sem dependência (o cgi saiu do 3.13)
+  painel/console.py              console de operação: Hoje, Elegibilidade, Assistente
   motor/rodadas.py               reotimização contínua: o dia inteiro em rodadas
   motor/rodar_rodadas.py         roda a manhã em rodadas e grava rodadas.json
   operacao/app_motorista.html    app offline-first (fila local + sincronização)
@@ -132,6 +140,9 @@ python -m painel.render                # gera relatorios/painel-economia.html
 python -m painel.render --diesel 7.20 --dias 20
 python motor/importar.py --gerar-exemplo   # planilha bagunçada -> demanda
 python motor/rodar_rodadas.py          # reotimização contínua da manhã (~1 min)
+python -m planejamento.servidor        # tela da roteirização (127.0.0.1:8090)
+python motor/planejar.py planilha.xlsx # mesmo caminho pela linha de comando
+python -m painel.console               # gera relatorios/console.html
 python -m operacao.servidor            # apps do motorista e do responsável (8080)
 python conversa/cli.py --offline "quanto eu economizo por mês?"
 python elegibilidade/demonstracao.py && python elegibilidade/relatorio.py
@@ -244,6 +255,22 @@ python -m unittest discover -s testes -v
   min entre o evento e o plano faz o app da família voltar ao horário
   planejado e dizer por quê — apareceu numa demonstração como "878 min
   atrasado" escrito com toda a confiança.
+- **A frota atual estimada só vale para o Município Modelo.** Com planilha
+  real, `montar_relatorio(permitir_estimativa=False)`: sem a frota declarada,
+  o plano sai SEM comparação. A estimativa supõe ocupação de 85% e 2,5
+  viagens por veículo; com 297 alunos em 196 pontos ela projetou 3 veículos
+  contra os 23 do plano, e a "economia" saiu em −666%.
+- **Oferta de veículos ao solver tem dois mínimos**: por assentos e por tempo
+  (`viagens_pelo_tempo`). Demanda esparsa esgota o tempo muito antes dos
+  assentos — só com o mínimo por assentos o solver não achava solução.
+- **Aluno cuja ida-e-volta já passa do limite não tem rota possível.**
+  `_separar_inviaveis` tira esses pontos e devolve por escrito em
+  `demanda_nao_atendida`: é decisão da secretaria (endereço errado, escola do
+  outro lado do município ou atendimento individual), não do sistema.
+- **Frota declarada e planilha de alunos podem não falar do mesmo universo.**
+  `_conferir_coerencia` avisa quando os lugares declarados passam de 2× o
+  maior turno — foi o caso da primeira planilha real: frota do município
+  inteiro contra 297 alunos.
 - **`urlparse` corta o que vem depois de `;`** no último segmento da URL (vira
   `params`) — e o OSRM separa coordenadas com `;`. Qualquer código que
   interprete URLs do OSRM precisa recolar `path + ';' + params`.

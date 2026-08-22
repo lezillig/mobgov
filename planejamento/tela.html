@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOBGOV — Planejamento: da planilha às rotas</title>
+<style>
+/* Tela de trabalho da secretaria. Cinco passos numa página só, porque o
+   servidor que a usa não vai ler manual e não pode se perder entre telas.
+   Sem biblioteca: roda no notebook velho da prefeitura, offline. */
+:root{
+  --papel:#FFFFFF; --papel-2:#F4F7F9; --tinta:#0E1D27; --tinta-fraca:#4E6273;
+  --linha:#D3DDE4; --institucional:#123E6B; --otim:#0E6B57; --otim-fraco:#DCEDE7;
+  --atual:#B4531E; --atual-fraco:#F6E7DC; --alerta:#8A5A00;
+  --alerta-fundo:#FCF3DF;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--papel-2);color:var(--tinta);font-size:16.5px;line-height:1.5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--papel);border-bottom:3px solid var(--institucional);
+  padding:22px 0}
+.folha{max-width:1120px;margin:0 auto;padding:0 22px}
+.produto{font-weight:800;letter-spacing:.08em;color:var(--institucional)}
+h1{font-size:26px;margin-top:6px}
+h2{font-size:19px}
+.sub{color:var(--tinta-fraca);margin-top:4px}
+main{padding:26px 0 80px}
+.passo{background:var(--papel);border:1px solid var(--linha);border-radius:14px;
+  padding:22px;margin-bottom:20px}
+.passo[data-bloqueado="1"]{opacity:.55}
+.cabeca{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.numero{width:34px;height:34px;border-radius:50%;background:var(--institucional);
+  color:#FFF;display:flex;align-items:center;justify-content:center;
+  font-weight:800;flex:0 0 auto}
+.passo.pronto .numero{background:var(--otim)}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:13px 18px;
+  background:var(--institucional);color:#FFF;cursor:pointer;min-height:48px}
+button.secundaria{background:var(--papel);color:var(--tinta);
+  border:1.5px solid var(--linha)}
+button[disabled]{opacity:.45;cursor:not-allowed}
+input[type=file]{font:inherit}
+input[type=text],input[type=number]{font:inherit;padding:10px;border-radius:8px;
+  border:1px solid var(--linha);width:100%;max-width:230px}
+label{display:block;font-size:14px;color:var(--tinta-fraca);margin-bottom:4px}
+.campos{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;margin:16px 0}
+.kpi{background:var(--papel-2);border-left:4px solid var(--institucional);
+  border-radius:0 10px 10px 0;padding:12px 14px}
+.kpi .rotulo{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--tinta-fraca)}
+.kpi .valor{font-size:28px;font-weight:800;line-height:1.15}
+.kpi.ruim{border-left-color:var(--atual)}
+.kpi.ruim .valor{color:var(--atual)}
+.kpi.bom{border-left-color:var(--otim)}
+.kpi.bom .valor{color:var(--otim)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--linha);
+  vertical-align:top}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--tinta-fraca)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.rolagem{max-height:340px;overflow:auto;border:1px solid var(--linha);
+  border-radius:10px}
+.marca{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;
+  border-radius:999px}
+.marca.erro{background:var(--atual-fraco);color:var(--atual)}
+.marca.aviso{background:var(--alerta-fundo);color:var(--alerta)}
+.aviso{background:var(--alerta-fundo);border-left:4px solid var(--alerta);
+  border-radius:0 10px 10px 0;padding:14px;margin:14px 0;font-size:15px}
+.erro-caixa{background:var(--atual-fraco);border-left:4px solid var(--atual);
+  border-radius:0 10px 10px 0;padding:14px;margin:14px 0}
+.mapa{border:1px solid var(--linha);border-radius:12px;background:#EEF3F6;
+  touch-action:none}
+.mapa circle{cursor:grab}
+.mapa circle.ajustar{cursor:grab}
+.legenda{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;
+  color:var(--tinta-fraca);margin-top:10px}
+.legenda span{display:flex;align-items:center;gap:6px}
+.ponto-legenda{width:12px;height:12px;border-radius:50%;display:inline-block}
+.progresso{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;
+  background:#0E1D27;color:#DDEAF2;border-radius:10px;padding:14px;
+  max-height:220px;overflow:auto;white-space:pre-wrap}
+.lista{margin:12px 0 0 20px}
+.lista li{margin:6px 0}
+</style>
+</head>
+<body>
+<header><div class="folha">
+  <div class="produto">MOBGOV</div>
+  <h1>Planejamento: da planilha às rotas</h1>
+  <p class="sub">Envie o arquivo que a secretaria já tem. O sistema aponta o
+  que não entendeu, você ajusta o que for preciso, ele roteiriza e você
+  publica — os motoristas passam a ver a rota nova no app.</p>
+</div></header>
+
+<main><div class="folha">
+
+  <section class="passo" id="passo-1">
+    <div class="cabeca"><div class="numero">1</div>
+      <h2>Enviar a planilha da secretaria</h2></div>
+    <p class="sub">.xlsx, .csv ou .tsv. Pode estar bagunçada: título antes do
+    cabeçalho, turno escrito de vários jeitos, aluno repetido, endereço rural
+    sem coordenada. É para isso que existe o passo 2.</p>
+    <div class="campos">
+      <div><label for="arquivo">Arquivo</label>
+        <input type="file" id="arquivo" accept=".xlsx,.csv,.tsv"></div>
+      <div style="align-self:flex-end">
+        <button id="botao-enviar">Enviar e conferir</button></div>
+    </div>
+    <div id="erro-envio"></div>
+  </section>
+
+  <section class="passo" id="passo-2" data-bloqueado="1">
+    <div class="cabeca"><div class="numero">2</div>
+      <h2>Conferir o que entrou</h2></div>
+    <div id="resumo-importacao"><p class="sub">Envie a planilha para ver o
+    resultado.</p></div>
+  </section>
+
+  <section class="passo" id="passo-3" data-bloqueado="1">
+    <div class="cabeca"><div class="numero">3</div>
+      <h2>Ajustar no mapa</h2></div>
+    <p class="sub">Cada bolinha é um aluno. As <b>laranjas</b> estão no ponto
+    de referência do bairro porque o endereço não tinha coordenada — arraste
+    cada uma para a casa certa. As <b>verdes</b> vieram com coordenada da
+    planilha. As <b>azuis</b> são de quem usa cadeira de rodas: essas o veículo
+    busca na porta.</p>
+    <div id="area-mapa"></div>
+  </section>
+
+  <section class="passo" id="passo-4" data-bloqueado="1">
+    <div class="cabeca"><div class="numero">4</div>
+      <h2>Roteirizar</h2></div>
+    <p class="sub">O motor resolve escola por escola e turno por turno. Leva
+    alguns minutos — é otimização de verdade, não é tela de carregamento.</p>
+    <div class="campos" id="campos-roteirizacao"></div>
+    <div class="campos">
+      <div style="align-self:flex-end">
+        <button id="botao-roteirizar">Calcular as rotas</button></div>
+    </div>
+    <div id="area-progresso"></div>
+  </section>
+
+  <section class="passo" id="passo-5" data-bloqueado="1">
+    <div class="cabeca"><div class="numero">5</div>
+      <h2>Publicar</h2></div>
+    <div id="area-plano"><p class="sub">O resultado aparece aqui quando a
+    roteirização terminar.</p></div>
+  </section>
+
+</div></main>
+
+<script>
+/* Tudo o que esta tela faz é conversar com planejamento/servidor.py. Ela não
+   calcula nada: nem a economia, nem a frota, nem o agrupamento. Se um número
+   aparece aqui, ele veio do motor — a mesma regra do painel. */
+(function () {
+  "use strict";
+  var estado = {importacao: null, plano: null, rodando: false};
+  var pontos = [];
+  var mapa = null;
+
+  function elemento(id) { return document.getElementById(id); }
+  function esc(t) {
+    return String(t === undefined || t === null ? "" : t)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function numero(v, casas) {
+    if (v === undefined || v === null) { return "—"; }
+    return Number(v).toLocaleString("pt-BR",
+      {minimumFractionDigits: casas || 0, maximumFractionDigits: casas || 0});
+  }
+  function reais(v) {
+    if (v === undefined || v === null) { return "—"; }
+    return "R$ " + numero(v);
+  }
+  function liberar(id, pronto) {
+    var no = elemento(id);
+    no.removeAttribute("data-bloqueado");
+    if (pronto) { no.classList.add("pronto"); }
+  }
+
+  function buscarEstado() {
+    return fetch("/api/estado").then(function (r) { return r.json(); })
+      .then(function (d) {
+        estado.rodando = d.rodando;
+        if (d.importacao && d.importacao.resumo) {
+          estado.importacao = d.importacao;
+          pontos = d.importacao.pontos || [];
+        }
+        estado.plano = d.plano && d.plano.frota ? d.plano : null;
+        pintar(d);
+        return d;
+      });
+  }
+
+  /* ------------------------------------------------------------ passo 2 --- */
+  function pintarImportacao() {
+    var imp = estado.importacao;
+    if (!imp || !imp.resumo) { return; }
+    var r = imp.resumo;
+    liberar("passo-2", r.erros === 0);
+    liberar("passo-3");
+    liberar("passo-4");
+
+    var tipos = {};
+    (imp.problemas || []).forEach(function (p) {
+      var chave = p.gravidade + "|" + p.problema + "|" + p.sugestao;
+      if (!tipos[chave]) { tipos[chave] = {linhas: [], p: p}; }
+      tipos[chave].linhas.push(p.linha);
+    });
+    var linhas = Object.keys(tipos).sort(function (a, b) {
+      return tipos[b].linhas.length - tipos[a].linhas.length;
+    }).map(function (chave) {
+      var t = tipos[chave];
+      return '<tr><td><span class="marca ' + esc(t.p.gravidade) + '">'
+        + esc(t.p.gravidade) + '</span></td><td>' + esc(t.p.problema)
+        + '</td><td class="num">' + t.linhas.length + '</td><td>'
+        + esc(t.linhas.slice(0, 8).join(", "))
+        + (t.linhas.length > 8 ? "…" : "") + '</td><td>' + esc(t.p.sugestao)
+        + '</td></tr>';
+    }).join("");
+
+    elemento("resumo-importacao").innerHTML =
+      '<div class="kpis">'
+      + kpi("Alunos importados", numero(r.alunos_importados),
+            esc(imp.arquivo || ""), "bom")
+      + kpi("Erros (a linha não entrou)", numero(r.erros),
+            "exigem decisão humana", r.erros ? "ruim" : "")
+      + kpi("Avisos", numero(r.avisos), "entraram, mas confira")
+      + kpi("Precisam de ajuste no mapa", numero(r.precisam_ajuste_no_mapa),
+            "endereço sem coordenada", r.precisam_ajuste_no_mapa ? "ruim" : "")
+      + kpi("Cadeirantes", numero(r.cadeirantes), "veículo acessível")
+      + '</div>'
+      + (linhas ? '<div class="rolagem"><table><thead><tr><th>Gravidade</th>'
+          + '<th>O que aconteceu</th><th class="num">Linhas</th><th>Onde</th>'
+          + '<th>O que fazer</th></tr></thead><tbody>' + linhas
+          + '</tbody></table></div>'
+        : '<p class="sub">Nenhum problema encontrado nesta planilha.</p>')
+      + '<p class="sub" style="margin-top:12px">Colunas reconhecidas: '
+      + esc(Object.keys(r.colunas_detectadas || {}).join(", ")) + '.</p>';
+
+    pintarCamposDeRoteirizacao();
+    desenharMapa();
+  }
+
+  function kpi(rotulo, valor, detalhe, classe) {
+    return '<div class="kpi ' + (classe || "") + '"><div class="rotulo">'
+      + esc(rotulo) + '</div><div class="valor">' + esc(valor)
+      + '</div><div class="sub">' + esc(detalhe) + '</div></div>';
+  }
+
+  /* ------------------------------------------------------------ passo 3 --- */
+  function desenharMapa() {
+    var comCoordenada = pontos.filter(function (p) {
+      return p.lat !== null && p.lon !== null;
+    });
+    if (!comCoordenada.length) {
+      elemento("area-mapa").innerHTML = '<p class="sub">Nenhum ponto com '
+        + 'coordenada para mostrar.</p>';
+      return;
+    }
+    var lats = comCoordenada.map(function (p) { return p.lat; });
+    var lons = comCoordenada.map(function (p) { return p.lon; });
+    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+    var minLon = Math.min.apply(null, lons), maxLon = Math.max.apply(null, lons);
+    var margem = 0.02;
+    minLat -= margem; maxLat += margem; minLon -= margem; maxLon += margem;
+    var L = 900, A = 520;
+
+    function x(lon) { return (lon - minLon) / (maxLon - minLon) * L; }
+    function y(lat) { return A - (lat - minLat) / (maxLat - minLat) * A; }
+    function paraLon(px) { return minLon + (px / L) * (maxLon - minLon); }
+    function paraLat(py) { return minLat + ((A - py) / A) * (maxLat - minLat); }
+
+    var circulos = comCoordenada.map(function (p) {
+      var cor = p.ajustar ? "#C4711E" : (p.cadeirante ? "#1C6FB8" : "#0E6B57");
+      return '<circle data-aluno="' + esc(p.id) + '" class="'
+        + (p.ajustar ? "ajustar" : "") + '" cx="' + x(p.lon).toFixed(1)
+        + '" cy="' + y(p.lat).toFixed(1) + '" r="' + (p.ajustar ? 7 : 5)
+        + '" fill="' + cor + '" fill-opacity="' + (p.ajustar ? 0.9 : 0.6)
+        + '" stroke="#FFFFFF" stroke-width="1.2"><title>'
+        + esc((p.endereco || "") + " · " + (p.bairro || "") + " · "
+              + (p.escola || "")) + '</title></circle>';
+    }).join("");
+
+    elemento("area-mapa").innerHTML =
+      '<svg class="mapa" viewBox="0 0 ' + L + ' ' + A + '" width="100%" '
+      + 'role="img" aria-label="Mapa dos alunos importados">' + circulos
+      + '</svg>'
+      + '<div class="legenda">'
+      + '<span><i class="ponto-legenda" style="background:#0E6B57"></i>'
+      + 'coordenada da planilha</span>'
+      + '<span><i class="ponto-legenda" style="background:#C4711E"></i>'
+      + 'no ponto do bairro — arraste para a casa</span>'
+      + '<span><i class="ponto-legenda" style="background:#1C6FB8"></i>'
+      + 'cadeira de rodas</span>'
+      + '<span id="contagem-ajuste"></span></div>';
+
+    mapa = elemento("area-mapa").querySelector("svg");
+    var arrastando = null;
+
+    function posicao(evento) {
+      var caixa = mapa.getBoundingClientRect();
+      var toque = evento.touches ? evento.touches[0] : evento;
+      return {px: (toque.clientX - caixa.left) / caixa.width * L,
+              py: (toque.clientY - caixa.top) / caixa.height * A};
+    }
+    mapa.addEventListener("pointerdown", function (evento) {
+      if (evento.target.tagName !== "circle") { return; }
+      arrastando = evento.target;
+      mapa.setPointerCapture(evento.pointerId);
+    });
+    mapa.addEventListener("pointermove", function (evento) {
+      if (!arrastando) { return; }
+      var p = posicao(evento);
+      arrastando.setAttribute("cx", p.px.toFixed(1));
+      arrastando.setAttribute("cy", p.py.toFixed(1));
+    });
+    mapa.addEventListener("pointerup", function (evento) {
+      if (!arrastando) { return; }
+      var alvo = arrastando;
+      arrastando = null;
+      var lat = paraLat(parseFloat(alvo.getAttribute("cy")));
+      var lon = paraLon(parseFloat(alvo.getAttribute("cx")));
+      fetch("/api/ajustar", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({aluno: alvo.getAttribute("data-aluno"),
+                              lat: lat, lon: lon})
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (d.ok) {
+          alvo.setAttribute("fill", "#0E6B57");
+          alvo.setAttribute("r", "5");
+          alvo.classList.remove("ajustar");
+          var conta = elemento("contagem-ajuste");
+          if (conta) {
+            conta.textContent = d.faltam + " ainda no ponto do bairro";
+          }
+          estado.plano = null;   // mexeu no dado: o plano anterior venceu
+        }
+      });
+    });
+    var conta = elemento("contagem-ajuste");
+    var faltam = comCoordenada.filter(function (p) { return p.ajustar; }).length;
+    if (conta) { conta.textContent = faltam + " ainda no ponto do bairro"; }
+  }
+
+  /* ------------------------------------------------------------ passo 4 --- */
+  function pintarCamposDeRoteirizacao() {
+    var frota = (estado.importacao && estado.importacao.frota_declarada) || {};
+    var comp = frota.composicao || {};
+    var origem = frota.origem
+      ? '<p class="sub">Frota atual lida da planilha (' + esc(frota.origem)
+        + '). Confira antes de calcular.</p>'
+      : '<div class="aviso">A planilha não trouxe a frota que o município usa '
+        + 'hoje. Sem ela o sistema calcula as rotas, mas <b>não</b> apresenta '
+        + 'economia — não dá para comparar com um "antes" que ninguém '
+        + 'informou. Os números costumam estar no contrato de transporte ou no '
+        + 'relatório do PNATE.</div>';
+    elemento("campos-roteirizacao").innerHTML = origem
+      + campo("Ônibus 31 lugares", "frota-ONIBUS31", comp.ONIBUS31 || 0)
+      + campo("Micro-ônibus 20", "frota-MICRO20", comp.MICRO20 || 0)
+      + campo("Van acessível 15", "frota-VAN15A", comp.VAN15A || 0)
+      + campo("Km por dia (hoje)", "frota-km", frota.km_dia || 0)
+      + campo("Raio urbano (m)", "raio-urbano", 300)
+      + campo("Raio rural (m)", "raio-rural", 800)
+      + campo("Tempo do solver (s)", "tempo-limite", 20);
+  }
+
+  function campo(rotulo, id, valor) {
+    return '<div><label for="' + id + '">' + esc(rotulo) + '</label>'
+      + '<input type="number" id="' + id + '" value="' + esc(valor)
+      + '" min="0" style="max-width:150px"></div>';
+  }
+
+  function valor(id) {
+    var no = elemento(id);
+    return no ? Number(no.value || 0) : 0;
+  }
+
+  function pintarProgresso(d) {
+    var linhas = (d.progresso || []).map(function (p) {
+      return p.em + "  " + p.etapa + (p.detalhe ? ": " + p.detalhe : "");
+    }).join("\n");
+    elemento("area-progresso").innerHTML = linhas
+      ? '<div class="progresso">' + esc(linhas) + '</div>' : "";
+    elemento("botao-roteirizar").disabled = !!d.rodando || !estado.importacao;
+    elemento("botao-roteirizar").textContent = d.rodando
+      ? "Calculando…" : "Calcular as rotas";
+    if (d.erro) {
+      elemento("area-progresso").innerHTML +=
+        '<div class="erro-caixa"><b>A roteirização parou:</b> ' + esc(d.erro)
+        + '</div>';
+    }
+  }
+
+  /* ------------------------------------------------------------ passo 5 --- */
+  function pintarPlano(plano) {
+    if (!plano || !plano.frota) { return; }
+    liberar("passo-5", true);
+    var eco = plano.economia;
+    var nao = plano.demanda_nao_atendida || {};
+    var html = '<div class="kpis">'
+      + kpi("Frota necessária", plano.frota.total + " veículos",
+            numero(plano.viagens) + " viagens por dia", "bom")
+      + kpi("Quilometragem", numero(plano.frota.km_dia, 1) + " km/dia",
+            "das rotas calculadas")
+      + kpi("Custo mensal", reais(plano.frota.custo_mes),
+            "da frota necessária");
+    if (eco) {
+      html += kpi("Economia", reais(eco.custo_mes) + "/mês",
+                  eco.veiculos + " veículos a menos ("
+                  + numero(eco.reducao_frota_pct, 1) + "%)", "bom");
+    }
+    html += '</div>';
+
+    if (!eco && plano.comparacao_indisponivel) {
+      html += '<div class="aviso">' + esc(plano.comparacao_indisponivel)
+        + '</div>';
+    }
+    (plano.coerencia || []).forEach(function (aviso) {
+      html += '<div class="aviso"><b>Confira antes de levar este número para '
+        + 'uma reunião:</b> ' + esc(aviso) + '</div>';
+    });
+    if (nao.alunos) {
+      html += '<div class="erro-caixa"><b>' + nao.alunos + ' aluno(s) não '
+        + 'cabem em rota nenhuma dentro do limite de tempo.</b> Isso é decisão '
+        + 'da secretaria — o sistema não afrouxa a regra nem deixa a criança '
+        + 'de fora em silêncio.<ul class="lista">'
+        + (nao.pontos || []).slice(0, 6).map(function (p) {
+            return '<li>' + esc(p.ponto) + ' (' + esc(p.bairro) + ') → '
+              + esc(p.escola) + ': ' + p.minutos_minimos + ' min de trajeto '
+              + 'mínimo, limite de ' + p.limite_min + ' min</li>';
+          }).join("")
+        + '</ul></div>';
+    }
+    (plano.agrupamento && plano.agrupamento.avisos || []).forEach(function (a) {
+      html += '<div class="aviso">' + esc(a) + '</div>';
+    });
+    if (plano.agrupamento && plano.agrupamento.pontos) {
+      var g = plano.agrupamento;
+      html += '<p class="sub">' + numero(g.alunos) + ' alunos em '
+        + numero(g.pontos) + ' pontos de embarque · caminhada média de '
+        + numero(g.caminhada_media_m) + ' m (máx. '
+        + numero(g.caminhada_maxima_m) + ' m) · '
+        + numero(g.pontos_exclusivos_de_cadeirante)
+        + ' pontos exclusivos de cadeirante.</p>';
+    }
+    html += '<div class="campos" style="margin-top:18px">'
+      + '<div><button id="botao-publicar">Publicar este plano</button></div>'
+      + '<div style="align-self:center" class="sub">Publicar troca a rota que '
+      + 'os motoristas veem no app. O plano anterior vai para o histórico.</div>'
+      + '</div><div id="resultado-publicacao"></div>';
+    elemento("area-plano").innerHTML = html;
+
+    elemento("botao-publicar").addEventListener("click", function () {
+      if (!confirm("Publicar o plano com " + plano.frota.total + " veículos e "
+                   + plano.viagens + " viagens?")) { return; }
+      this.disabled = true;
+      fetch("/api/publicar", {method: "POST"})
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          elemento("resultado-publicacao").innerHTML = d.erro
+            ? '<div class="erro-caixa">' + esc(d.erro) + '</div>'
+            : '<div class="aviso"><b>Publicado.</b> ' + esc(d.mensagem)
+              + '</div>';
+        });
+    });
+  }
+
+  function pintar(d) {
+    if (estado.importacao) { pintarImportacao(); }
+    pintarProgresso(d);
+    if (d.plano && d.plano.frota) { pintarPlano(d.plano); }
+  }
+
+  /* ------------------------------------------------------------- eventos -- */
+  elemento("botao-enviar").addEventListener("click", function () {
+    var entrada = elemento("arquivo");
+    if (!entrada.files.length) {
+      elemento("erro-envio").innerHTML =
+        '<div class="erro-caixa">Escolha um arquivo primeiro.</div>';
+      return;
+    }
+    var dados = new FormData();
+    dados.append("planilha", entrada.files[0]);
+    this.disabled = true;
+    this.textContent = "Lendo a planilha…";
+    var botao = this;
+    fetch("/api/enviar-planilha", {method: "POST", body: dados})
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        botao.disabled = false;
+        botao.textContent = "Enviar e conferir";
+        if (d.erro) {
+          elemento("erro-envio").innerHTML =
+            '<div class="erro-caixa">' + esc(d.erro) + '</div>';
+          return;
+        }
+        elemento("erro-envio").innerHTML = "";
+        elemento("passo-1").classList.add("pronto");
+        estado.importacao = d;
+        pontos = d.pontos || [];
+        pintarImportacao();
+      });
+  });
+
+  elemento("botao-roteirizar").addEventListener("click", function () {
+    var frota = {ONIBUS31: valor("frota-ONIBUS31"),
+                 MICRO20: valor("frota-MICRO20"),
+                 VAN15A: valor("frota-VAN15A")};
+    var total = frota.ONIBUS31 + frota.MICRO20 + frota.VAN15A;
+    this.disabled = true;
+    fetch("/api/roteirizar", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        frota_declarada: total ? {composicao: frota, km_dia: valor("frota-km"),
+                                  origem: "informada na tela"} : null,
+        raio_urbano: valor("raio-urbano"), raio_rural: valor("raio-rural"),
+        tempo_limite: valor("tempo-limite")})
+    }).then(function (r) { return r.json(); }).then(function () {
+      acompanhar();
+    });
+  });
+
+  function acompanhar() {
+    buscarEstado().then(function (d) {
+      if (d.rodando) { setTimeout(acompanhar, 1500); }
+    });
+  }
+
+  buscarEstado();
+})();
+</script>
+</body>
+</html>

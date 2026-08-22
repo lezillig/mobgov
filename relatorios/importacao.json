@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-08-22 19:38",
+  "gerado_em": "2026-08-22 20:52",
   "arquivo": "planilha-prefeitura-demo.xlsx",
   "resumo": {
     "alunos_importados": 297,
@@ -5054,5 +5054,6 @@
       "sugestao": "Provavelmente é um rodapé ou total; conferir.",
       "gravidade": "aviso"
     }
-  ]
+  ],
+  "cofre": {}
 }
