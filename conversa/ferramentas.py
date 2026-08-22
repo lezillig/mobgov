@@ -154,13 +154,18 @@ def explicar_rota(viagem: str = None) -> dict:
 
 def estado_da_operacao() -> dict:
     """O que já aconteceu hoje: eventos do app, faltas, reotimizações."""
-    from operacao import registro
+    from operacao import onde_esta, registro
     resumo = registro.resumo()
     reot = _opcional("reotimizacao.json").get("resumo", {})
     rodadas = _opcional("rodadas.json")
+    faltas = onde_esta.faltas_do_dia()
     return {"eventos_recebidos": resumo, "reotimizacoes_do_dia": reot,
             "rodadas_do_dia": rodadas.get("resumo", {}),
-            "politica_das_rodadas": rodadas.get("politica", {})}
+            "politica_das_rodadas": rodadas.get("politica", {}),
+            "avisos_das_familias": {
+                "dia": faltas["dia"], "faltas_avisadas": faltas["faltas"],
+                "avisos_desfeitos": faltas["avisos_desfeitos"],
+                "viagens_afetadas": len(faltas["por_viagem"])}}
 
 
 def qualidade_da_importacao() -> dict:

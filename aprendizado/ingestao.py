@@ -7,17 +7,23 @@ Converte o que o app do motorista mandou em observações de aprendizado.
 que `aprendizado/simulador.py` produz — de propósito: o ciclo de aprendizado
 não muda uma linha quando a origem passa a ser GPS.
 
-O que dá para medir com os eventos que o app manda hoje:
+O que dá para medir com os eventos que os apps mandam:
 
 - **duração real da coleta**: do primeiro ao último embarque de uma viagem,
   comparada com o previsto para o mesmo trecho;
 - **tempo de parada por ponto**: o intervalo entre dois embarques menos o
-  deslocamento previsto entre eles.
+  deslocamento previsto entre eles;
+- **taxa de ausência**: dos avisos do app do responsável ("hoje ele(a) não
+  vai"), por viagem e por dia. Era a última coisa do aprendizado que
+  continuava estimada; agora tem origem, e quem informa é a própria família.
 
-O que NÃO dá, e por isso não é inventado aqui: a taxa de ausência. Ela vem do
-app do responsável ("meu filho não vai hoje"), que ainda não existe. Enquanto
-não existir, o modelo mantém a estimativa anterior — melhor do que fabricar
-uma medição.
+Vale o ÚLTIMO aviso de cada aluno no dia: quem avisou e depois desdisse não
+faltou. Contar aviso desfeito como falta ensinaria ao modelo uma ausência que
+não houve — e, no dia, faria o veículo passar direto pela criança que estava
+no ponto.
+
+Sem aviso nenhum a lista sai vazia: dia sem aviso não é dia sem falta, é dia
+sem informação, e as duas coisas não podem virar o mesmo número.
 """
 from __future__ import annotations
 
@@ -96,7 +102,64 @@ def observacoes(eventos: list, plano: dict, faixa_por_turno: dict,
                 paradas.append({"ponto": ponto_b, "dia": dia,
                                 "min_extra_realizado": round(max(0.0, extra), 2)})
 
-    return {"trechos": trechos, "paradas": paradas, "faltas": []}
+    return {"trechos": trechos, "paradas": paradas,
+            "faltas": faltas_observadas(eventos, plano)}
+
+
+def faltas_observadas(eventos: list, plano: dict) -> list:
+    """Taxa de ausência por viagem e por dia, a partir dos avisos da família."""
+    viagens = {v["id"]: v for v in
+               (plano.get("frota_otimizada") or {}).get("viagens", [])}
+
+    # último aviso de cada aluno em cada dia — desdizer apaga o aviso anterior
+    ultimo = {}
+    for evento in sorted(eventos, key=lambda e: (e.get("em") or "")):
+        if evento.get("tipo") not in ("falta", "volta_atras"):
+            continue
+        dia = _dia(evento.get("em"))
+        if dia is None or not evento.get("aluno"):
+            continue
+        ultimo[(dia, evento["aluno"])] = evento
+
+    por_viagem_dia = {}
+    for (dia, _aluno), evento in ultimo.items():
+        if evento["tipo"] != "falta":
+            continue
+        viagem_id = evento.get("viagem")
+        if viagem_id not in viagens:
+            continue
+        por_viagem_dia[(viagem_id, dia)] = por_viagem_dia.get(
+            (viagem_id, dia), 0) + 1
+
+    faltas = []
+    for (viagem_id, dia), quantas in sorted(por_viagem_dia.items()):
+        previstos = viagens[viagem_id].get("alunos") or 0
+        if previstos <= 0:
+            continue
+        faltas.append({
+            "viagem": viagem_id, "dia": dia,
+            "turno": viagens[viagem_id].get("turno"),
+            "alunos_previstos": previstos,
+            "faltas_avisadas": quantas,
+            "taxa": round(quantas / previstos, 4),
+            "origem": "aviso_do_responsavel",
+        })
+    return faltas
+
+
+def taxa_de_ausencia(observadas: dict, minimo_de_dias: int = 5):
+    """Taxa média — ou None enquanto não houver dias suficientes.
+
+    Devolver None é o ponto: com dois dias de aviso, qualquer número seria
+    ruído com cara de medição, e o modelo continua com a estimativa anterior.
+    """
+    faltas = observadas.get("faltas") or []
+    dias = {f["dia"] for f in faltas}
+    if len(dias) < minimo_de_dias:
+        return None
+    previstos = sum(f["alunos_previstos"] for f in faltas)
+    avisadas = sum(f["faltas_avisadas"] for f in faltas)
+    return round(avisadas / previstos, 4) if previstos else None
 
 
 def suficiente(observadas: dict, minimo_de_trechos: int = 30) -> bool:

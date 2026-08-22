@@ -56,8 +56,11 @@ previu X, aconteceu Y, ajustou Z".
 | 4 | `dados/tempos.py` (trânsito variável), `motor/porta_a_porta.py` (PCD n:n), `motor/reotimizar.py` (falta, cancelamento, inserção dinâmica) | ✅ pronto |
 | 5 | `dados/osrm.py` (malha viária real), `aprendizado/` (ciclo com rollback), mapa das rotas em SVG | ✅ pronto |
 | 6 | `dados/importador.py` (planilha da prefeitura) + `operacao/` (app do motorista offline-first, API e ingestão para o aprendizado) | ✅ pronto |
-| 7 | Camada conversacional + roteiro de demo ensaiado | ⬜ |
-| 8 | Elegibilidade PCD (ou pós-MVP, conforme o edital-alvo) | ⬜ |
+| 7 | `conversa/` — camada conversacional (ferramentas + roteador offline + auditoria de números) | ✅ pronto |
+| 7 | `elegibilidade/` — porta a porta sem papel: formulário, leitura assistida, fila com decisão humana | ✅ pronto |
+| 7 | `motor/rodadas.py` — reotimização contínua em rodadas (ruin & recreate com horizonte de compromisso) | ✅ pronto |
+| 7 | `operacao/app_responsavel.html` — "onde está o ônibus" e aviso de falta (origem real da taxa de ausência) | ✅ pronto |
+| 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
 **30 → 23 veículos (−23,3%)**, R$ 141.122/mês, R$ 1,69 mi/ano, com 107
@@ -90,9 +93,21 @@ mobgov/                          (raiz deste repositório)
   dados/demanda_pcd.py           demanda sintética do porta a porta (sem dado pessoal)
   dados/planilha.py              lê csv/tsv/xlsx sem dependência (xlsx = zip + xml)
   dados/importador.py            colunas por sinônimo, dedup, geocodificação com plano B
+  motor/rodadas.py               reotimização contínua: o dia inteiro em rodadas
+  motor/rodar_rodadas.py         roda a manhã em rodadas e grava rodadas.json
   operacao/app_motorista.html    app offline-first (fila local + sincronização)
-  operacao/servidor.py           API do app: rota do dia, eventos, resumo
+  operacao/app_responsavel.html  app da família: previsão, paradas, aviso de falta
+  operacao/onde_esta.py          "onde está o ônibus" com origem da previsão declarada
+  operacao/servidor.py           API dos dois apps: rota do dia, situação, eventos
   operacao/registro.py           trilha append-only dos eventos da operação
+  elegibilidade/perfil.py        necessidade operacional (nunca diagnóstico)
+  elegibilidade/formulario.py    perguntas em língua de família -> restrições
+  elegibilidade/extracao.py      leitura assistida do documento: sugere, não decide
+  elegibilidade/fila.py          estados, prazo e registro de quem decidiu
+  conversa/ferramentas.py        as 9 ferramentas — única fonte de número da resposta
+  conversa/roteador.py           escolhe a ferramenta por palavra-chave, sem LLM
+  conversa/redator.py            resposta em pt-BR a partir do resultado bruto
+  conversa/assistente.py         laço de tool use + auditoria dos números escritos
   aprendizado/ingestao.py        eventos do app -> observações do ciclo de aprendizado
   painel/economia.py             recálculo auditável + cenários + memória de cálculo
   painel/aprendizado.py          série "o que o sistema aprendeu" (real ou demonstração)
@@ -116,7 +131,11 @@ MOBGOV_OSRM_URL=http://localhost:5000 python motor/dimensionar.py   # malha real
 python -m painel.render                # gera relatorios/painel-economia.html
 python -m painel.render --diesel 7.20 --dias 20
 python motor/importar.py --gerar-exemplo   # planilha bagunçada -> demanda
-python -m operacao.servidor            # app do motorista (127.0.0.1:8080)
+python motor/rodar_rodadas.py          # reotimização contínua da manhã (~1 min)
+python -m operacao.servidor            # apps do motorista e do responsável (8080)
+python conversa/cli.py --offline "quanto eu economizo por mês?"
+python elegibilidade/demonstracao.py && python elegibilidade/relatorio.py
+python elegibilidade/cli.py fila
 python -m painel.servidor              # http://127.0.0.1:8000/
 python -m unittest discover -s testes -v
 ```
@@ -141,6 +160,19 @@ python -m unittest discover -s testes -v
   Há teste que quebra se entrar `http://`, `src=` ou `href=` na página.
 - **Painel e testes só com biblioteca padrão.** Dependência nova só no motor, e
   com justificativa: a demo tem que subir em máquina de prefeitura.
+- **O modelo de linguagem nunca escreve número.** As ferramentas de
+  `conversa/` são a única fonte; `auditar_numeros` confere cada número da
+  resposta contra o que as ferramentas devolveram e reprova a resposta que
+  inventar. Sem chave de API, o roteador por palavra-chave responde igual.
+- **Diagnóstico não roteiriza; necessidade roteiriza.** Em `elegibilidade/`,
+  CID e laudo ficam no processo; o que vai para o motor é restrição
+  operacional com identificador pseudonimizado. Não acrescente campo clínico
+  ao `Perfil`.
+- **Decisão sobre direito de pessoa com deficiência tem nome.** Aprovar sem
+  analista, aprovar sem evidência ou negar sem justificativa levantam erro no
+  código, não são convenção.
+- **Previsão para a família tem origem declarada**: `medido` só quando houve
+  embarque ou ping do veículo hoje; senão é `planejado`, e a tela diz isso.
 - **Teste antes de commitar.** As fórmulas, a coerência dos indicadores e a meta
   de ≥20% de redução de frota são cobertas por testes; se a economia cair abaixo
   disso, a suíte quebra de propósito.
@@ -197,6 +229,21 @@ python -m unittest discover -s testes -v
   "cortado" na captura pode estar perfeitamente dentro da página — meça
   `document.documentElement.scrollWidth` antes de "consertar" CSS que não está
   quebrado.
+- **Reotimizar não pode remarcar quem já foi avisado.** As rodadas congelam o
+  horizonte de compromisso (20 min) e só mexem em horário ainda não firme
+  (janela de aviso, 60 min). Uma melhoria que quebre promessa é descartada
+  inteira — e a rodada devolve o plano anterior.
+- **A conta da rodada tem três parcelas** (km liberado por falta, km de
+  demanda nova, ganho de remanejamento). Somar tudo num número só faz
+  "atender mais gente" virar economia negativa — ou some com o custo.
+- **Linha vazia some do XML do Excel.** O leitor de `.xlsx` respeita o
+  atributo `r` do `<row>`; sem isso, uma linha em branco no meio desloca toda
+  a numeração e o "conserte a linha 88" do relatório manda o servidor para a
+  linha errada.
+- **Sinal com horário absurdo não vira previsão.** Divergência acima de 120
+  min entre o evento e o plano faz o app da família voltar ao horário
+  planejado e dizer por quê — apareceu numa demonstração como "878 min
+  atrasado" escrito com toda a confiança.
 - **`urlparse` corta o que vem depois de `;`** no último segmento da URL (vira
   `params`) — e o OSRM separa coordenadas com `;`. Qualquer código que
   interprete URLs do OSRM precisa recolar `path + ';' + params`.
@@ -236,6 +283,8 @@ que o FastAPI as reaproveite sem reescrita.
   (5,88 → 2,03 min em 5 semanas, com 3 rollbacks recusando piora); vira medição
   real quando o app do motorista entrar.
 - Planilha real de prefeitura → rotas publicadas em < 1 hora. ⬜
+- Taxa de ausência medida, e não estimada. ✅ o app do responsável é a origem
+  (`aprendizado/ingestao.faltas_observadas`); vira número real com uso real.
 
 ## Benchmarks de referência
 

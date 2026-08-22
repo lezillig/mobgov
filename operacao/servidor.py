@@ -4,9 +4,15 @@ MOBGOV — Sprint 6 · agent-apps
 Servidor de operação: serve o app do motorista e recebe o que ele manda.
 
     GET  /                      app do motorista (PWA offline-first)
+    GET  /responsavel           app do responsável ("onde está o ônibus")
     GET  /api/motoristas        lista de motoristas do plano (modo demonstração)
+    GET  /api/responsaveis      vínculos de exemplo (modo demonstração)
     GET  /api/rota-do-dia       rota do motorista (motorista + token)
+    GET  /api/situacao          situação do aluno (aluno + ponto + token)
     POST /api/eventos           lote de eventos guardados no aparelho
+    POST /api/falta             a família avisa que hoje não vai
+    POST /api/desfazer-falta    a família desdiz o aviso
+    GET  /api/faltas-do-dia     quem avisou falta hoje, por viagem
     GET  /api/resumo            o que já chegou (para a central)
 
 Biblioteca padrão, como o resto do sistema. O token é um HMAC simples por
@@ -29,10 +35,12 @@ from urllib.parse import urlparse, parse_qs
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from operacao import registro, rota_do_dia as rotas
+from operacao import onde_esta, registro, rota_do_dia as rotas
 
 APP = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                    "app_motorista.html")
+APP_RESPONSAVEL = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "app_responsavel.html")
 TAMANHO_MAXIMO = 2 * 1024 * 1024      # 2 MB de lote já é um dia inteiro offline
 
 
@@ -64,6 +72,21 @@ class Operacao(BaseHTTPRequestHandler):
             return motorista
         return None
 
+    def _vinculo(self, q) -> dict:
+        """Devolve {aluno, ponto, turno} quando o token da família confere.
+
+        O token assina os três juntos: trocar o ?ponto= na URL não vale, senão
+        qualquer responsável veria a rota inteira do município.
+        """
+        aluno = (q.get("aluno") or [""])[0]
+        ponto = (q.get("ponto") or [""])[0]
+        turno = (q.get("turno") or [""])[0]
+        token = (q.get("token") or [""])[0]
+        if aluno and registro.token_de_responsavel_valido(aluno, token, ponto,
+                                                          turno):
+            return {"aluno": aluno, "ponto": ponto, "turno": turno}
+        return None
+
     # --------------------------------------------------------------- rotas
     def do_GET(self):
         rota = urlparse(self.path)
@@ -92,18 +115,62 @@ class Operacao(BaseHTTPRequestHandler):
                                    "viagens": []}, 404)
             return self._json(rota_dia)
 
+        if rota.path in ("/responsavel", "/responsavel.html"):
+            with open(APP_RESPONSAVEL, "rb") as f:
+                return self._responder(f.read(), "text/html; charset=utf-8")
+
+        if rota.path == "/api/responsaveis":
+            if not self.modo_demonstracao:
+                return self._json({"erro": "Disponível apenas em modo "
+                                            "demonstração."}, 403)
+            return self._json(vinculos_de_demonstracao(self.plano))
+
+        if rota.path == "/api/situacao":
+            vinculo = self._vinculo(q)
+            if not vinculo:
+                return self._json({"erro": "Aluno ou token inválido."}, 401)
+            return self._json(onde_esta.situacao(
+                vinculo, self.plano,
+                registro.ler_eventos(self.arquivo_eventos)))
+
+        if rota.path == "/api/faltas-do-dia":
+            return self._json(onde_esta.faltas_do_dia(
+                registro.ler_eventos(self.arquivo_eventos)))
+
         if rota.path == "/api/resumo":
             return self._json(registro.resumo(self.arquivo_eventos))
 
         self._json({"erro": "Rota não encontrada.",
-                    "rotas": ["/", "/api/motoristas", "/api/rota-do-dia",
-                              "/api/eventos", "/api/resumo"]}, 404)
+                    "rotas": ["/", "/responsavel", "/api/motoristas",
+                              "/api/rota-do-dia", "/api/situacao",
+                              "/api/eventos", "/api/falta",
+                              "/api/desfazer-falta", "/api/faltas-do-dia",
+                              "/api/resumo"]}, 404)
 
     do_HEAD = do_GET
 
     def do_POST(self):
         rota = urlparse(self.path)
         q = parse_qs(rota.query)
+
+        if rota.path in ("/api/falta", "/api/desfazer-falta"):
+            vinculo = self._vinculo(q)
+            if not vinculo:
+                return self._json({"erro": "Aluno ou token inválido."}, 401)
+            situacao = onde_esta.situacao(
+                vinculo, self.plano, registro.ler_eventos(self.arquivo_eventos))
+            viagem = situacao.get("viagem", "")
+            if rota.path == "/api/falta":
+                evento = onde_esta.avisar_falta(
+                    vinculo["aluno"], vinculo["ponto"], viagem,
+                    arquivo=self.arquivo_eventos)
+            else:
+                evento = onde_esta.desfazer_aviso(
+                    vinculo["aluno"], vinculo["ponto"], viagem,
+                    arquivo=self.arquivo_eventos)
+            return self._json({"registrado": evento["tipo"],
+                               "em": evento["em"], "viagem": viagem})
+
         if rota.path != "/api/eventos":
             return self._json({"erro": "Rota não encontrada."}, 404)
 
@@ -134,6 +201,35 @@ class Operacao(BaseHTTPRequestHandler):
         sys.stderr.write("[operacao] %s\n" % (formato % args))
 
 
+def vinculos_de_demonstracao(plano: dict, quantos: int = 5) -> list:
+    """Links de exemplo para abrir o app do responsável na demonstração.
+
+    Em produção o vínculo sai do cadastro (aluno ↔ ponto) e o link vai por
+    SMS. Aqui ele é montado a partir do próprio plano, sem inventar aluno: o
+    identificador é derivado do ponto, e não há nome nenhum envolvido.
+    """
+    frota = (plano or {}).get("frota_otimizada") or {}
+    vinculos = []
+    for viagem in frota.get("viagens", []):
+        paradas = viagem.get("paradas") or []
+        # primeira e uma do meio: na demonstração, a do meio é a que mostra a
+        # previsão MEDIDA (já há embarque antes dela), e a primeira mostra o
+        # horário de plano. As duas telas precisam aparecer.
+        escolhidas = [p for p in (paradas[:1] + paradas[len(paradas) // 2:
+                                                        len(paradas) // 2 + 1])]
+        for ponto in dict.fromkeys(escolhidas):
+            aluno = f"A{ponto}"
+            vinculos.append({
+                "aluno": aluno, "ponto": ponto, "turno": viagem["turno"],
+                "escola": viagem["escola"],
+                "token": registro.token_do_responsavel(aluno, ponto,
+                                                       viagem["turno"]),
+            })
+        if len(vinculos) >= quantos:
+            break
+    return vinculos
+
+
 def main():
     ap = argparse.ArgumentParser(description="Servidor de operação do MOBGOV")
     ap.add_argument("--porta", type=int, default=8080)
@@ -157,6 +253,13 @@ def main():
               f"&token={token}")
     else:
         print("  Nenhum plano encontrado — rode antes: python motor/dimensionar.py")
+
+    familias = vinculos_de_demonstracao(Operacao.plano)
+    if familias and Operacao.modo_demonstracao:
+        v = familias[0]
+        print(f"App do responsável em http://{a.host}:{a.porta}/responsavel")
+        print(f"  http://{a.host}:{a.porta}/responsavel?aluno={v['aluno']}"
+              f"&ponto={v['ponto']}&turno={v['turno']}&token={v['token']}")
     try:
         servidor.serve_forever()
     except KeyboardInterrupt:

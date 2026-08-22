@@ -123,6 +123,15 @@ def operacao(d: dict) -> str:
             if chave in reot:
                 texto.append(_linha(rotulo,
                                     f"{numero(reot[chave], casas)}{sufixo}"))
+    familias = d.get("avisos_das_familias") or {}
+    if familias:
+        texto += ["", f"Avisos das famílias em {familias.get('dia')}:"]
+        texto.append(_linha("Faltas avisadas pelo app do responsável",
+                            numero(familias.get("faltas_avisadas", 0))))
+        texto.append(_linha("Avisos desfeitos (\"na verdade vai\")",
+                            numero(familias.get("avisos_desfeitos", 0))))
+        texto.append(_linha("Viagens afetadas",
+                            numero(familias.get("viagens_afetadas", 0))))
     rodadas = d.get("rodadas_do_dia") or {}
     politica = d.get("politica_das_rodadas") or {}
     if rodadas:

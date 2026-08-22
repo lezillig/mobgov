@@ -34,7 +34,14 @@ DIR_OPERACAO = os.path.join(
     "relatorios", "operacao")
 ARQUIVO_EVENTOS = os.path.join(DIR_OPERACAO, "eventos.jsonl")
 
-TIPOS = ("ping", "embarque", "desembarque", "imprevisto", "inicio", "fim")
+TIPOS_DO_MOTORISTA = ("ping", "embarque", "desembarque", "imprevisto",
+                      "inicio", "fim")
+# O app do responsável é a origem da taxa de ausência — a única coisa do
+# aprendizado que continuava estimada. "falta" é o aviso de que a criança não
+# vai hoje; "volta_atras" é o responsável desdizendo o aviso, o que acontece
+# bastante e precisa chegar antes de o veículo passar.
+TIPOS_DO_RESPONSAVEL = ("falta", "volta_atras")
+TIPOS = TIPOS_DO_MOTORISTA + TIPOS_DO_RESPONSAVEL
 _trava = threading.Lock()
 
 
@@ -60,6 +67,27 @@ def token_valido(motorista: str, token: str, chave: str = None) -> bool:
     return hmac.compare_digest(token_do_motorista(motorista, chave), token or "")
 
 
+def token_do_responsavel(aluno: str, ponto: str = "", turno: str = "",
+                         chave: str = None) -> str:
+    """Token da família, ligado ao aluno E ao ponto onde ele embarca.
+
+    O prefixo "responsavel:" é o que impede um token de motorista de valer
+    como token de família (e vice-versa) só porque o identificador coincidiu.
+    Amarrar o ponto no token evita a outra brincadeira: trocar o ?ponto= da
+    URL e sair vendo onde está o veículo de outra rota.
+    """
+    chave = chave or os.environ.get("MOBGOV_CHAVE", "demonstracao")
+    semente = f"responsavel:{aluno}|{ponto}|{turno}"
+    return hmac.new(chave.encode("utf-8"), semente.encode("utf-8"),
+                    hashlib.sha256).hexdigest()[:16]
+
+
+def token_de_responsavel_valido(aluno: str, token: str, ponto: str = "",
+                                turno: str = "", chave: str = None) -> bool:
+    return hmac.compare_digest(
+        token_do_responsavel(aluno, ponto, turno, chave), token or "")
+
+
 # ---------------------------------------------------------------- eventos ---
 def _agora() -> str:
     return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -73,7 +101,10 @@ def registrar(evento: dict, arquivo: str = None) -> dict:
         raise ErroDeRegistro(
             f"Tipo de evento desconhecido: {tipo!r}. Esperado um de: "
             f"{', '.join(TIPOS)}.")
-    if not evento.get("motorista"):
+    if tipo in TIPOS_DO_RESPONSAVEL:
+        if not evento.get("aluno"):
+            raise ErroDeRegistro("Aviso da família sem identificação do aluno.")
+    elif not evento.get("motorista"):
         raise ErroDeRegistro("Evento sem motorista.")
 
     gravado = dict(evento)
@@ -106,7 +137,7 @@ def registrar_lote(eventos: list, arquivo: str = None) -> dict:
 
 
 def ler_eventos(arquivo: str = None, motorista: str = None,
-                tipo: str = None) -> list:
+                tipo: str = None, aluno: str = None) -> list:
     arquivo = arquivo or ARQUIVO_EVENTOS
     if not os.path.exists(arquivo):
         return []
@@ -121,6 +152,8 @@ def ler_eventos(arquivo: str = None, motorista: str = None,
             except json.JSONDecodeError:
                 continue        # linha corrompida não invalida o histórico
             if motorista and evento.get("motorista") != motorista:
+                continue
+            if aluno and evento.get("aluno") != aluno:
                 continue
             if tipo and evento.get("tipo") != tipo:
                 continue
