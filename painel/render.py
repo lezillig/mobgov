@@ -211,6 +211,65 @@ def bloco_qualidade(p: dict, viagens: list) -> str:
     )
 
 
+def bloco_importacao(imp: dict) -> str:
+    """Qualidade dos dados que entraram — o primeiro passo da demonstração."""
+    if not imp or not imp.get("resumo"):
+        return ""
+    r = imp["resumo"]
+    problemas = imp.get("problemas") or []
+
+    # agrupa por tipo: a secretaria quer saber "o que" está errado, não ler
+    # 39 linhas repetindo a mesma coisa
+    tipos = {}
+    for p_ in problemas:
+        chave = (p_["problema"], p_["gravidade"], p_["sugestao"])
+        tipos.setdefault(chave, []).append(p_["linha"])
+    linhas = "".join(
+        f'<tr><td><span class="marcador '
+        f'{"atual" if grav == "erro" else "otim"}">{esc(grav)}</span></td>'
+        f'<td>{esc(problema)}</td>'
+        f'<td class="num">{len(linhas_afetadas)}</td>'
+        f'<td>{esc(", ".join(str(l) for l in linhas_afetadas[:6]))}'
+        f'{"…" if len(linhas_afetadas) > 6 else ""}</td>'
+        f'<td>{esc(sugestao)}</td></tr>'
+        for (problema, grav, sugestao), linhas_afetadas
+        in sorted(tipos.items(), key=lambda kv: -len(kv[1])))
+
+    return (
+        '<section><h2>Importação da planilha da secretaria</h2>'
+        f'<p class="chamada">A planilha veio como planilha de prefeitura vem: '
+        f'com título antes do cabeçalho, turno escrito de seis jeitos, aluno '
+        f'repetido e endereço rural sem coordenada. O sistema importou '
+        f'<b>{numero(r["alunos_importados"])} alunos</b> e apontou linha a '
+        f'linha o que não deu para resolver sozinho — em vez de recusar o '
+        f'arquivo.</p>'
+        '<div class="kpis">'
+        + _kpi("Alunos importados", numero(r["alunos_importados"]),
+               f'de {esc(imp.get("arquivo", "planilha"))}')
+        + _kpi("Precisam de ajuste no mapa",
+               numero(r["precisam_ajuste_no_mapa"]),
+               'endereço sem coordenada — usei o ponto do bairro')
+        + _kpi("Erros apontados", numero(r["erros"]),
+               'linhas que exigem decisão humana',
+               piora=r["erros"] > 0)
+        + _kpi("Avisos", numero(r["avisos"]),
+               'resolvidos automaticamente, mas registrados')
+        + '</div>'
+        '<div class="rolagem" style="margin-top:18px"><table>'
+        '<caption>O que o importador encontrou, agrupado por tipo</caption>'
+        '<thead><tr><th>Gravidade</th><th>Problema</th>'
+        '<th class="num">Linhas</th><th>Onde</th><th>O que fazer</th></tr></thead>'
+        f'<tbody>{linhas}</tbody></table></div>'
+        '<ul class="lista">'
+        f'<li>Colunas reconhecidas automaticamente: '
+        f'{esc(", ".join(sorted(r.get("colunas_detectadas", {}))))}.</li>'
+        '<li>O nome do aluno <b>não entra</b> no dado de roteirização: cada '
+        'aluno vira um pseudônimo estável. A lista nominal só é gravada se o '
+        'município pedir, em arquivo separado.</li>'
+        '</ul></section>'
+    )
+
+
 def bloco_mapa(p: dict) -> str:
     """Mapa das rotas — desenhado em SVG, sem tiles e sem internet."""
     geografia = p.get("geografia") or {}
@@ -579,6 +638,7 @@ def renderizar(p: dict, serie: dict, viagens: list, origem: str) -> str:
   {bloco_antes_depois(p)}
   {bloco_frota(p)}
   {bloco_qualidade(p, viagens)}
+  {bloco_importacao(p.get("importacao"))}
   {bloco_mapa(p)}
   {bloco_porta_a_porta(p.get("porta_a_porta"))}
   {bloco_reotimizacao(p.get("reotimizacao"))}
@@ -618,6 +678,9 @@ def montar_html(caminho_relatorio: str = economia_mod.RELATORIO_PADRAO,
     rel.setdefault("reotimizacao",
                    economia_mod.carregar_opcional(
                        economia_mod.RELATORIO_REOTIMIZACAO))
+    rel.setdefault("importacao",
+                   economia_mod.carregar_opcional(
+                       economia_mod.RELATORIO_IMPORTACAO))
     premissas = economia_mod.premissas_do_relatorio(rel).substituir(
         preco_diesel_l=diesel, dias_letivos_mes=dias)
     p = economia_mod.montar_painel(rel, premissas)

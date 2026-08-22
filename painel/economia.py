@@ -57,6 +57,8 @@ RELATORIO_PCD = os.path.join(
     os.path.dirname(RELATORIO_PADRAO), "porta_a_porta.json")
 RELATORIO_REOTIMIZACAO = os.path.join(
     os.path.dirname(RELATORIO_PADRAO), "reotimizacao.json")
+RELATORIO_IMPORTACAO = os.path.join(
+    os.path.dirname(RELATORIO_PADRAO), "importacao.json")
 
 
 def carregar_relatorio(caminho: str = RELATORIO_PADRAO) -> dict:
@@ -389,6 +391,8 @@ def montar_painel(rel: dict, premissas: Premissas = None,
         painel["porta_a_porta"] = rel["porta_a_porta"]
     if rel.get("reotimizacao"):
         painel["reotimizacao"] = rel["reotimizacao"]
+    if rel.get("importacao"):
+        painel["importacao"] = rel["importacao"]
     if com_cenarios:
         painel["cenarios"] = grade_de_cenarios(rel, premissas)
     return painel

@@ -7,3 +7,5 @@ venv/
 # saídas geradas localmente (o painel e o relatório versionados ficam em relatorios/)
 *.pdf
 relatorios/cache/
+relatorios/planilha-prefeitura.xlsx
+relatorios/cofre-nomes.json
