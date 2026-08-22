@@ -84,10 +84,8 @@ def ler_frota_declarada(caminho: str, aba: int = 1, perfil=None) -> dict:
         texto = " ".join(celulas)
         achado = re.search(r"([\d.,]+)\s*km", texto, re.IGNORECASE)
         if achado and "km" in texto.lower():
-            try:
-                km_dia = float(achado.group(1).replace(".", "").replace(",", "."))
-            except ValueError:
-                pass
+            from dados.planilha import numero_br
+            km_dia = numero_br(achado.group(1), km_dia)
         if not celulas or not celulas[0]:
             continue
         tipo = por_nome.get(_normalizar(celulas[0]))
@@ -119,10 +117,10 @@ def _normalizar(texto: str) -> str:
 
 
 def _inteiro(texto: str):
-    texto = (texto or "").strip().replace(".", "").replace(",", ".")
-    try:
-        valor = float(texto)
-    except ValueError:
+    from dados.planilha import numero_br
+
+    valor = numero_br(texto)
+    if valor is None:
         return None
     return int(valor) if valor == int(valor) else None
 

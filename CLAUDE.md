@@ -63,6 +63,7 @@ previu X, aconteceu Y, ajustou Z".
 | 8 | `painel/console.py` — a tela do sistema (Hoje, Elegibilidade, Assistente, Economia) | ✅ pronto |
 | 8 | `planejamento/` + `motor/planejar.py` + `dados/agrupar.py` — planilha → pontos → rotas → publicar | ✅ pronto |
 | 9 | `dados/perfis.py` + `motor/jornada.py` — perfil de fretamento: turnos configuráveis e jornada do motorista (Lei 13.103) como restrição | ✅ pronto |
+| 10 | `comercial/` — precificação (custo → preço com margem por divisão) e diagnóstico da operação existente | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -99,6 +100,10 @@ mobgov/                          (raiz deste repositório)
   dados/agrupar.py               alunos importados -> pontos de embarque (raio de caminhada)
   dados/perfis.py                perfil de operação: escolar, fretamento ou JSON do cliente
   motor/jornada.py               fase 3: escala de motoristas (jornada, intervalo, interjornada)
+  comercial/precificacao.py      custo aberto -> preço (margem e imposto por divisão)
+  comercial/diagnostico.py       o que dá para cortar na operação que já roda
+  comercial/operacao_atual.py    importa o quadro de linhas operadas hoje
+  comercial/proposta.py          a proposta em HTML, com a conta aberta
   motor/planejar.py              planilha -> importador -> agrupador -> motor -> plano
   planejamento/servidor.py       a tela da roteirização: envia, confere, ajusta, publica
   planejamento/tela.html         os cinco passos numa página só
@@ -146,6 +151,9 @@ python motor/rodar_rodadas.py          # reotimização contínua da manhã (~1 
 python -m planejamento.servidor        # tela da roteirização (127.0.0.1:8090)
 python motor/planejar.py planilha.xlsx # mesmo caminho pela linha de comando
 python motor/planejar.py rh.csv --perfil fretamento --frota-atual "RODO46=9,EXEC28=6"
+python comercial/cli.py precificar --plano relatorios/plano-fretamento.json --margem 12
+python comercial/cli.py diagnosticar --plano ... --linhas linhas-atuais.csv
+python comercial/cli.py proposta --plano ... --linhas ... --cliente "Empresa X"
 python -m painel.console               # gera relatorios/console.html
 python -m operacao.servidor            # apps do motorista e do responsável (8080)
 python conversa/cli.py --offline "quanto eu economizo por mês?"
@@ -303,6 +311,16 @@ demonstração — é essa conta que decide o preço da proposta, e ela vive em
 - **As regras de jornada são parâmetros declarados**, não constantes
   escondidas: acordo coletivo muda quase todas, e elas vão para o relatório
   para o jurídico da empresa conferir.
+- **Margem entra por DIVISÃO, não por soma.** `preço = custo / (1 − imposto −
+  margem)`. Somar 12% ao custo e depois pagar 14,93% sobre a receita dá margem
+  real de −4,2% — a proposta sai no prejuízo com cara de lucro.
+- **Economia de diagnóstico não se soma.** Troca de veículo, fusão de linha e
+  frota ociosa se contêm: o teto é o achado de frota ociosa, e os outros são
+  parcelas dele. Somar tudo venderia economia que não existe.
+- **Ponto pode ser milhar ou decimal.** `numero_br` decide pela forma (ponto
+  seguido de exatamente três dígitos é milhar) e NÃO serve para coordenada:
+  "-21.150" cairia na regra do milhar. Coordenada tem parser próprio, de
+  propósito. `100.3` km/dia virando `1003` inflava a economia em quatro vezes.
 - **`urlparse` corta o que vem depois de `;`** no último segmento da URL (vira
   `params`) — e o OSRM separa coordenadas com `;`. Qualquer código que
   interprete URLs do OSRM precisa recolar `path + ';' + params`.

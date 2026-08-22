@@ -67,6 +67,34 @@ def _separador(texto: str, amostra: int = 12) -> str:
     return melhor if candidatos[melhor][0] else ","
 
 
+def numero_br(texto, padrao=None):
+    """Número escrito como brasileiro escreve — para QUANTIDADE, não para
+    coordenada.
+
+    A ambiguidade é real: "4.386" é quatro mil e trezentos e oitenta e seis, e
+    "100.3" é cem vírgula três. A regra que resolve os dois é a do uso: ponto
+    seguido de exatamente três dígitos, sem vírgula na frase, é separador de
+    milhar; qualquer outro ponto é decimal.
+
+    NÃO use isto em latitude/longitude: "-21.150" é vinte e um e cento e
+    cinquenta milésimos, e cairia na regra do milhar. Coordenada tem parser
+    próprio no importador, e é assim de propósito.
+    """
+    bruto = str(texto or "").strip()
+    achado = re.search(r"-?[\d.,]+", bruto)
+    if not achado:
+        return padrao
+    numero = achado.group(0)
+    if "," in numero:                       # vírgula manda: é a decimal
+        numero = numero.replace(".", "").replace(",", ".")
+    elif re.fullmatch(r"-?\d{1,3}(?:\.\d{3})+", numero):
+        numero = numero.replace(".", "")    # 4.386 e 1.234.567
+    try:
+        return float(numero)
+    except ValueError:
+        return padrao
+
+
 def ler_csv(caminho: str) -> list:
     with open(caminho, "rb") as f:
         texto = _decodificar(f.read())
