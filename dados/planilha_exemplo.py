@@ -105,6 +105,8 @@ def escrever_xlsx(caminho: str, linhas: list):
     for i, linha in enumerate(linhas, start=1):
         celulas = "".join(_celula(_referencia(j, i), v)
                           for j, v in enumerate(linha))
+        if not celulas:
+            continue          # o Excel não grava linha vazia: pula o <row r=N>
         corpo.append(f'<row r="{i}">{celulas}</row>')
     planilha = ('<?xml version="1.0" encoding="UTF-8"?>'
                 '<worksheet xmlns="http://schemas.openxmlformats.org/'

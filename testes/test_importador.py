@@ -60,6 +60,17 @@ class TestLeituraDePlanilha(BaseArquivos):
         x = self.xlsx([["a", "b", "c"], ["1", "", "3"]])
         self.assertEqual(planilha.ler(x)[1], ["1", "", "3"])
 
+    def test_xlsx_com_linha_em_branco_mantem_a_numeracao(self):
+        """Linha vazia some do XML — mas a linha 4 do relatório tem que ser a
+        linha 4 que o servidor vê quando abre o arquivo no Excel."""
+        x = self.xlsx([["a"], [""], ["b"], ["c"]])
+        lido = planilha.ler(x)
+        self.assertEqual(len(lido), 4)
+        self.assertEqual(lido[0], ["a"])
+        self.assertEqual(lido[1], [])
+        self.assertEqual(lido[2], ["b"])
+        self.assertEqual(lido[3], ["c"])
+
     def test_arquivo_inexistente(self):
         with self.assertRaises(planilha.ErroDePlanilha):
             planilha.ler(os.path.join(self.pasta, "nao-existe.xlsx"))
@@ -133,6 +144,13 @@ class TestImportacao(BaseArquivos):
                            ["transporte 2026", "", ""],
                            CABECALHO, self.linha()])
         self.assertEqual(len(r.alunos), 1)
+
+    def test_linha_do_relatorio_e_a_linha_do_excel(self):
+        """Com título, linha em branco e cabeçalho na linha 4, o primeiro
+        aluno é a linha 5 — é para lá que o servidor tem que ir."""
+        r = self.importar([["PREFEITURA DE X"], ["transporte 2026"], [""],
+                           CABECALHO, self.linha(), self.linha(nome="Bruno")])
+        self.assertEqual([a["linha_planilha"] for a in r.alunos], [5, 6])
 
     def test_aluno_repetido_entra_uma_vez_so(self):
         r = self.importar([CABECALHO, self.linha(), self.linha()])

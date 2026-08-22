@@ -93,6 +93,16 @@ def ler_xlsx(caminho: str, aba: int = 0) -> list:
             while len(valores) < indice:       # célula vazia some do XML
                 valores.append("")
             valores.append(_valor_da_celula(celula, compartilhadas))
+        # Linha totalmente vazia também some do XML: o Excel pula do <row r=2>
+        # para o <row r=4>. Se a gente ignorasse o 'r', tudo depois da linha em
+        # branco andaria uma casa — e o "conserte a linha 88" do relatório de
+        # importação mandaria o servidor para a linha errada da planilha dele.
+        try:
+            numero = int(linha.get("r", "0"))
+        except ValueError:
+            numero = 0
+        while numero and len(linhas) < numero - 1:
+            linhas.append([])
         linhas.append(valores)
     return linhas
 
