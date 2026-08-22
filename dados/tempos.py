@@ -247,7 +247,22 @@ class ProvedorExterno(ProvedorDeTempos):
 
 # ------------------------------------------------------------------ padrão ---
 def provedor_padrao(com_transito: bool = True) -> ProvedorDeTempos:
-    base = ProvedorHaversine()
+    """Monta o provedor conforme o ambiente, sem o motor precisar saber.
+
+    Com `MOBGOV_OSRM_URL` definida, os tempos vêm da malha viária real; sem
+    ela, da distância em linha reta. Em cima disso vai o perfil de trânsito,
+    a menos que o próprio OSRM já sirva velocidades com trânsito — nesse caso
+    defina `MOBGOV_OSRM_COM_TRANSITO=0` para não contar o congestionamento
+    duas vezes.
+    """
+    url_osrm = os.environ.get("MOBGOV_OSRM_URL", "").strip()
+    if url_osrm:
+        from dados.osrm import ProvedorOSRM   # import tardio: evita ciclo
+        base = ProvedorOSRM(url_osrm, fallback=ProvedorHaversine())
+        if os.environ.get("MOBGOV_OSRM_COM_TRANSITO", "1") == "0":
+            return base
+    else:
+        base = ProvedorHaversine()
     if not com_transito:
         return base
     return ComTransito(base, PerfilDeTransito(

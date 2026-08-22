@@ -1,0 +1,89 @@
+{
+  "origem": "simulacao",
+  "unidade_erro": "min",
+  "gerado_em": "2026-08-22 15:36",
+  "semanas": [
+    {
+      "semana": "Semana 1",
+      "mae_min": 5.88,
+      "acuracia_ausencia_pct": 91.9,
+      "viagens": 530,
+      "versao_modelo": 1,
+      "promovido": true,
+      "motivo_rollback": null
+    },
+    {
+      "semana": "Semana 2",
+      "mae_min": 3.14,
+      "acuracia_ausencia_pct": 92.0,
+      "viagens": 1060,
+      "versao_modelo": 2,
+      "promovido": true,
+      "motivo_rollback": null
+    },
+    {
+      "semana": "Semana 3",
+      "mae_min": 2.05,
+      "acuracia_ausencia_pct": 92.6,
+      "viagens": 1590,
+      "versao_modelo": 3,
+      "promovido": true,
+      "motivo_rollback": null
+    },
+    {
+      "semana": "Semana 4",
+      "mae_min": 2.26,
+      "acuracia_ausencia_pct": 92.0,
+      "viagens": 2120,
+      "versao_modelo": 4,
+      "promovido": true,
+      "motivo_rollback": null
+    },
+    {
+      "semana": "Semana 5",
+      "mae_min": 2.03,
+      "acuracia_ausencia_pct": 91.8,
+      "viagens": 2650,
+      "versao_modelo": 5,
+      "promovido": true,
+      "motivo_rollback": null
+    },
+    {
+      "semana": "Semana 6",
+      "mae_min": 2.03,
+      "acuracia_ausencia_pct": 91.8,
+      "viagens": 3180,
+      "versao_modelo": 5,
+      "promovido": false,
+      "motivo_rollback": "erro subiria de 3.24 para 3.25 min"
+    },
+    {
+      "semana": "Semana 7",
+      "mae_min": 2.03,
+      "acuracia_ausencia_pct": 91.8,
+      "viagens": 3710,
+      "versao_modelo": 5,
+      "promovido": false,
+      "motivo_rollback": "erro subiria de 3.24 para 3.29 min"
+    },
+    {
+      "semana": "Semana 8",
+      "mae_min": 2.03,
+      "acuracia_ausencia_pct": 91.8,
+      "viagens": 4240,
+      "versao_modelo": 5,
+      "promovido": false,
+      "motivo_rollback": "erro subiria de 3.24 para 3.29 min"
+    }
+  ],
+  "exemplos": [
+    "Faixa “pico manha” na zona urbano: o planejamento supunha ×1.35 e a rua mostrou ×1.59 — mais lento do que o mapa dizia.",
+    "Faixa “pico manha” na zona rural: o planejamento supunha ×1.10 e a rua mostrou ×1.23 — mais lento do que o mapa dizia.",
+    "Faixa “entre picos” na zona urbano: o planejamento supunha ×1.00 e a rua mostrou ×1.09 — mais lento do que o mapa dizia.",
+    "Ponto P136: o embarque leva 1.8 min a mais que o previsto — a rota que passa por ele ganhou folga.",
+    "Sexta tem 13.4% de ausência: dá para usar veículo menor sem deixar aluno em pé."
+  ],
+  "versao_modelo": 5,
+  "rollbacks": 3,
+  "amostras": 7950
+}

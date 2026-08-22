@@ -7,142 +7,126 @@
       "tipo_nome": "Van porta a porta 8 lugares",
       "capacidade": 8,
       "posicoes_cadeirante": 2,
-      "usuarios": 7,
-      "cadeirantes": 2,
+      "usuarios": 5,
+      "cadeirantes": 1,
       "eventos": [
         {
           "tipo": "embarque",
-          "usuario": "U079",
-          "minuto": 410,
-          "hora": "06h50",
-          "cadeirante": true,
+          "usuario": "U073",
+          "lat": -21.158741,
+          "lon": -47.691524,
+          "minuto": 462,
+          "hora": "07h42",
+          "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "embarque",
-          "usuario": "U074",
-          "minuto": 425,
-          "hora": "07h05",
+          "usuario": "U003",
+          "lat": -21.13829,
+          "lon": -47.691044,
+          "minuto": 475,
+          "hora": "07h55",
           "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 3
+          "acompanhante": false,
+          "ocupacao_apos": 2
         },
         {
           "tipo": "embarque",
-          "usuario": "U019",
-          "minuto": 436,
-          "hora": "07h16",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 5
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U069",
-          "minuto": 439,
-          "hora": "07h19",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 6
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U069",
-          "minuto": 461,
-          "hora": "07h41",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 5
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U074",
-          "minuto": 464,
-          "hora": "07h44",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U079",
-          "minuto": 470,
-          "hora": "07h50",
+          "usuario": "U023",
+          "lat": -21.121849,
+          "lon": -47.698957,
+          "minuto": 483,
+          "hora": "08h03",
           "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U063",
+          "lat": -21.131171,
+          "lon": -47.720071,
+          "minuto": 494,
+          "hora": "08h14",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U057",
+          "lat": -21.100142,
+          "lon": -47.745924,
+          "minuto": 506,
+          "hora": "08h26",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 5
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U057",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 533,
+          "hora": "08h53",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U073",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 537,
+          "hora": "08h57",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U003",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 550,
+          "hora": "09h10",
+          "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
-          "usuario": "U019",
-          "minuto": 490,
-          "hora": "08h10",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U031",
-          "minuto": 496,
-          "hora": "08h16",
+          "usuario": "U063",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 554,
+          "hora": "09h14",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "desembarque",
-          "usuario": "U031",
-          "minuto": 520,
-          "hora": "08h40",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U046",
-          "minuto": 557,
-          "hora": "09h17",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U006",
-          "minuto": 562,
-          "hora": "09h22",
+          "usuario": "U023",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 559,
+          "hora": "09h19",
           "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U006",
-          "minuto": 570,
-          "hora": "09h30",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U046",
-          "minuto": 580,
-          "hora": "09h40",
-          "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 0
         }
       ],
-      "km": 49.0,
-      "inicio": "06h50",
-      "fim": "09h40",
-      "minutos": 170,
-      "ocupacao_maxima": 6,
-      "ocupacao_maxima_pct": 75
+      "km": 44.8,
+      "inicio": "07h42",
+      "fim": "09h19",
+      "minutos": 97,
+      "ocupacao_maxima": 5,
+      "ocupacao_maxima_pct": 62
     },
     {
       "id": "PP02",
@@ -150,806 +134,173 @@
       "tipo_nome": "Van porta a porta 8 lugares",
       "capacidade": 8,
       "posicoes_cadeirante": 2,
-      "usuarios": 4,
-      "cadeirantes": 1,
-      "eventos": [
-        {
-          "tipo": "embarque",
-          "usuario": "U016",
-          "minuto": 410,
-          "hora": "06h50",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U016",
-          "minuto": 430,
-          "hora": "07h10",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U055",
-          "minuto": 457,
-          "hora": "07h37",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U020",
-          "minuto": 469,
-          "hora": "07h49",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U055",
-          "minuto": 496,
-          "hora": "08h16",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U020",
-          "minuto": 520,
-          "hora": "08h40",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U056",
-          "minuto": 558,
-          "hora": "09h18",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U056",
-          "minuto": 580,
-          "hora": "09h40",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        }
-      ],
-      "km": 30.8,
-      "inicio": "06h50",
-      "fim": "09h40",
-      "minutos": 170,
-      "ocupacao_maxima": 2,
-      "ocupacao_maxima_pct": 25
-    },
-    {
-      "id": "PP03",
-      "tipo": "VANPCD8",
-      "tipo_nome": "Van porta a porta 8 lugares",
-      "capacidade": 8,
-      "posicoes_cadeirante": 2,
       "usuarios": 7,
-      "cadeirantes": 3,
-      "eventos": [
-        {
-          "tipo": "embarque",
-          "usuario": "U070",
-          "minuto": 400,
-          "hora": "06h40",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U010",
-          "minuto": 411,
-          "hora": "06h51",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U005",
-          "minuto": 422,
-          "hora": "07h02",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 5
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U041",
-          "minuto": 449,
-          "hora": "07h29",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 7
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U070",
-          "minuto": 460,
-          "hora": "07h40",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 5
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U005",
-          "minuto": 463,
-          "hora": "07h43",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U041",
-          "minuto": 469,
-          "hora": "07h49",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U010",
-          "minuto": 474,
-          "hora": "07h54",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U065",
-          "minuto": 512,
-          "hora": "08h32",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U065",
-          "minuto": 550,
-          "hora": "09h10",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U045",
-          "minuto": 583,
-          "hora": "09h43",
-          "cadeirante": true,
-          "acompanhante": true,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U040",
-          "minuto": 604,
-          "hora": "10h04",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U040",
-          "minuto": 623,
-          "hora": "10h23",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U045",
-          "minuto": 629,
-          "hora": "10h29",
-          "cadeirante": true,
-          "acompanhante": true,
-          "ocupacao_apos": 0
-        }
-      ],
-      "km": 91.3,
-      "inicio": "06h40",
-      "fim": "10h29",
-      "minutos": 229,
-      "ocupacao_maxima": 7,
-      "ocupacao_maxima_pct": 88
-    },
-    {
-      "id": "PP04",
-      "tipo": "VANPCD8",
-      "tipo_nome": "Van porta a porta 8 lugares",
-      "capacidade": 8,
-      "posicoes_cadeirante": 2,
-      "usuarios": 7,
-      "cadeirantes": 1,
-      "eventos": [
-        {
-          "tipo": "embarque",
-          "usuario": "U038",
-          "minuto": 428,
-          "hora": "07h08",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U068",
-          "minuto": 439,
-          "hora": "07h19",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 4
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U078",
-          "minuto": 446,
-          "hora": "07h26",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 5
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U071",
-          "minuto": 460,
-          "hora": "07h40",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 6
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U038",
-          "minuto": 467,
-          "hora": "07h47",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 4
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U071",
-          "minuto": 470,
-          "hora": "07h50",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U078",
-          "minuto": 490,
-          "hora": "08h10",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U068",
-          "minuto": 495,
-          "hora": "08h15",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U059",
-          "minuto": 521,
-          "hora": "08h41",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U044",
-          "minuto": 542,
-          "hora": "09h02",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U034",
-          "minuto": 549,
-          "hora": "09h09",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U034",
-          "minuto": 569,
-          "hora": "09h29",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U059",
-          "minuto": 580,
-          "hora": "09h40",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U044",
-          "minuto": 586,
-          "hora": "09h46",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        }
-      ],
-      "km": 57.0,
-      "inicio": "07h08",
-      "fim": "09h46",
-      "minutos": 158,
-      "ocupacao_maxima": 6,
-      "ocupacao_maxima_pct": 75
-    },
-    {
-      "id": "PP05",
-      "tipo": "VANPCD8",
-      "tipo_nome": "Van porta a porta 8 lugares",
-      "capacidade": 8,
-      "posicoes_cadeirante": 2,
-      "usuarios": 7,
-      "cadeirantes": 1,
-      "eventos": [
-        {
-          "tipo": "embarque",
-          "usuario": "U033",
-          "minuto": 406,
-          "hora": "06h46",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U048",
-          "minuto": 419,
-          "hora": "06h59",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U018",
-          "minuto": 429,
-          "hora": "07h09",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 4
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U033",
-          "minuto": 460,
-          "hora": "07h40",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U048",
-          "minuto": 463,
-          "hora": "07h43",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U018",
-          "minuto": 476,
-          "hora": "07h56",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U037",
-          "minuto": 528,
-          "hora": "08h48",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U072",
-          "minuto": 531,
-          "hora": "08h51",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U077",
-          "minuto": 536,
-          "hora": "08h56",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U026",
-          "minuto": 558,
-          "hora": "09h18",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 4
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U072",
-          "minuto": 563,
-          "hora": "09h23",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U037",
-          "minuto": 580,
-          "hora": "09h40",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U077",
-          "minuto": 585,
-          "hora": "09h45",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U026",
-          "minuto": 588,
-          "hora": "09h48",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        }
-      ],
-      "km": 60.6,
-      "inicio": "06h46",
-      "fim": "09h48",
-      "minutos": 182,
-      "ocupacao_maxima": 4,
-      "ocupacao_maxima_pct": 50
-    },
-    {
-      "id": "PP06",
-      "tipo": "VANPCD8",
-      "tipo_nome": "Van porta a porta 8 lugares",
-      "capacidade": 8,
-      "posicoes_cadeirante": 2,
-      "usuarios": 6,
-      "cadeirantes": 4,
-      "eventos": [
-        {
-          "tipo": "embarque",
-          "usuario": "U032",
-          "minuto": 431,
-          "hora": "07h11",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U028",
-          "minuto": 461,
-          "hora": "07h41",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U032",
-          "minuto": 490,
-          "hora": "08h10",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U028",
-          "minuto": 498,
-          "hora": "08h18",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U080",
-          "minuto": 522,
-          "hora": "08h42",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U039",
-          "minuto": 534,
-          "hora": "08h54",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U004",
-          "minuto": 539,
-          "hora": "08h59",
-          "cadeirante": true,
-          "acompanhante": true,
-          "ocupacao_apos": 4
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U080",
-          "minuto": 563,
-          "hora": "09h23",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U039",
-          "minuto": 569,
-          "hora": "09h29",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U004",
-          "minuto": 580,
-          "hora": "09h40",
-          "cadeirante": true,
-          "acompanhante": true,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U051",
-          "minuto": 590,
-          "hora": "09h50",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U051",
-          "minuto": 610,
-          "hora": "10h10",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        }
-      ],
-      "km": 73.3,
-      "inicio": "07h11",
-      "fim": "10h10",
-      "minutos": 179,
-      "ocupacao_maxima": 4,
-      "ocupacao_maxima_pct": 50
-    },
-    {
-      "id": "PP07",
-      "tipo": "VANPCD8",
-      "tipo_nome": "Van porta a porta 8 lugares",
-      "capacidade": 8,
-      "posicoes_cadeirante": 2,
-      "usuarios": 8,
       "cadeirantes": 2,
       "eventos": [
         {
           "tipo": "embarque",
-          "usuario": "U073",
-          "minuto": 473,
-          "hora": "07h53",
+          "usuario": "U047",
+          "lat": -21.072756,
+          "lon": -47.779603,
+          "minuto": 394,
+          "hora": "06h34",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "embarque",
-          "usuario": "U003",
-          "minuto": 485,
-          "hora": "08h05",
+          "usuario": "U018",
+          "lat": -21.109308,
+          "lon": -47.726865,
+          "minuto": 413,
+          "hora": "06h53",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "embarque",
-          "usuario": "U023",
-          "minuto": 501,
-          "hora": "08h21",
+          "usuario": "U048",
+          "lat": -21.111656,
+          "lon": -47.715448,
+          "minuto": 417,
+          "hora": "06h57",
           "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
+          "tipo": "desembarque",
+          "usuario": "U047",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 449,
+          "hora": "07h29",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U048",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 460,
+          "hora": "07h40",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U018",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 467,
+          "hora": "07h47",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        },
+        {
           "tipo": "embarque",
-          "usuario": "U063",
-          "minuto": 512,
-          "hora": "08h32",
+          "usuario": "U031",
+          "lat": -21.133931,
+          "lon": -47.794618,
+          "minuto": 487,
+          "hora": "08h07",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U031",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 520,
+          "hora": "08h40",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U045",
+          "lat": -21.194031,
+          "lon": -47.911007,
+          "minuto": 555,
+          "hora": "09h15",
+          "cadeirante": true,
+          "acompanhante": true,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U015",
+          "lat": -21.182481,
+          "lon": -47.868808,
+          "minuto": 594,
+          "hora": "09h54",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U051",
+          "lat": -21.158837,
+          "lon": -47.812685,
+          "minuto": 615,
+          "hora": "10h15",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 4
         },
         {
           "tipo": "desembarque",
-          "usuario": "U073",
-          "minuto": 538,
-          "hora": "08h58",
+          "usuario": "U051",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 620,
+          "hora": "10h20",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "desembarque",
-          "usuario": "U003",
-          "minuto": 550,
-          "hora": "09h10",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U063",
-          "minuto": 553,
-          "hora": "09h13",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U021",
-          "minuto": 559,
-          "hora": "09h19",
+          "usuario": "U045",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 624,
+          "hora": "10h24",
           "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U023",
-          "minuto": 568,
-          "hora": "09h28",
-          "cadeirante": true,
-          "acompanhante": false,
+          "acompanhante": true,
           "ocupacao_apos": 1
         },
         {
           "tipo": "desembarque",
-          "usuario": "U021",
-          "minuto": 580,
-          "hora": "09h40",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
           "usuario": "U015",
-          "minuto": 605,
-          "hora": "10h05",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U054",
-          "minuto": 619,
-          "hora": "10h19",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U014",
-          "minuto": 622,
-          "hora": "10h22",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U014",
+          "lat": -21.16,
+          "lon": -47.812,
           "minuto": 640,
           "hora": "10h40",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U054",
-          "minuto": 643,
-          "hora": "10h43",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U015",
-          "minuto": 646,
-          "hora": "10h46",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 0
         }
       ],
-      "km": 67.5,
-      "inicio": "07h53",
-      "fim": "10h46",
-      "minutos": 173,
+      "km": 76.8,
+      "inicio": "06h34",
+      "fim": "10h40",
+      "minutos": 246,
       "ocupacao_maxima": 4,
       "ocupacao_maxima_pct": 50
     },
     {
-      "id": "PP08",
+      "id": "PP03",
       "tipo": "VANPCD8",
       "tipo_nome": "Van porta a porta 8 lugares",
       "capacidade": 8,
@@ -959,45 +310,77 @@
       "eventos": [
         {
           "tipo": "embarque",
-          "usuario": "U047",
-          "minuto": 384,
-          "hora": "06h24",
+          "usuario": "U067",
+          "lat": -21.075846,
+          "lon": -47.772623,
+          "minuto": 363,
+          "hora": "06h03",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "embarque",
-          "usuario": "U067",
-          "minuto": 388,
-          "hora": "06h28",
-          "cadeirante": false,
+          "usuario": "U050",
+          "lat": -21.145717,
+          "lon": -47.862732,
+          "minuto": 393,
+          "hora": "06h33",
+          "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "embarque",
-          "usuario": "U001",
-          "minuto": 432,
-          "hora": "07h12",
+          "usuario": "U025",
+          "lat": -21.148486,
+          "lon": -47.853852,
+          "minuto": 404,
+          "hora": "06h44",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "desembarque",
-          "usuario": "U047",
+          "usuario": "U067",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 430,
+          "hora": "07h10",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U050",
+          "lat": -21.152,
+          "lon": -47.805,
           "minuto": 435,
           "hora": "07h15",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U001",
+          "lat": -21.140422,
+          "lon": -47.790462,
+          "minuto": 446,
+          "hora": "07h26",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
-          "usuario": "U067",
-          "minuto": 444,
-          "hora": "07h24",
+          "usuario": "U025",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 450,
+          "hora": "07h30",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
@@ -1005,212 +388,918 @@
         {
           "tipo": "desembarque",
           "usuario": "U001",
-          "minuto": 460,
-          "hora": "07h40",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 470,
+          "hora": "07h50",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 0
         },
         {
           "tipo": "embarque",
-          "usuario": "U035",
-          "minuto": 503,
-          "hora": "08h23",
+          "usuario": "U024",
+          "lat": -21.183914,
+          "lon": -47.849416,
+          "minuto": 516,
+          "hora": "08h36",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "embarque",
-          "usuario": "U075",
-          "minuto": 507,
-          "hora": "08h27",
+          "usuario": "U044",
+          "lat": -21.212933,
+          "lon": -47.81118,
+          "minuto": 531,
+          "hora": "08h51",
           "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "embarque",
-          "usuario": "U060",
-          "minuto": 514,
-          "hora": "08h34",
-          "cadeirante": true,
-          "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U024",
-          "minuto": 526,
-          "hora": "08h46",
+          "usuario": "U034",
+          "lat": -21.20287,
+          "lon": -47.809582,
+          "minuto": 538,
+          "hora": "08h58",
           "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 4
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U075",
-          "minuto": 540,
-          "hora": "09h00",
-          "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "desembarque",
-          "usuario": "U035",
-          "minuto": 550,
-          "hora": "09h10",
+          "usuario": "U024",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 554,
+          "hora": "09h14",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
-          "usuario": "U024",
-          "minuto": 553,
-          "hora": "09h13",
+          "usuario": "U034",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 564,
+          "hora": "09h24",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "embarque",
-          "usuario": "U066",
-          "minuto": 556,
-          "hora": "09h16",
+          "usuario": "U026",
+          "lat": -21.135209,
+          "lon": -47.792115,
+          "minuto": 569,
+          "hora": "09h29",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
-          "usuario": "U066",
-          "minuto": 563,
-          "hora": "09h23",
-          "cadeirante": false,
+          "usuario": "U044",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 580,
+          "hora": "09h40",
+          "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "desembarque",
-          "usuario": "U060",
-          "minuto": 566,
-          "hora": "09h26",
-          "cadeirante": true,
+          "usuario": "U026",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 588,
+          "hora": "09h48",
+          "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 0
         },
         {
           "tipo": "embarque",
-          "usuario": "U058",
-          "minuto": 582,
-          "hora": "09h42",
+          "usuario": "U054",
+          "lat": -21.213673,
+          "lon": -47.824644,
+          "minuto": 609,
+          "hora": "10h09",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "embarque",
-          "usuario": "U036",
-          "minuto": 592,
-          "hora": "09h52",
+          "usuario": "U014",
+          "lat": -21.216294,
+          "lon": -47.823449,
+          "minuto": 612,
+          "hora": "10h12",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
-          "usuario": "U036",
-          "minuto": 597,
-          "hora": "09h57",
+          "usuario": "U014",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 640,
+          "hora": "10h40",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "desembarque",
-          "usuario": "U058",
-          "minuto": 610,
-          "hora": "10h10",
+          "usuario": "U054",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 644,
+          "hora": "10h44",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 0
         }
       ],
-      "km": 73.0,
-      "inicio": "06h24",
-      "fim": "10h10",
-      "minutos": 226,
-      "ocupacao_maxima": 4,
-      "ocupacao_maxima_pct": 50
+      "km": 95.5,
+      "inicio": "06h03",
+      "fim": "10h44",
+      "minutos": 281,
+      "ocupacao_maxima": 3,
+      "ocupacao_maxima_pct": 38
     },
     {
-      "id": "PP09",
+      "id": "PP04",
       "tipo": "VANPCD8",
       "tipo_nome": "Van porta a porta 8 lugares",
       "capacidade": 8,
       "posicoes_cadeirante": 2,
-      "usuarios": 12,
+      "usuarios": 5,
       "cadeirantes": 2,
       "eventos": [
         {
           "tipo": "embarque",
-          "usuario": "U009",
-          "minuto": 370,
-          "hora": "06h10",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U030",
-          "minuto": 392,
-          "hora": "06h32",
-          "cadeirante": false,
-          "acompanhante": false,
+          "usuario": "U042",
+          "lat": -21.081054,
+          "lon": -47.785672,
+          "minuto": 445,
+          "hora": "07h25",
+          "cadeirante": true,
+          "acompanhante": true,
           "ocupacao_apos": 2
         },
         {
           "tipo": "embarque",
-          "usuario": "U050",
-          "minuto": 404,
-          "hora": "06h44",
+          "usuario": "U032",
+          "lat": -21.065768,
+          "lon": -47.766641,
+          "minuto": 456,
+          "hora": "07h36",
           "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "embarque",
-          "usuario": "U025",
-          "minuto": 411,
-          "hora": "06h51",
+          "usuario": "U052",
+          "lat": -21.101792,
+          "lon": -47.758731,
+          "minuto": 474,
+          "hora": "07h54",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 5
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U022",
+          "lat": -21.112983,
+          "lon": -47.784167,
+          "minuto": 483,
+          "hora": "08h03",
           "cadeirante": false,
           "acompanhante": false,
+          "ocupacao_apos": 6
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U042",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 496,
+          "hora": "08h16",
+          "cadeirante": true,
+          "acompanhante": true,
           "ocupacao_apos": 4
         },
         {
           "tipo": "desembarque",
-          "usuario": "U025",
-          "minuto": 430,
-          "hora": "07h10",
+          "usuario": "U022",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 503,
+          "hora": "08h23",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "desembarque",
-          "usuario": "U009",
-          "minuto": 433,
-          "hora": "07h13",
+          "usuario": "U032",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 510,
+          "hora": "08h30",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U052",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 520,
+          "hora": "08h40",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U056",
+          "lat": -21.137181,
+          "lon": -47.803409,
+          "minuto": 557,
+          "hora": "09h17",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U056",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 580,
+          "hora": "09h40",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        }
+      ],
+      "km": 38.9,
+      "inicio": "07h25",
+      "fim": "09h40",
+      "minutos": 135,
+      "ocupacao_maxima": 6,
+      "ocupacao_maxima_pct": 75
+    },
+    {
+      "id": "PP05",
+      "tipo": "VANPCD8",
+      "tipo_nome": "Van porta a porta 8 lugares",
+      "capacidade": 8,
+      "posicoes_cadeirante": 2,
+      "usuarios": 8,
+      "cadeirantes": 2,
+      "eventos": [
+        {
+          "tipo": "embarque",
+          "usuario": "U016",
+          "lat": -21.16224,
+          "lon": -47.799766,
+          "minuto": 420,
+          "hora": "07h00",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U016",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 440,
+          "hora": "07h20",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U035",
+          "lat": -21.186101,
+          "lon": -47.883045,
+          "minuto": 496,
+          "hora": "08h16",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U075",
+          "lat": -21.193531,
+          "lon": -47.884177,
+          "minuto": 500,
+          "hora": "08h20",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U060",
+          "lat": -21.196941,
+          "lon": -47.87744,
+          "minuto": 507,
+          "hora": "08h27",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U075",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 536,
+          "hora": "08h56",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U035",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 550,
+          "hora": "09h10",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U066",
+          "lat": -21.154524,
+          "lon": -47.80789,
+          "minuto": 554,
+          "hora": "09h14",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
+          "usuario": "U060",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 562,
+          "hora": "09h22",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U066",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 569,
+          "hora": "09h29",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U013",
+          "lat": -21.132403,
+          "lon": -47.745173,
+          "minuto": 587,
+          "hora": "09h47",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U008",
+          "lat": -21.129698,
+          "lon": -47.752228,
+          "minuto": 591,
+          "hora": "09h51",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U061",
+          "lat": -21.140298,
+          "lon": -47.784943,
+          "minuto": 604,
+          "hora": "10h04",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 5
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U013",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 610,
+          "hora": "10h10",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U008",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 614,
+          "hora": "10h14",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U061",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 618,
+          "hora": "10h18",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        }
+      ],
+      "km": 45.7,
+      "inicio": "07h00",
+      "fim": "10h18",
+      "minutos": 198,
+      "ocupacao_maxima": 5,
+      "ocupacao_maxima_pct": 62
+    },
+    {
+      "id": "PP06",
+      "tipo": "VANPCD8",
+      "tipo_nome": "Van porta a porta 8 lugares",
+      "capacidade": 8,
+      "posicoes_cadeirante": 2,
+      "usuarios": 9,
+      "cadeirantes": 0,
+      "eventos": [
+        {
+          "tipo": "embarque",
+          "usuario": "U069",
+          "lat": -21.221504,
+          "lon": -47.818786,
+          "minuto": 408,
+          "hora": "06h48",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U074",
+          "lat": -21.243456,
+          "lon": -47.826326,
+          "minuto": 416,
+          "hora": "06h56",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U019",
+          "lat": -21.227617,
+          "lon": -47.820611,
+          "minuto": 428,
+          "hora": "07h08",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 5
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U041",
+          "lat": -21.149116,
+          "lon": -47.816533,
+          "minuto": 457,
+          "hora": "07h37",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 7
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U069",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 462,
+          "hora": "07h42",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 6
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U041",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 466,
+          "hora": "07h46",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U074",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 470,
+          "hora": "07h50",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U019",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 490,
+          "hora": "08h10",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U043",
+          "lat": -21.167459,
+          "lon": -47.70174,
+          "minuto": 547,
+          "hora": "09h07",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U053",
+          "lat": -21.111385,
+          "lon": -47.714463,
+          "minuto": 564,
+          "hora": "09h24",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U058",
+          "lat": -21.153649,
+          "lon": -47.750669,
+          "minuto": 581,
+          "hora": "09h41",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U036",
+          "lat": -21.147941,
+          "lon": -47.781259,
+          "minuto": 593,
+          "hora": "09h53",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 5
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U036",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 598,
+          "hora": "09h58",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U043",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 610,
+          "hora": "10h10",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U076",
+          "lat": -21.159954,
+          "lon": -47.804348,
+          "minuto": 620,
+          "hora": "10h20",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U058",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 625,
+          "hora": "10h25",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U053",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 629,
+          "hora": "10h29",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U076",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 640,
+          "hora": "10h40",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 0
+        }
+      ],
+      "km": 73.9,
+      "inicio": "06h48",
+      "fim": "10h40",
+      "minutos": 232,
+      "ocupacao_maxima": 7,
+      "ocupacao_maxima_pct": 88
+    },
+    {
+      "id": "PP07",
+      "tipo": "VANPCD8",
+      "tipo_nome": "Van porta a porta 8 lugares",
+      "capacidade": 8,
+      "posicoes_cadeirante": 2,
+      "usuarios": 7,
+      "cadeirantes": 3,
+      "eventos": [
+        {
+          "tipo": "embarque",
+          "usuario": "U028",
+          "lat": -21.163876,
+          "lon": -47.719609,
+          "minuto": 428,
+          "hora": "07h08",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U033",
+          "lat": -21.157651,
+          "lon": -47.704339,
+          "minuto": 437,
+          "hora": "07h17",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U038",
+          "lat": -21.151714,
+          "lon": -47.750138,
+          "minuto": 450,
+          "hora": "07h30",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 5
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U033",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 465,
+          "hora": "07h45",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U038",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 472,
+          "hora": "07h52",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U028",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 490,
+          "hora": "08h10",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U080",
+          "lat": -21.186302,
+          "lon": -47.878638,
+          "minuto": 517,
+          "hora": "08h37",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U039",
+          "lat": -21.214743,
+          "lon": -47.870169,
+          "minuto": 529,
+          "hora": "08h49",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U059",
+          "lat": -21.207752,
+          "lon": -47.865151,
+          "minuto": 533,
+          "hora": "08h53",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U004",
+          "lat": -21.202409,
+          "lon": -47.86634,
+          "minuto": 536,
+          "hora": "08h56",
+          "cadeirante": true,
+          "acompanhante": true,
+          "ocupacao_apos": 5
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U080",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 563,
+          "hora": "09h23",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U039",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 570,
+          "hora": "09h30",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U004",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 580,
+          "hora": "09h40",
+          "cadeirante": true,
+          "acompanhante": true,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U059",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 593,
+          "hora": "09h53",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        }
+      ],
+      "km": 60.4,
+      "inicio": "07h08",
+      "fim": "09h53",
+      "minutos": 165,
+      "ocupacao_maxima": 5,
+      "ocupacao_maxima_pct": 62
+    },
+    {
+      "id": "PP08",
+      "tipo": "VANPCD8",
+      "tipo_nome": "Van porta a porta 8 lugares",
+      "capacidade": 8,
+      "posicoes_cadeirante": 2,
+      "usuarios": 3,
+      "cadeirantes": 1,
+      "eventos": [
+        {
+          "tipo": "embarque",
+          "usuario": "U009",
+          "lat": -21.247108,
+          "lon": -47.816056,
+          "minuto": 368,
+          "hora": "06h08",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U079",
+          "lat": -21.217246,
+          "lon": -47.862533,
+          "minuto": 392,
+          "hora": "06h32",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
           "usuario": "U030",
+          "lat": -21.185651,
+          "lon": -47.87267,
+          "minuto": 406,
+          "hora": "06h46",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U030",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 432,
+          "hora": "07h12",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U009",
+          "lat": -21.146,
+          "lon": -47.792,
           "minuto": 439,
           "hora": "07h19",
           "cadeirante": false,
@@ -1219,164 +1308,237 @@
         },
         {
           "tipo": "desembarque",
-          "usuario": "U050",
-          "minuto": 442,
-          "hora": "07h22",
+          "usuario": "U079",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 460,
+          "hora": "07h40",
           "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 0
-        },
+        }
+      ],
+      "km": 41.2,
+      "inicio": "06h08",
+      "fim": "07h40",
+      "minutos": 92,
+      "ocupacao_maxima": 3,
+      "ocupacao_maxima_pct": 38
+    },
+    {
+      "id": "PP09",
+      "tipo": "VANPCD8",
+      "tipo_nome": "Van porta a porta 8 lugares",
+      "capacidade": 8,
+      "posicoes_cadeirante": 2,
+      "usuarios": 9,
+      "cadeirantes": 1,
+      "eventos": [
         {
           "tipo": "embarque",
-          "usuario": "U042",
-          "minuto": 469,
-          "hora": "07h49",
-          "cadeirante": true,
+          "usuario": "U005",
+          "lat": -21.131674,
+          "lon": -47.890215,
+          "minuto": 403,
+          "hora": "06h43",
+          "cadeirante": false,
           "acompanhante": true,
           "ocupacao_apos": 2
         },
         {
           "tipo": "embarque",
-          "usuario": "U052",
-          "minuto": 482,
-          "hora": "08h02",
+          "usuario": "U010",
+          "lat": -21.153691,
+          "lon": -47.923327,
+          "minuto": 415,
+          "hora": "06h55",
           "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 4
+          "acompanhante": false,
+          "ocupacao_apos": 3
         },
         {
           "tipo": "embarque",
-          "usuario": "U022",
-          "minuto": 491,
-          "hora": "08h11",
+          "usuario": "U070",
+          "lat": -21.175657,
+          "lon": -47.892661,
+          "minuto": 427,
+          "hora": "07h07",
           "cadeirante": false,
-          "acompanhante": false,
+          "acompanhante": true,
           "ocupacao_apos": 5
         },
         {
           "tipo": "desembarque",
-          "usuario": "U022",
-          "minuto": 502,
-          "hora": "08h22",
+          "usuario": "U010",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 460,
+          "hora": "07h40",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 4
         },
         {
           "tipo": "desembarque",
-          "usuario": "U042",
+          "usuario": "U005",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 470,
+          "hora": "07h50",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U070",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 474,
+          "hora": "07h54",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U017",
+          "lat": -21.080154,
+          "lon": -47.77608,
+          "minuto": 498,
+          "hora": "08h18",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U062",
+          "lat": -21.073536,
+          "lon": -47.759682,
           "minuto": 505,
           "hora": "08h25",
           "cadeirante": true,
-          "acompanhante": true,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U052",
-          "minuto": 520,
-          "hora": "08h40",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 0
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U012",
-          "minuto": 576,
-          "hora": "09h36",
-          "cadeirante": false,
-          "acompanhante": false,
-          "ocupacao_apos": 1
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U007",
-          "minuto": 599,
-          "hora": "09h59",
-          "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "embarque",
-          "usuario": "U002",
-          "minuto": 608,
-          "hora": "10h08",
+          "usuario": "U027",
+          "lat": -21.069014,
+          "lon": -47.766353,
+          "minuto": 512,
+          "hora": "08h32",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "embarque",
-          "usuario": "U011",
-          "minuto": 619,
-          "hora": "10h19",
+          "usuario": "U072",
+          "lat": -21.071866,
+          "lon": -47.789688,
+          "minuto": 520,
+          "hora": "08h40",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 4
         },
         {
           "tipo": "embarque",
-          "usuario": "U061",
-          "minuto": 622,
-          "hora": "10h22",
+          "usuario": "U037",
+          "lat": -21.07545,
+          "lon": -47.791609,
+          "minuto": 523,
+          "hora": "08h43",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 5
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U077",
+          "lat": -21.084702,
+          "lon": -47.785353,
+          "minuto": 527,
+          "hora": "08h47",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 6
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U072",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 550,
+          "hora": "09h10",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 5
         },
         {
           "tipo": "desembarque",
-          "usuario": "U061",
-          "minuto": 627,
-          "hora": "10h27",
+          "usuario": "U017",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 560,
+          "hora": "09h20",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 4
         },
         {
           "tipo": "desembarque",
-          "usuario": "U012",
-          "minuto": 630,
-          "hora": "10h30",
+          "usuario": "U027",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 564,
+          "hora": "09h24",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "desembarque",
-          "usuario": "U007",
-          "minuto": 640,
-          "hora": "10h40",
-          "cadeirante": false,
+          "usuario": "U062",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 568,
+          "hora": "09h28",
+          "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
-          "usuario": "U011",
-          "minuto": 646,
-          "hora": "10h46",
+          "usuario": "U037",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 580,
+          "hora": "09h40",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "desembarque",
-          "usuario": "U002",
-          "minuto": 651,
-          "hora": "10h51",
+          "usuario": "U077",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 585,
+          "hora": "09h45",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 0
         }
       ],
-      "km": 106.6,
-      "inicio": "06h10",
-      "fim": "10h51",
-      "minutos": 281,
-      "ocupacao_maxima": 5,
-      "ocupacao_maxima_pct": 62
+      "km": 77.6,
+      "inicio": "06h43",
+      "fim": "09h45",
+      "minutos": 182,
+      "ocupacao_maxima": 6,
+      "ocupacao_maxima_pct": 75
     },
     {
       "id": "PP10",
@@ -1384,14 +1546,16 @@
       "tipo_nome": "Van porta a porta 8 lugares",
       "capacidade": 8,
       "posicoes_cadeirante": 2,
-      "usuarios": 8,
+      "usuarios": 7,
       "cadeirantes": 0,
       "eventos": [
         {
           "tipo": "embarque",
           "usuario": "U064",
-          "minuto": 442,
-          "hora": "07h22",
+          "lat": -21.242305,
+          "lon": -47.807696,
+          "minuto": 432,
+          "hora": "07h12",
           "cadeirante": false,
           "acompanhante": true,
           "ocupacao_apos": 2
@@ -1399,8 +1563,10 @@
         {
           "tipo": "embarque",
           "usuario": "U029",
-          "minuto": 468,
-          "hora": "07h48",
+          "lat": -21.236121,
+          "lon": -47.82496,
+          "minuto": 461,
+          "hora": "07h41",
           "cadeirante": false,
           "acompanhante": true,
           "ocupacao_apos": 4
@@ -1408,8 +1574,10 @@
         {
           "tipo": "embarque",
           "usuario": "U049",
-          "minuto": 474,
-          "hora": "07h54",
+          "lat": -21.223588,
+          "lon": -47.840496,
+          "minuto": 468,
+          "hora": "07h48",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 5
@@ -1417,8 +1585,10 @@
         {
           "tipo": "desembarque",
           "usuario": "U064",
-          "minuto": 496,
-          "hora": "08h16",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 494,
+          "hora": "08h14",
           "cadeirante": false,
           "acompanhante": true,
           "ocupacao_apos": 3
@@ -1426,6 +1596,8 @@
         {
           "tipo": "desembarque",
           "usuario": "U029",
+          "lat": -21.16,
+          "lon": -47.812,
           "minuto": 520,
           "hora": "08h40",
           "cadeirante": false,
@@ -1435,109 +1607,109 @@
         {
           "tipo": "desembarque",
           "usuario": "U049",
-          "minuto": 529,
-          "hora": "08h49",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 530,
+          "hora": "08h50",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 0
         },
         {
           "tipo": "embarque",
-          "usuario": "U043",
-          "minuto": 559,
-          "hora": "09h19",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 2
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U053",
-          "minuto": 574,
-          "hora": "09h34",
+          "usuario": "U012",
+          "lat": -21.061253,
+          "lon": -47.777989,
+          "minuto": 562,
+          "hora": "09h22",
           "cadeirante": false,
           "acompanhante": false,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U013",
-          "minuto": 585,
-          "hora": "09h45",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 5
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U008",
-          "minuto": 589,
-          "hora": "09h49",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 7
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U013",
-          "minuto": 610,
-          "hora": "10h10",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 5
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U008",
-          "minuto": 613,
-          "hora": "10h13",
-          "cadeirante": false,
-          "acompanhante": true,
-          "ocupacao_apos": 3
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U043",
-          "minuto": 616,
-          "hora": "10h16",
-          "cadeirante": false,
-          "acompanhante": true,
           "ocupacao_apos": 1
         },
         {
           "tipo": "embarque",
-          "usuario": "U076",
-          "minuto": 623,
-          "hora": "10h23",
+          "usuario": "U007",
+          "lat": -21.103186,
+          "lon": -47.753671,
+          "minuto": 594,
+          "hora": "09h54",
           "cadeirante": false,
-          "acompanhante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U002",
+          "lat": -21.104534,
+          "lon": -47.784904,
+          "minuto": 603,
+          "hora": "10h03",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 3
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U011",
+          "lat": -21.139375,
+          "lon": -47.785796,
+          "minuto": 619,
+          "hora": "10h19",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 4
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U012",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 624,
+          "hora": "10h24",
+          "cadeirante": false,
+          "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "desembarque",
-          "usuario": "U053",
-          "minuto": 628,
-          "hora": "10h28",
+          "usuario": "U007",
+          "lat": -21.146,
+          "lon": -47.792,
+          "minuto": 640,
+          "hora": "10h40",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
-          "usuario": "U076",
-          "minuto": 640,
-          "hora": "10h40",
+          "usuario": "U011",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 647,
+          "hora": "10h47",
           "cadeirante": false,
-          "acompanhante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U002",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 652,
+          "hora": "10h52",
+          "cadeirante": false,
+          "acompanhante": false,
           "ocupacao_apos": 0
         }
       ],
-      "km": 72.9,
-      "inicio": "07h22",
-      "fim": "10h40",
-      "minutos": 198,
-      "ocupacao_maxima": 7,
-      "ocupacao_maxima_pct": 88
+      "km": 69.6,
+      "inicio": "07h12",
+      "fim": "10h52",
+      "minutos": 220,
+      "ocupacao_maxima": 5,
+      "ocupacao_maxima_pct": 62
     },
     {
       "id": "PP11",
@@ -1546,144 +1718,449 @@
       "capacidade": 15,
       "posicoes_cadeirante": 2,
       "usuarios": 4,
-      "cadeirantes": 1,
+      "cadeirantes": 2,
       "eventos": [
         {
           "tipo": "embarque",
-          "usuario": "U057",
-          "minuto": 478,
-          "hora": "07h58",
+          "usuario": "U055",
+          "lat": -21.149308,
+          "lon": -47.858633,
+          "minuto": 452,
+          "hora": "07h32",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "embarque",
-          "usuario": "U062",
-          "minuto": 493,
-          "hora": "08h13",
+          "usuario": "U020",
+          "lat": -21.138975,
+          "lon": -47.884955,
+          "minuto": 465,
+          "hora": "07h45",
           "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
+          "tipo": "desembarque",
+          "usuario": "U055",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 495,
+          "hora": "08h15",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U020",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 520,
+          "hora": "08h40",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        },
+        {
           "tipo": "embarque",
-          "usuario": "U027",
-          "minuto": 500,
-          "hora": "08h20",
+          "usuario": "U046",
+          "lat": -21.167333,
+          "lon": -47.795559,
+          "minuto": 555,
+          "hora": "09h15",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U006",
+          "lat": -21.159942,
+          "lon": -47.802599,
+          "minuto": 560,
+          "hora": "09h20",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U006",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 568,
+          "hora": "09h28",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U046",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 580,
+          "hora": "09h40",
+          "cadeirante": false,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        }
+      ],
+      "km": 31.2,
+      "inicio": "07h32",
+      "fim": "09h40",
+      "minutos": 128,
+      "ocupacao_maxima": 2,
+      "ocupacao_maxima_pct": 13
+    },
+    {
+      "id": "PP12",
+      "tipo": "VAN15A",
+      "tipo_nome": "Van acessível 15 lugares",
+      "capacidade": 15,
+      "posicoes_cadeirante": 2,
+      "usuarios": 6,
+      "cadeirantes": 3,
+      "eventos": [
+        {
+          "tipo": "embarque",
+          "usuario": "U068",
+          "lat": -21.12035,
+          "lon": -47.728461,
+          "minuto": 432,
+          "hora": "07h12",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U078",
+          "lat": -21.126967,
+          "lon": -47.744816,
+          "minuto": 441,
+          "hora": "07h21",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "embarque",
-          "usuario": "U017",
-          "minuto": 505,
-          "hora": "08h25",
+          "usuario": "U071",
+          "lat": -21.141915,
+          "lon": -47.787377,
+          "minuto": 457,
+          "hora": "07h37",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 4
         },
         {
           "tipo": "desembarque",
-          "usuario": "U057",
-          "minuto": 529,
-          "hora": "08h49",
+          "usuario": "U071",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 465,
+          "hora": "07h45",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 3
         },
         {
           "tipo": "desembarque",
-          "usuario": "U017",
-          "minuto": 550,
-          "hora": "09h10",
+          "usuario": "U078",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 490,
+          "hora": "08h10",
           "cadeirante": false,
           "acompanhante": false,
           "ocupacao_apos": 2
         },
         {
           "tipo": "desembarque",
-          "usuario": "U062",
-          "minuto": 553,
-          "hora": "09h13",
+          "usuario": "U068",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 495,
+          "hora": "08h15",
+          "cadeirante": false,
+          "acompanhante": true,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U065",
+          "lat": -21.15372,
+          "lon": -47.863378,
+          "minuto": 526,
+          "hora": "08h46",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U021",
+          "lat": -21.149795,
+          "lon": -47.818895,
+          "minuto": 557,
+          "hora": "09h17",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 2
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U065",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 567,
+          "hora": "09h27",
           "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 1
         },
         {
           "tipo": "desembarque",
-          "usuario": "U027",
-          "minuto": 559,
-          "hora": "09h19",
-          "cadeirante": false,
+          "usuario": "U021",
+          "lat": -21.16,
+          "lon": -47.812,
+          "minuto": 580,
+          "hora": "09h40",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 0
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U040",
+          "lat": -21.146055,
+          "lon": -47.856738,
+          "minuto": 599,
+          "hora": "09h59",
+          "cadeirante": true,
+          "acompanhante": false,
+          "ocupacao_apos": 1
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U040",
+          "lat": -21.152,
+          "lon": -47.805,
+          "minuto": 620,
+          "hora": "10h20",
+          "cadeirante": true,
           "acompanhante": false,
           "ocupacao_apos": 0
         }
       ],
-      "km": 34.0,
-      "inicio": "07h58",
-      "fim": "09h19",
-      "minutos": 81,
+      "km": 54.7,
+      "inicio": "07h12",
+      "fim": "10h20",
+      "minutos": 188,
       "ocupacao_maxima": 4,
       "ocupacao_maxima_pct": 27
     }
   ],
   "composicao": {
     "VANPCD8": 10,
-    "VAN15A": 1
+    "VAN15A": 2
   },
-  "total_veiculos": 11,
-  "km_dia": 716.0,
+  "total_veiculos": 12,
+  "km_dia": 710.3,
   "tempo_bordo": [
     {
-      "usuario": "U079",
+      "usuario": "U073",
+      "min_a_bordo": 75,
+      "min_direto": 37,
+      "limite": 75,
+      "desvio_pct": 103
+    },
+    {
+      "usuario": "U003",
+      "min_a_bordo": 75,
+      "min_direto": 37,
+      "limite": 75,
+      "desvio_pct": 103
+    },
+    {
+      "usuario": "U023",
+      "min_a_bordo": 76,
+      "min_direto": 38,
+      "limite": 76,
+      "desvio_pct": 100
+    },
+    {
+      "usuario": "U063",
       "min_a_bordo": 60,
-      "min_direto": 28,
-      "limite": 60,
-      "desvio_pct": 114
+      "min_direto": 29,
+      "limite": 62,
+      "desvio_pct": 107
     },
     {
-      "usuario": "U074",
-      "min_a_bordo": 39,
-      "min_direto": 27,
-      "limite": 59,
-      "desvio_pct": 44
+      "usuario": "U057",
+      "min_a_bordo": 27,
+      "min_direto": 25,
+      "limite": 55,
+      "desvio_pct": 8
     },
     {
-      "usuario": "U019",
+      "usuario": "U047",
+      "min_a_bordo": 55,
+      "min_direto": 25,
+      "limite": 55,
+      "desvio_pct": 120
+    },
+    {
+      "usuario": "U018",
       "min_a_bordo": 54,
       "min_direto": 24,
       "limite": 54,
       "desvio_pct": 125
     },
     {
-      "usuario": "U069",
-      "min_a_bordo": 22,
-      "min_direto": 20,
-      "limite": 47,
-      "desvio_pct": 10
+      "usuario": "U048",
+      "min_a_bordo": 43,
+      "min_direto": 27,
+      "limite": 59,
+      "desvio_pct": 59
     },
     {
       "usuario": "U031",
-      "min_a_bordo": 24,
-      "min_direto": 9,
-      "limite": 30,
-      "desvio_pct": 167
+      "min_a_bordo": 33,
+      "min_direto": 11,
+      "limite": 33,
+      "desvio_pct": 200
     },
     {
-      "usuario": "U046",
+      "usuario": "U045",
+      "min_a_bordo": 69,
+      "min_direto": 37,
+      "limite": 75,
+      "desvio_pct": 86
+    },
+    {
+      "usuario": "U015",
+      "min_a_bordo": 46,
+      "min_direto": 19,
+      "limite": 46,
+      "desvio_pct": 142
+    },
+    {
+      "usuario": "U051",
+      "min_a_bordo": 5,
+      "min_direto": 3,
+      "limite": 20,
+      "desvio_pct": 67
+    },
+    {
+      "usuario": "U067",
+      "min_a_bordo": 67,
+      "min_direto": 32,
+      "limite": 67,
+      "desvio_pct": 109
+    },
+    {
+      "usuario": "U050",
+      "min_a_bordo": 42,
+      "min_direto": 19,
+      "limite": 46,
+      "desvio_pct": 121
+    },
+    {
+      "usuario": "U025",
+      "min_a_bordo": 46,
+      "min_direto": 19,
+      "limite": 46,
+      "desvio_pct": 142
+    },
+    {
+      "usuario": "U001",
+      "min_a_bordo": 24,
+      "min_direto": 10,
+      "limite": 31,
+      "desvio_pct": 140
+    },
+    {
+      "usuario": "U024",
+      "min_a_bordo": 38,
+      "min_direto": 14,
+      "limite": 38,
+      "desvio_pct": 171
+    },
+    {
+      "usuario": "U044",
+      "min_a_bordo": 49,
+      "min_direto": 21,
+      "limite": 49,
+      "desvio_pct": 133
+    },
+    {
+      "usuario": "U034",
+      "min_a_bordo": 26,
+      "min_direto": 21,
+      "limite": 49,
+      "desvio_pct": 24
+    },
+    {
+      "usuario": "U026",
+      "min_a_bordo": 19,
+      "min_direto": 11,
+      "limite": 33,
+      "desvio_pct": 73
+    },
+    {
+      "usuario": "U054",
+      "min_a_bordo": 35,
+      "min_direto": 19,
+      "limite": 46,
+      "desvio_pct": 84
+    },
+    {
+      "usuario": "U014",
+      "min_a_bordo": 28,
+      "min_direto": 19,
+      "limite": 46,
+      "desvio_pct": 47
+    },
+    {
+      "usuario": "U042",
+      "min_a_bordo": 51,
+      "min_direto": 22,
+      "limite": 51,
+      "desvio_pct": 132
+    },
+    {
+      "usuario": "U032",
+      "min_a_bordo": 54,
+      "min_direto": 32,
+      "limite": 67,
+      "desvio_pct": 69
+    },
+    {
+      "usuario": "U052",
+      "min_a_bordo": 46,
+      "min_direto": 19,
+      "limite": 46,
+      "desvio_pct": 142
+    },
+    {
+      "usuario": "U022",
+      "min_a_bordo": 20,
+      "min_direto": 11,
+      "limite": 33,
+      "desvio_pct": 82
+    },
+    {
+      "usuario": "U056",
       "min_a_bordo": 23,
       "min_direto": 5,
       "limite": 23,
       "desvio_pct": 360
-    },
-    {
-      "usuario": "U006",
-      "min_a_bordo": 8,
-      "min_direto": 3,
-      "limite": 20,
-      "desvio_pct": 167
     },
     {
       "usuario": "U016",
@@ -1693,333 +2170,102 @@
       "desvio_pct": 567
     },
     {
-      "usuario": "U055",
-      "min_a_bordo": 39,
-      "min_direto": 15,
-      "limite": 39,
-      "desvio_pct": 160
-    },
-    {
-      "usuario": "U020",
-      "min_a_bordo": 51,
-      "min_direto": 22,
-      "limite": 51,
-      "desvio_pct": 132
-    },
-    {
-      "usuario": "U056",
-      "min_a_bordo": 22,
-      "min_direto": 4,
-      "limite": 22,
-      "desvio_pct": 450
-    },
-    {
-      "usuario": "U070",
-      "min_a_bordo": 60,
-      "min_direto": 28,
-      "limite": 60,
-      "desvio_pct": 114
-    },
-    {
-      "usuario": "U010",
-      "min_a_bordo": 63,
-      "min_direto": 30,
-      "limite": 63,
-      "desvio_pct": 110
-    },
-    {
-      "usuario": "U005",
-      "min_a_bordo": 41,
-      "min_direto": 27,
-      "limite": 59,
-      "desvio_pct": 52
-    },
-    {
-      "usuario": "U041",
-      "min_a_bordo": 20,
-      "min_direto": 3,
-      "limite": 20,
-      "desvio_pct": 567
-    },
-    {
-      "usuario": "U065",
-      "min_a_bordo": 38,
-      "min_direto": 14,
-      "limite": 38,
-      "desvio_pct": 171
-    },
-    {
-      "usuario": "U045",
-      "min_a_bordo": 46,
-      "min_direto": 31,
-      "limite": 65,
-      "desvio_pct": 48
-    },
-    {
-      "usuario": "U040",
-      "min_a_bordo": 19,
-      "min_direto": 14,
-      "limite": 38,
-      "desvio_pct": 36
-    },
-    {
-      "usuario": "U038",
-      "min_a_bordo": 39,
-      "min_direto": 15,
-      "limite": 39,
-      "desvio_pct": 160
-    },
-    {
-      "usuario": "U068",
-      "min_a_bordo": 56,
-      "min_direto": 26,
-      "limite": 57,
-      "desvio_pct": 115
-    },
-    {
-      "usuario": "U078",
-      "min_a_bordo": 44,
-      "min_direto": 18,
-      "limite": 44,
-      "desvio_pct": 144
-    },
-    {
-      "usuario": "U071",
-      "min_a_bordo": 10,
-      "min_direto": 5,
-      "limite": 23,
-      "desvio_pct": 100
-    },
-    {
-      "usuario": "U059",
-      "min_a_bordo": 59,
-      "min_direto": 27,
-      "limite": 59,
-      "desvio_pct": 119
-    },
-    {
-      "usuario": "U044",
-      "min_a_bordo": 44,
-      "min_direto": 18,
-      "limite": 44,
-      "desvio_pct": 144
-    },
-    {
-      "usuario": "U034",
-      "min_a_bordo": 20,
-      "min_direto": 18,
-      "limite": 44,
-      "desvio_pct": 11
-    },
-    {
-      "usuario": "U033",
+      "usuario": "U035",
       "min_a_bordo": 54,
       "min_direto": 24,
       "limite": 54,
       "desvio_pct": 125
     },
     {
-      "usuario": "U048",
-      "min_a_bordo": 44,
-      "min_direto": 23,
-      "limite": 52,
-      "desvio_pct": 91
-    },
-    {
-      "usuario": "U018",
-      "min_a_bordo": 47,
-      "min_direto": 20,
-      "limite": 47,
-      "desvio_pct": 135
-    },
-    {
-      "usuario": "U037",
-      "min_a_bordo": 52,
-      "min_direto": 23,
-      "limite": 52,
-      "desvio_pct": 126
-    },
-    {
-      "usuario": "U072",
-      "min_a_bordo": 32,
-      "min_direto": 22,
-      "limite": 51,
-      "desvio_pct": 45
-    },
-    {
-      "usuario": "U077",
-      "min_a_bordo": 49,
-      "min_direto": 23,
-      "limite": 52,
-      "desvio_pct": 113
-    },
-    {
-      "usuario": "U026",
-      "min_a_bordo": 30,
-      "min_direto": 9,
-      "limite": 30,
-      "desvio_pct": 233
-    },
-    {
-      "usuario": "U032",
-      "min_a_bordo": 59,
-      "min_direto": 27,
-      "limite": 59,
-      "desvio_pct": 119
-    },
-    {
-      "usuario": "U028",
-      "min_a_bordo": 37,
-      "min_direto": 24,
-      "limite": 54,
-      "desvio_pct": 54
-    },
-    {
-      "usuario": "U080",
-      "min_a_bordo": 41,
-      "min_direto": 19,
-      "limite": 46,
-      "desvio_pct": 116
-    },
-    {
-      "usuario": "U039",
-      "min_a_bordo": 35,
-      "min_direto": 23,
-      "limite": 52,
-      "desvio_pct": 52
-    },
-    {
-      "usuario": "U004",
-      "min_a_bordo": 41,
-      "min_direto": 19,
-      "limite": 46,
-      "desvio_pct": 116
-    },
-    {
-      "usuario": "U051",
-      "min_a_bordo": 20,
-      "min_direto": 3,
-      "limite": 20,
-      "desvio_pct": 567
-    },
-    {
-      "usuario": "U073",
-      "min_a_bordo": 65,
-      "min_direto": 31,
-      "limite": 65,
-      "desvio_pct": 110
-    },
-    {
-      "usuario": "U003",
-      "min_a_bordo": 65,
-      "min_direto": 31,
-      "limite": 65,
-      "desvio_pct": 110
-    },
-    {
-      "usuario": "U023",
-      "min_a_bordo": 67,
-      "min_direto": 32,
-      "limite": 67,
-      "desvio_pct": 109
-    },
-    {
-      "usuario": "U063",
-      "min_a_bordo": 41,
-      "min_direto": 24,
-      "limite": 54,
-      "desvio_pct": 71
-    },
-    {
-      "usuario": "U021",
-      "min_a_bordo": 21,
-      "min_direto": 4,
-      "limite": 22,
-      "desvio_pct": 425
-    },
-    {
-      "usuario": "U015",
-      "min_a_bordo": 41,
-      "min_direto": 16,
-      "limite": 41,
-      "desvio_pct": 156
-    },
-    {
-      "usuario": "U054",
-      "min_a_bordo": 24,
-      "min_direto": 16,
-      "limite": 41,
-      "desvio_pct": 50
-    },
-    {
-      "usuario": "U014",
-      "min_a_bordo": 18,
-      "min_direto": 16,
-      "limite": 41,
-      "desvio_pct": 12
-    },
-    {
-      "usuario": "U047",
-      "min_a_bordo": 51,
-      "min_direto": 22,
-      "limite": 51,
-      "desvio_pct": 132
-    },
-    {
-      "usuario": "U067",
-      "min_a_bordo": 56,
-      "min_direto": 27,
-      "limite": 59,
-      "desvio_pct": 107
-    },
-    {
-      "usuario": "U001",
-      "min_a_bordo": 28,
-      "min_direto": 8,
-      "limite": 28,
-      "desvio_pct": 250
-    },
-    {
-      "usuario": "U035",
-      "min_a_bordo": 47,
-      "min_direto": 20,
-      "limite": 47,
-      "desvio_pct": 135
-    },
-    {
       "usuario": "U075",
-      "min_a_bordo": 33,
-      "min_direto": 22,
-      "limite": 51,
-      "desvio_pct": 50
+      "min_a_bordo": 36,
+      "min_direto": 25,
+      "limite": 55,
+      "desvio_pct": 44
     },
     {
       "usuario": "U060",
-      "min_a_bordo": 52,
-      "min_direto": 27,
-      "limite": 59,
-      "desvio_pct": 93
-    },
-    {
-      "usuario": "U024",
-      "min_a_bordo": 27,
-      "min_direto": 12,
-      "limite": 35,
-      "desvio_pct": 125
+      "min_a_bordo": 55,
+      "min_direto": 32,
+      "limite": 67,
+      "desvio_pct": 72
     },
     {
       "usuario": "U066",
-      "min_a_bordo": 7,
-      "min_direto": 5,
-      "limite": 23,
-      "desvio_pct": 40
+      "min_a_bordo": 15,
+      "min_direto": 6,
+      "limite": 25,
+      "desvio_pct": 150
+    },
+    {
+      "usuario": "U013",
+      "min_a_bordo": 23,
+      "min_direto": 16,
+      "limite": 41,
+      "desvio_pct": 44
+    },
+    {
+      "usuario": "U008",
+      "min_a_bordo": 23,
+      "min_direto": 14,
+      "limite": 38,
+      "desvio_pct": 64
+    },
+    {
+      "usuario": "U061",
+      "min_a_bordo": 14,
+      "min_direto": 3,
+      "limite": 20,
+      "desvio_pct": 367
+    },
+    {
+      "usuario": "U069",
+      "min_a_bordo": 54,
+      "min_direto": 24,
+      "limite": 54,
+      "desvio_pct": 125
+    },
+    {
+      "usuario": "U074",
+      "min_a_bordo": 54,
+      "min_direto": 32,
+      "limite": 67,
+      "desvio_pct": 69
+    },
+    {
+      "usuario": "U019",
+      "min_a_bordo": 62,
+      "min_direto": 29,
+      "limite": 62,
+      "desvio_pct": 114
+    },
+    {
+      "usuario": "U041",
+      "min_a_bordo": 9,
+      "min_direto": 3,
+      "limite": 20,
+      "desvio_pct": 200
+    },
+    {
+      "usuario": "U043",
+      "min_a_bordo": 63,
+      "min_direto": 30,
+      "limite": 63,
+      "desvio_pct": 110
+    },
+    {
+      "usuario": "U053",
+      "min_a_bordo": 65,
+      "min_direto": 35,
+      "limite": 71,
+      "desvio_pct": 86
     },
     {
       "usuario": "U058",
-      "min_a_bordo": 28,
-      "min_direto": 16,
-      "limite": 41,
-      "desvio_pct": 75
+      "min_a_bordo": 44,
+      "min_direto": 19,
+      "limite": 46,
+      "desvio_pct": 132
     },
     {
       "usuario": "U036",
@@ -2029,186 +2275,277 @@
       "desvio_pct": 67
     },
     {
+      "usuario": "U076",
+      "min_a_bordo": 20,
+      "min_direto": 3,
+      "limite": 20,
+      "desvio_pct": 567
+    },
+    {
+      "usuario": "U028",
+      "min_a_bordo": 62,
+      "min_direto": 29,
+      "limite": 62,
+      "desvio_pct": 114
+    },
+    {
+      "usuario": "U033",
+      "min_a_bordo": 28,
+      "min_direto": 29,
+      "limite": 62,
+      "desvio_pct": -3
+    },
+    {
+      "usuario": "U038",
+      "min_a_bordo": 22,
+      "min_direto": 17,
+      "limite": 43,
+      "desvio_pct": 29
+    },
+    {
+      "usuario": "U080",
+      "min_a_bordo": 46,
+      "min_direto": 22,
+      "limite": 51,
+      "desvio_pct": 109
+    },
+    {
+      "usuario": "U039",
+      "min_a_bordo": 41,
+      "min_direto": 27,
+      "limite": 59,
+      "desvio_pct": 52
+    },
+    {
+      "usuario": "U059",
+      "min_a_bordo": 60,
+      "min_direto": 32,
+      "limite": 67,
+      "desvio_pct": 88
+    },
+    {
+      "usuario": "U004",
+      "min_a_bordo": 44,
+      "min_direto": 22,
+      "limite": 51,
+      "desvio_pct": 100
+    },
+    {
       "usuario": "U009",
+      "min_a_bordo": 71,
+      "min_direto": 35,
+      "limite": 71,
+      "desvio_pct": 103
+    },
+    {
+      "usuario": "U079",
+      "min_a_bordo": 68,
+      "min_direto": 33,
+      "limite": 68,
+      "desvio_pct": 106
+    },
+    {
+      "usuario": "U030",
+      "min_a_bordo": 26,
+      "min_direto": 24,
+      "limite": 54,
+      "desvio_pct": 8
+    },
+    {
+      "usuario": "U005",
+      "min_a_bordo": 67,
+      "min_direto": 32,
+      "limite": 67,
+      "desvio_pct": 109
+    },
+    {
+      "usuario": "U010",
+      "min_a_bordo": 45,
+      "min_direto": 35,
+      "limite": 71,
+      "desvio_pct": 29
+    },
+    {
+      "usuario": "U070",
+      "min_a_bordo": 47,
+      "min_direto": 33,
+      "limite": 68,
+      "desvio_pct": 42
+    },
+    {
+      "usuario": "U017",
+      "min_a_bordo": 62,
+      "min_direto": 30,
+      "limite": 63,
+      "desvio_pct": 107
+    },
+    {
+      "usuario": "U062",
+      "min_a_bordo": 63,
+      "min_direto": 33,
+      "limite": 68,
+      "desvio_pct": 91
+    },
+    {
+      "usuario": "U027",
+      "min_a_bordo": 52,
+      "min_direto": 35,
+      "limite": 71,
+      "desvio_pct": 49
+    },
+    {
+      "usuario": "U072",
+      "min_a_bordo": 30,
+      "min_direto": 25,
+      "limite": 55,
+      "desvio_pct": 20
+    },
+    {
+      "usuario": "U037",
+      "min_a_bordo": 57,
+      "min_direto": 27,
+      "limite": 59,
+      "desvio_pct": 111
+    },
+    {
+      "usuario": "U077",
+      "min_a_bordo": 58,
+      "min_direto": 27,
+      "limite": 59,
+      "desvio_pct": 115
+    },
+    {
+      "usuario": "U064",
+      "min_a_bordo": 62,
+      "min_direto": 29,
+      "limite": 62,
+      "desvio_pct": 114
+    },
+    {
+      "usuario": "U029",
+      "min_a_bordo": 59,
+      "min_direto": 27,
+      "limite": 59,
+      "desvio_pct": 119
+    },
+    {
+      "usuario": "U049",
+      "min_a_bordo": 62,
+      "min_direto": 30,
+      "limite": 63,
+      "desvio_pct": 107
+    },
+    {
+      "usuario": "U012",
+      "min_a_bordo": 62,
+      "min_direto": 29,
+      "limite": 62,
+      "desvio_pct": 114
+    },
+    {
+      "usuario": "U007",
+      "min_a_bordo": 46,
+      "min_direto": 19,
+      "limite": 46,
+      "desvio_pct": 142
+    },
+    {
+      "usuario": "U002",
+      "min_a_bordo": 49,
+      "min_direto": 21,
+      "limite": 49,
+      "desvio_pct": 133
+    },
+    {
+      "usuario": "U011",
+      "min_a_bordo": 28,
+      "min_direto": 8,
+      "limite": 28,
+      "desvio_pct": 250
+    },
+    {
+      "usuario": "U055",
+      "min_a_bordo": 43,
+      "min_direto": 17,
+      "limite": 43,
+      "desvio_pct": 153
+    },
+    {
+      "usuario": "U020",
+      "min_a_bordo": 55,
+      "min_direto": 25,
+      "limite": 55,
+      "desvio_pct": 120
+    },
+    {
+      "usuario": "U046",
+      "min_a_bordo": 25,
+      "min_direto": 6,
+      "limite": 25,
+      "desvio_pct": 317
+    },
+    {
+      "usuario": "U006",
+      "min_a_bordo": 8,
+      "min_direto": 3,
+      "limite": 20,
+      "desvio_pct": 167
+    },
+    {
+      "usuario": "U068",
       "min_a_bordo": 63,
       "min_direto": 30,
       "limite": 63,
       "desvio_pct": 110
     },
     {
-      "usuario": "U030",
-      "min_a_bordo": 47,
-      "min_direto": 20,
-      "limite": 47,
-      "desvio_pct": 135
+      "usuario": "U078",
+      "min_a_bordo": 49,
+      "min_direto": 21,
+      "limite": 49,
+      "desvio_pct": 133
     },
     {
-      "usuario": "U050",
-      "min_a_bordo": 38,
-      "min_direto": 16,
-      "limite": 41,
-      "desvio_pct": 138
+      "usuario": "U071",
+      "min_a_bordo": 8,
+      "min_direto": 6,
+      "limite": 25,
+      "desvio_pct": 33
     },
     {
-      "usuario": "U025",
-      "min_a_bordo": 19,
-      "min_direto": 16,
-      "limite": 41,
-      "desvio_pct": 19
-    },
-    {
-      "usuario": "U042",
-      "min_a_bordo": 36,
-      "min_direto": 19,
-      "limite": 46,
-      "desvio_pct": 89
-    },
-    {
-      "usuario": "U052",
-      "min_a_bordo": 38,
-      "min_direto": 16,
-      "limite": 41,
-      "desvio_pct": 138
-    },
-    {
-      "usuario": "U022",
-      "min_a_bordo": 11,
-      "min_direto": 9,
-      "limite": 30,
-      "desvio_pct": 22
-    },
-    {
-      "usuario": "U012",
-      "min_a_bordo": 54,
-      "min_direto": 24,
-      "limite": 54,
-      "desvio_pct": 125
-    },
-    {
-      "usuario": "U007",
+      "usuario": "U065",
       "min_a_bordo": 41,
       "min_direto": 16,
       "limite": 41,
       "desvio_pct": 156
     },
     {
-      "usuario": "U002",
-      "min_a_bordo": 43,
-      "min_direto": 18,
-      "limite": 44,
-      "desvio_pct": 139
+      "usuario": "U021",
+      "min_a_bordo": 23,
+      "min_direto": 5,
+      "limite": 23,
+      "desvio_pct": 360
     },
     {
-      "usuario": "U011",
-      "min_a_bordo": 27,
-      "min_direto": 7,
-      "limite": 27,
-      "desvio_pct": 286
-    },
-    {
-      "usuario": "U061",
-      "min_a_bordo": 5,
-      "min_direto": 3,
-      "limite": 20,
-      "desvio_pct": 67
-    },
-    {
-      "usuario": "U064",
-      "min_a_bordo": 54,
-      "min_direto": 24,
-      "limite": 54,
-      "desvio_pct": 125
-    },
-    {
-      "usuario": "U029",
-      "min_a_bordo": 52,
-      "min_direto": 23,
-      "limite": 52,
-      "desvio_pct": 126
-    },
-    {
-      "usuario": "U049",
-      "min_a_bordo": 55,
-      "min_direto": 26,
-      "limite": 57,
-      "desvio_pct": 112
-    },
-    {
-      "usuario": "U043",
-      "min_a_bordo": 57,
-      "min_direto": 26,
-      "limite": 57,
-      "desvio_pct": 119
-    },
-    {
-      "usuario": "U053",
-      "min_a_bordo": 54,
-      "min_direto": 30,
-      "limite": 63,
-      "desvio_pct": 80
-    },
-    {
-      "usuario": "U013",
-      "min_a_bordo": 25,
-      "min_direto": 14,
-      "limite": 38,
-      "desvio_pct": 79
-    },
-    {
-      "usuario": "U008",
-      "min_a_bordo": 24,
-      "min_direto": 12,
-      "limite": 35,
-      "desvio_pct": 100
-    },
-    {
-      "usuario": "U076",
-      "min_a_bordo": 17,
-      "min_direto": 3,
-      "limite": 20,
-      "desvio_pct": 467
-    },
-    {
-      "usuario": "U057",
-      "min_a_bordo": 51,
-      "min_direto": 22,
-      "limite": 51,
-      "desvio_pct": 132
-    },
-    {
-      "usuario": "U062",
-      "min_a_bordo": 60,
-      "min_direto": 28,
-      "limite": 60,
-      "desvio_pct": 114
-    },
-    {
-      "usuario": "U027",
-      "min_a_bordo": 59,
-      "min_direto": 30,
-      "limite": 63,
-      "desvio_pct": 97
-    },
-    {
-      "usuario": "U017",
-      "min_a_bordo": 45,
-      "min_direto": 26,
-      "limite": 57,
-      "desvio_pct": 73
+      "usuario": "U040",
+      "min_a_bordo": 21,
+      "min_direto": 16,
+      "limite": 41,
+      "desvio_pct": 31
     }
   ],
   "provedor_tempos": "haversine+transito",
   "partida_min": 420,
   "indicadores": {
-    "usuarios_por_veiculo": 7.27,
-    "tempo_bordo_medio_min": 38.9,
-    "tempo_bordo_max_min": 67,
+    "usuarios_por_veiculo": 6.67,
+    "tempo_bordo_medio_min": 43.2,
+    "tempo_bordo_max_min": 76,
     "dentro_do_limite_pct": 100.0,
     "compartilhamento_max": 7,
-    "ocupacao_media_pct": 58.2,
-    "km_por_usuario": 8.95
+    "ocupacao_media_pct": 54.3,
+    "km_por_usuario": 8.88
   },
-  "gerado_em": "2026-08-22 15:00",
+  "gerado_em": "2026-08-22 15:40",
   "premissas": {
     "janela_embarque_min": 20,
     "fator_tempo_bordo": 1.6,
@@ -2234,16 +2571,16 @@
         "id": "pico_manha",
         "inicio": "06h00",
         "fim": "08h30",
-        "fator_urbano": 1.35,
-        "fator_rural": 1.1
+        "fator_urbano": 1.588,
+        "fator_rural": 1.232
       },
       {
         "faixa": "Entre picos",
         "id": "entre_picos",
         "inicio": "08h30",
         "fim": "16h00",
-        "fator_urbano": 1.0,
-        "fator_rural": 1.0
+        "fator_urbano": 1.095,
+        "fator_rural": 1.032
       },
       {
         "faixa": "Pico da tarde",
@@ -2262,7 +2599,7 @@
         "fator_rural": 0.95
       }
     ],
-    "transito_origem": "estimado"
+    "transito_origem": "simulacao"
   },
   "fila_espera": [
     "U081",

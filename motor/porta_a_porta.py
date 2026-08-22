@@ -190,9 +190,13 @@ def _extrair(routing, manager, sol, dim_tempo, frota, pedidos, dist, tempo,
                              if tipo_evento == "embarque"
                              else -(pedido.assentos + pedido.posicoes_cadeira))
                 pico = max(pico, ocupacao)
+                coord = (pedido.origem if tipo_evento == "embarque"
+                         else pedido.destino)
                 eventos.append({
                     "tipo": tipo_evento,
                     "usuario": pedido.id,
+                    "lat": round(coord[0], 6),
+                    "lon": round(coord[1], 6),
                     "minuto": minuto,
                     "hora": f"{minuto // 60:02d}h{minuto % 60:02d}",
                     "cadeirante": pedido.cadeirante,

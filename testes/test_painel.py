@@ -100,9 +100,20 @@ class TestPaginaDoPainel(unittest.TestCase):
         for passo in self.painel["memoria_calculo"]:
             self.assertIn(passo["passo"], self.html)
 
-    def test_serie_de_aprendizado_vem_marcada_como_demonstracao(self):
-        self.assertIn("SÉRIE DE DEMONSTRAÇÃO", self.html)
+    def test_serie_de_aprendizado_declara_a_origem(self):
+        """A regra que não pode quebrar: simulação nunca aparece como medição."""
+        serie = aprendizado.carregar_serie()
+        self.assertIn(serie["selo"], self.html)
         self.assertIn("Leia com atenção", self.html)
+        if serie["origem"] != "operacao_real":
+            self.assertNotIn("MEDIDO NA OPERAÇÃO", self.html)
+        if serie["origem"] == "simulacao":
+            self.assertIn("operação SIMULADA", self.html)
+
+    def test_mostra_versao_do_modelo_e_rollbacks(self):
+        serie = aprendizado.carregar_serie()
+        if serie.get("versao_modelo"):
+            self.assertIn("rollback", self.html.lower())
 
     def test_cenarios_embutidos_sao_json_valido(self):
         bruto = re.search(

@@ -56,8 +56,12 @@ _DEMONSTRACAO = {
 
 _ROTULOS_ORIGEM = {
     "demonstracao": ("SÉRIE DE DEMONSTRAÇÃO",
-                     "Dados ilustrativos. O aprendizado com GPS real entra na "
-                     "Sprint 5, quando o app do motorista for ao ar."),
+                     "Dados ilustrativos, escritos à mão para a apresentação."),
+    "simulacao": ("APRENDIDO EM SIMULAÇÃO",
+                  "O ciclo de aprendizado rodou de verdade — coleta, "
+                  "estimativa, versão e rollback —, mas sobre uma operação "
+                  "simulada. Os pings reais entram quando o app do motorista "
+                  "for ao ar."),
     "operacao_real": ("MEDIDO NA OPERAÇÃO",
                       "Série calculada com GPS e horários reais de embarque "
                       "coletados pelo app do motorista."),
@@ -83,6 +87,7 @@ def resumir(serie: dict) -> dict:
     serie["selo"] = selo
     serie["explicacao_selo"] = explicacao
     serie["e_demonstracao"] = serie.get("origem") != "operacao_real"
+    serie["e_simulacao"] = serie.get("origem") == "simulacao"
     if semanas:
         primeiro, ultimo = semanas[0], semanas[-1]
         queda = primeiro["mae_min"] - ultimo["mae_min"]
@@ -94,4 +99,6 @@ def resumir(serie: dict) -> dict:
             ultimo.get("acuracia_ausencia_pct", 0)
             - primeiro.get("acuracia_ausencia_pct", 0), 1)
         serie["viagens_observadas"] = sum(s.get("viagens", 0) for s in semanas)
+        serie["rollbacks"] = serie.get("rollbacks", 0)
+        serie["versao_modelo"] = serie.get("versao_modelo", 0)
     return serie

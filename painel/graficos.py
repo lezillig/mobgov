@@ -10,6 +10,8 @@ modo de projetor usem a mesma marcação.
 """
 from __future__ import annotations
 
+import math
+
 from .formato import esc, numero, reais_curto
 
 
@@ -181,6 +183,127 @@ def barras_ocupacao(viagens: list) -> str:
                         f"{len(rotas)} viagens otimizadas — ocupação de assentos",
                         "g-rotulo-fraco"))
     return _svg(L, A, "".join(corpo), "Ocupação de assentos por viagem otimizada")
+
+
+# ----------------------------------------------------------------- mapas ---
+def _projecao(coordenadas, largura, altura, margem=26):
+    """Converte lat/lon em x/y do SVG, sem biblioteca de mapa e sem tiles.
+
+    Projeção equirretangular com correção de longitude por cos(latitude) — em
+    escala municipal a distorção é irrelevante, e em troca a página continua
+    abrindo offline. Com OSRM ligado, o traçado de cada rota vira a rua de
+    verdade; a projeção é a mesma.
+    """
+    lats = [c[0] for c in coordenadas]
+    lons = [c[1] for c in coordenadas]
+    lat_min, lat_max = min(lats), max(lats)
+    lon_min, lon_max = min(lons), max(lons)
+    lat_media = (lat_min + lat_max) / 2
+    cos_lat = math.cos(math.radians(lat_media)) or 1.0
+
+    span_x = max((lon_max - lon_min) * cos_lat, 1e-6)
+    span_y = max(lat_max - lat_min, 1e-6)
+    escala = min((largura - 2 * margem) / span_x, (altura - 2 * margem) / span_y)
+    desloc_x = (largura - span_x * escala) / 2
+    desloc_y = (altura - span_y * escala) / 2
+
+    def para_xy(coord):
+        x = desloc_x + (coord[1] - lon_min) * cos_lat * escala
+        y = altura - (desloc_y + (coord[0] - lat_min) * escala)  # norte para cima
+        return x, y
+    return para_xy
+
+
+def mapa_rotas(geografia: dict, viagens: list, turno_id: str = None) -> str:
+    """Mapa das rotas escolares: paradas, escolas e o traçado de cada viagem."""
+    pontos = (geografia or {}).get("pontos") or {}
+    escolas = (geografia or {}).get("escolas") or []
+    if not pontos or not escolas:
+        return ""
+    if turno_id:
+        viagens = [v for v in viagens if v.get("turno") == turno_id]
+    if not viagens:
+        return ""
+
+    L, A = 720, 460
+    coordenadas = list(pontos.values()) + [[e["lat"], e["lon"]] for e in escolas]
+    xy = _projecao(coordenadas, L, A)
+    indice_escola = {e["id"]: i for i, e in enumerate(escolas)}
+    corpo = []
+
+    # todas as paradas ao fundo, para dar a forma do município
+    for pid, coord in pontos.items():
+        x, y = xy(coord)
+        corpo.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.8" class="m-parada"/>')
+
+    # o traçado de cada viagem, colorido pela escola de destino
+    for v in viagens:
+        escola = next((e for e in escolas if e["id"] == v.get("escola_id")), None)
+        if not escola:
+            continue
+        sequencia = [[escola["lat"], escola["lon"]]]
+        sequencia += [pontos[pid] for pid in v.get("paradas", []) if pid in pontos]
+        sequencia.append([escola["lat"], escola["lon"]])
+        if len(sequencia) < 3:
+            continue
+        d = " ".join(("M" if i == 0 else "L") + f"{xy(c)[0]:.1f},{xy(c)[1]:.1f}"
+                     for i, c in enumerate(sequencia))
+        classe = f'm-rota m-e{indice_escola.get(escola["id"], 0) % 3}'
+        corpo.append(f'<path d="{d}" class="{classe}">'
+                     f'<title>{esc(v["id"])} · {esc(escola["nome"])} · '
+                     f'{v.get("alunos", 0)} alunos · '
+                     f'{numero(v.get("km_viagem", 0), 1)} km</title></path>')
+
+    # as escolas por cima de tudo
+    for e in escolas:
+        x, y = xy([e["lat"], e["lon"]])
+        i = indice_escola[e["id"]] % 3
+        corpo.append(
+            f'<rect x="{x - 6:.1f}" y="{y - 6:.1f}" width="12" height="12" '
+            f'rx="2" class="m-escola m-e{i}"><title>{esc(e["nome"])}</title></rect>')
+        corpo.append(_texto(x, y - 12, e["nome"], "m-rotulo"))
+
+    corpo.append(_texto(L / 2, A - 8,
+                        f"{len(viagens)} viagens · {len(pontos)} pontos de "
+                        f"embarque · {len(escolas)} escolas",
+                        "g-rotulo-fraco"))
+    return _svg(L, A, "".join(corpo), "Mapa das rotas escolares",
+                "Cada linha é uma viagem; a cor indica a escola de destino.")
+
+
+def mapa_porta_a_porta(rotas: list, limite: int = 6) -> str:
+    """Mapa do porta a porta: o vaivém entre casas e destinos."""
+    rotas = [r for r in rotas if r.get("eventos")][:limite]
+    coordenadas = [[e["lat"], e["lon"]] for r in rotas for e in r["eventos"]
+                   if "lat" in e]
+    if len(coordenadas) < 2:
+        return ""
+
+    L, A = 720, 420
+    xy = _projecao(coordenadas, L, A)
+    corpo = []
+    for i, r in enumerate(rotas):
+        pontos = [e for e in r["eventos"] if "lat" in e]
+        d = " ".join(("M" if k == 0 else "L")
+                     + f"{xy([e['lat'], e['lon']])[0]:.1f},"
+                       f"{xy([e['lat'], e['lon']])[1]:.1f}"
+                     for k, e in enumerate(pontos))
+        corpo.append(f'<path d="{d}" class="m-rota m-e{i % 3}">'
+                     f'<title>{esc(r["id"])} · {r.get("usuarios", 0)} usuários · '
+                     f'{numero(r.get("km", 0), 1)} km</title></path>')
+        for e in pontos:
+            x, y = xy([e["lat"], e["lon"]])
+            embarque = e["tipo"] == "embarque"
+            corpo.append(
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.4" '
+                f'class="{"m-embarque" if embarque else "m-desembarque"}">'
+                f'<title>{esc(e["hora"])} · {esc(e["tipo"])} de '
+                f'{esc(e["usuario"])}</title></circle>')
+    corpo.append(_texto(L / 2, A - 8,
+                        f"{len(rotas)} rotas porta a porta · verde = embarque na "
+                        f"casa, laranja = desembarque no destino",
+                        "g-rotulo-fraco"))
+    return _svg(L, A, "".join(corpo), "Mapa das rotas porta a porta")
 
 
 # ------------------------------------------- linha do tempo do porta a porta ---

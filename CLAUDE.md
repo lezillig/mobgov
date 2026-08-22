@@ -54,20 +54,23 @@ previu X, aconteceu Y, ajustou Z".
 | 2 | `painel/` — painel de economia (a tela da demo) | ✅ pronto |
 | 3 | `motor/escala.py` — roteirização multiviagem + demanda real (~2.900 alunos, 2 turnos) | ✅ pronto |
 | 4 | `dados/tempos.py` (trânsito variável), `motor/porta_a_porta.py` (PCD n:n), `motor/reotimizar.py` (falta, cancelamento, inserção dinâmica) | ✅ pronto |
-| 5 | Malha viária real (OSRM/Valhalla) + mapa MapLibre + tela de planejamento | ⬜ |
-| 5–6 | App do motorista (React Native) → aprendizado contínuo real | ⬜ |
+| 5 | `dados/osrm.py` (malha viária real), `aprendizado/` (ciclo com rollback), mapa das rotas em SVG | ✅ pronto |
+| 6 | App do motorista (React Native) → troca simulação por GPS real | ⬜ |
 | 7 | Camada conversacional + roteiro de demo ensaiado | ⬜ |
 | 8 | Elegibilidade PCD (ou pós-MVP, conforme o edital-alvo) | ⬜ |
 
-Resultado atual no Município Modelo (escolar, já com trânsito variável):
-**30 → 22 veículos (−26,7%)**, R$ 160.112/mês, R$ 1,92 mi/ano, −1.374 km/dia,
-−281 l/dia, −199,1 tCO₂/ano, com 106 viagens/dia (2,65 por veículo/turno),
-ocupação média 93,7% e tempo máximo de 63 min dentro do veículo (limite 75).
+Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
+**30 → 23 veículos (−23,3%)**, R$ 141.122/mês, R$ 1,69 mi/ano, com 107
+viagens/dia e ocupação média de 93%. Era 22 veículos antes do aprendizado: o
+ciclo descobriu que a rua é mais lenta do que o planejamento supunha e o motor
+corrigiu para cima — economia menor, mas confiável.
 
-Porta a porta (PCD): 80 viagens/dia atendidas por 11 veículos, 716 km/dia,
-tempo a bordo médio de 38,9 min (máx 67) e 100% dentro do limite.
-Reotimização do dia: 10 eventos, resposta máxima de 0,069 s, 6 de 6 pedidos
+Porta a porta (PCD): 80 viagens/dia em 12 veículos, 710 km/dia, tempo a bordo
+médio de 43,2 min e 100% dentro do limite.
+Reotimização do dia: 10 eventos, resposta máxima de 0,063 s, 5 de 6 pedidos
 novos encaixados em rota existente.
+Aprendizado: erro do tempo estimado de 5,88 → 2,03 min em 5 semanas
+(simulação), 3 rollbacks recusando piora.
 
 ## Estrutura
 
@@ -80,6 +83,10 @@ mobgov/                          (raiz deste repositório)
   motor/reotimizar.py            dia em andamento: falta, cancelamento, inserção dinâmica
   motor/rodar_dia.py             orquestra o porta a porta e os eventos do dia
   dados/tempos.py                trânsito variável e provedores plugáveis de tempo
+  dados/osrm.py                  malha viária real: blocos, cache, retry e fallback
+  aprendizado/simulador.py       operação simulada com verdade oculta (troca pelo app)
+  aprendizado/aprender.py        estimativas, métricas, versão e rollback do modelo
+  motor/rodar_aprendizado.py     roda o ciclo e grava os fatores que o motor usa
   dados/demanda_pcd.py           demanda sintética do porta a porta (sem dado pessoal)
   painel/economia.py             recálculo auditável + cenários + memória de cálculo
   painel/aprendizado.py          série "o que o sistema aprendeu" (real ou demonstração)
@@ -98,6 +105,8 @@ mobgov/                          (raiz deste repositório)
 pip install -r requirements.txt        # só o motor precisa (OR-Tools)
 python motor/dimensionar.py            # planejamento escolar (~5 min)
 python motor/rodar_dia.py              # porta a porta + eventos do dia (~40 s)
+python motor/rodar_aprendizado.py      # ciclo de aprendizado (~5 s)
+MOBGOV_OSRM_URL=http://localhost:5000 python motor/dimensionar.py   # malha real
 python -m painel.render                # gera relatorios/painel-economia.html
 python -m painel.render --diesel 7.20 --dias 20
 python -m painel.servidor              # http://127.0.0.1:8000/
@@ -165,7 +174,19 @@ python -m unittest discover -s testes -v
   bordo e faz a reotimização recusar encaixes que na prática cabem — foi um bug
   real da Sprint 4.
 - **Trânsito muda a frota.** Ligar o perfil de trânsito ao motor escolar somou
-  um veículo no turno da manhã. É o resultado certo: o pico existe.
+  um veículo no turno da manhã. É o resultado certo: o pico existe. Depois do
+  aprendizado (fatores maiores que os estimados), somou outro.
+- **O aprendizado precisa saber qual fator o plano usou.** Cada observação
+  carrega `fator_plano`; sem isso, o estimador desfaz o fator errado e o
+  trânsito "aprendido" cresce a cada rodada (1,35 → 1,55 → 1,83 → …). Foi um
+  bug real da Sprint 5.
+- **Métrica de aprendizado usa dois conjuntos fixos**: um valida (decide
+  promoção), outro reporta. Medir no conjunto que escolheu o modelo infla o
+  resultado; e reusar a "semana seguinte" faz a curva oscilar com o clima, não
+  com o modelo.
+- **`urlparse` corta o que vem depois de `;`** no último segmento da URL (vira
+  `params`) — e o OSRM separa coordenadas com `;`. Qualquer código que
+  interprete URLs do OSRM precisa recolar `path + ';' + params`.
 
 ## Módulos previstos (agentes do prompt-mestre)
 
@@ -176,7 +197,7 @@ python -m unittest discover -s testes -v
 | `agent-porta-a-porta` | PDPTW do vertical PCD: par embarque/desembarque, janela por usuário, tempo máximo a bordo, cadeira de rodas |
 | `agent-transito` | Camada de tempos: perfil por faixa horária e zona, provedores externos (OSRM/Valhalla/Google/Mapbox), fatores aprendidos |
 | `agent-reotimizacao` | Operação do dia: falta informada, cancelamento, inserção dinâmica de pedido novo, diff legível em segundos |
-| `agent-aprendizado` | Tempo por trecho, tempo de parada, previsão de ausência, re-treino noturno com rollback |
+| `agent-aprendizado` | Tempo por trecho, tempo de parada, previsão de ausência, re-treino com validação separada e rollback |
 | `agent-painel` | Mapa vivo, planejamento, **painel de economia**, gestão de cadastros |
 | `agent-apps` | App do motorista (offline-first) e app do responsável/usuário (WCAG) |
 | `agent-elegibilidade` | Cadastro PCD, ficha médica com revisão humana obrigatória |
@@ -198,7 +219,9 @@ que o FastAPI as reaproveite sem reescrita.
 
 - Redução de frota ≥ 20% no Município Modelo, com premissas auditáveis. ✅ (26,7%)
 - Reotimização após imprevisto em < 30 segundos. ✅ (máximo medido: 0,07 s)
-- Erro de previsão de tempo caindo semana a semana no painel. ⬜ (série ainda ilustrativa)
+- Erro de previsão de tempo caindo semana a semana no painel. ✅ em simulação
+  (5,88 → 2,03 min em 5 semanas, com 3 rollbacks recusando piora); vira medição
+  real quando o app do motorista entrar.
 - Planilha real de prefeitura → rotas publicadas em < 1 hora. ⬜
 
 ## Benchmarks de referência

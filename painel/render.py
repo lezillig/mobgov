@@ -211,6 +211,30 @@ def bloco_qualidade(p: dict, viagens: list) -> str:
     )
 
 
+def bloco_mapa(p: dict) -> str:
+    """Mapa das rotas — desenhado em SVG, sem tiles e sem internet."""
+    geografia = p.get("geografia") or {}
+    viagens = p.get("viagens_mapa") or []
+    pcd = (p.get("porta_a_porta") or {}).get("rotas") or []
+    escolar = graficos.mapa_rotas(geografia, viagens, turno_id="manha")
+    porta = graficos.mapa_porta_a_porta(pcd)
+    if not escolar and not porta:
+        return ""
+    partes = ['<section><h2>Mapa das rotas</h2>'
+              '<p class="chamada">O desenho sai do mesmo relatório que gera os '
+              'números — não é ilustração. Cada linha é uma viagem; a cor diz a '
+              'escola de destino. O traçado é reto entre paradas porque o sistema '
+              'ainda calcula sobre distância geográfica; com o servidor de malha '
+              'viária (OSRM) ligado, aparece a rua de verdade.</p>']
+    if escolar:
+        partes.append('<h3 class="sub">Escolar · turno da manhã</h3>' + escolar)
+    if porta:
+        partes.append('<h3 class="sub">Porta a porta · primeiras rotas do dia</h3>'
+                      + porta)
+    partes.append('</section>')
+    return "".join(partes)
+
+
 def bloco_porta_a_porta(pcd: dict) -> str:
     """Vertical PCD: a rota que encosta na porta, com n embarques e n desembarques."""
     if not pcd or not pcd.get("rotas"):
@@ -319,9 +343,14 @@ def bloco_transito(pcd: dict) -> str:
     perfil = pr.get("perfil_transito") or []
     if not perfil:
         return ""
-    medido = pr.get("transito_origem") == "gps_real"
-    selo = ('<span class="selo medido">MEDIDO COM GPS</span>' if medido
-            else '<span class="selo">FATORES ESTIMADOS</span>')
+    origem = pr.get("transito_origem")
+    medido = origem == "gps_real"
+    if medido:
+        selo = '<span class="selo medido">MEDIDO COM GPS</span>'
+    elif origem == "simulacao":
+        selo = '<span class="selo">APRENDIDO EM SIMULAÇÃO</span>'
+    else:
+        selo = '<span class="selo">FATORES ESTIMADOS</span>' 
     linhas = "".join(
         f'<tr><td>{esc(f["faixa"])}</td><td>{esc(f["inicio"])} — {esc(f["fim"])}</td>'
         f'<td class="num">{numero(f["fator_urbano"], 2)}×</td>'
@@ -338,12 +367,15 @@ def bloco_transito(pcd: dict) -> str:
         '<th class="num">Fator urbano</th><th class="num">Fator rural</th></tr></thead>'
         f'<tbody>{linhas}</tbody></table></div>'
         + ('' if medido else
-           '<div class="aviso"><b>Fatores estimados:</b> são premissas de projeto '
-           'enquanto não houver GPS real na rua. Quando o app do motorista entrar '
-           '(Sprint 5), os fatores medidos substituem estes automaticamente, e o '
-           'selo acima muda sozinho. Trocar por malha viária real com trânsito ao '
-           'vivo (OSRM, Mapbox ou Google Routes) é implementar uma função — o motor '
-           'de rotas não muda.</div>')
+           ('<div class="aviso"><b>Aprendido em simulação:</b> estes fatores não '
+            'são mais o chute inicial — saíram do ciclo de aprendizado rodando '
+            'sobre uma operação simulada, e já corrigiram o planejamento. Com o '
+            'app do motorista na rua, a mesma rotina roda sobre os pings reais e '
+            'o selo vira "medido com GPS".</div>') if origem == "simulacao" else
+           ('<div class="aviso"><b>Fatores estimados:</b> são premissas de projeto '
+            'enquanto não houver dados de operação. Trocar por malha viária real '
+            'com trânsito (OSRM, Mapbox ou Google Routes) é implementar uma '
+            'função — o motor de rotas não muda.</div>'))
         + '</section>'
     )
 
@@ -403,16 +435,35 @@ def bloco_aprendizado(serie: dict) -> str:
             f'{numero(serie["ganho_ausencia_pp"], 1)} pontos percentuais de acurácia.</p>')
     else:
         resumo = '<p class="chamada">Série ainda sem semanas registradas.</p>'
-    aviso = ('<div class="aviso"><b>Leia com atenção:</b> esta série é ilustrativa. '
-             'O aprendizado com GPS real entra na Sprint 5, quando o app do motorista '
-             'for ao ar; os números de economia das seções anteriores NÃO dependem '
-             'desta série.</div>') if serie["e_demonstracao"] else ""
+    if serie.get("e_simulacao"):
+        aviso = ('<div class="aviso"><b>Leia com atenção:</b> o ciclo de '
+                 'aprendizado rodou de verdade — coleta, estimativa, validação '
+                 'em conjunto separado, versão e rollback —, mas sobre uma '
+                 'operação SIMULADA. Os pings reais entram quando o app do '
+                 'motorista for ao ar; os números de economia das seções '
+                 'anteriores não dependem desta série.</div>')
+    elif serie["e_demonstracao"]:
+        aviso = ('<div class="aviso"><b>Leia com atenção:</b> esta série é '
+                 'ilustrativa, escrita à mão para a apresentação.</div>')
+    else:
+        aviso = ""
+    versoes = ""
+    if serie.get("versao_modelo"):
+        versoes = (
+            f'<ul class="lista"><li>Modelo na versão '
+            f'{serie["versao_modelo"]} depois de {len(serie.get("semanas", []))} '
+            f'semanas: cada versão só entra se o erro cair no conjunto de '
+            f'validação.</li>'
+            f'<li>{serie.get("rollbacks", 0)} rollback(s): o sistema recusou '
+            f'trocar o modelo quando a versão nova pioraria a previsão. '
+            f'Aprender também é saber não mexer.</li></ul>')
     return (
         '<section><h2>O que o sistema aprendeu '
         f'<span class="{classe_selo}">{esc(serie["selo"])}</span></h2>'
         + resumo
         + graficos.linha_erro(serie.get("semanas", []))
         + (f'<ul class="lista">{exemplos}</ul>' if exemplos else "")
+        + versoes
         + aviso
         + '</section>'
     )
@@ -528,6 +579,7 @@ def renderizar(p: dict, serie: dict, viagens: list, origem: str) -> str:
   {bloco_antes_depois(p)}
   {bloco_frota(p)}
   {bloco_qualidade(p, viagens)}
+  {bloco_mapa(p)}
   {bloco_porta_a_porta(p.get("porta_a_porta"))}
   {bloco_reotimizacao(p.get("reotimizacao"))}
   {bloco_transito(p.get("porta_a_porta"))}

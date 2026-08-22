@@ -1,0 +1,24 @@
+{
+  "origem": "simulacao",
+  "gerado_em": "2026-08-22 15:36",
+  "fatores": {
+    "pico_manha": {
+      "urbano": 1.588,
+      "rural": 1.232
+    },
+    "entre_picos": {
+      "urbano": 1.095,
+      "rural": 1.032
+    },
+    "pico_tarde": {
+      "urbano": 1.3,
+      "rural": 1.08
+    },
+    "fora_pico": {
+      "urbano": 0.92,
+      "rural": 0.95
+    }
+  },
+  "amostras": 7950,
+  "observacao": "Fatores estimados a partir de operação simulada. Quando o app do motorista entrar, a mesma rotina roda sobre os pings reais e a origem passa a 'gps_real'."
+}

@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-08-22 15:00",
+  "gerado_em": "2026-08-22 15:40",
   "escolar": [
     {
       "viagem": "E3-tarde-02",
@@ -18,7 +18,7 @@
         ],
         "alunos": 31,
         "km": 17.8,
-        "minutos": 37
+        "minutos": 40
       },
       "depois": {
         "paradas": [
@@ -34,7 +34,7 @@
         ],
         "alunos": 28,
         "km": 17.8,
-        "minutos": 35
+        "minutos": 38
       },
       "economia": {
         "km": 0.0,
@@ -63,7 +63,7 @@
         ],
         "alunos": 31,
         "km": 24.8,
-        "minutos": 49
+        "minutos": 54
       },
       "depois": {
         "paradas": [
@@ -76,18 +76,18 @@
         ],
         "alunos": 20,
         "km": 24.2,
-        "minutos": 44
+        "minutos": 50
       },
       "economia": {
         "km": 0.6,
-        "minutos": 5
+        "minutos": 4
       },
       "tipo_sugerido": "MICRO20",
       "diff": [
         "Parada P186 removida hoje — nenhum aluno embarca nela.",
         "Parada P202 removida hoje — nenhum aluno embarca nela.",
         "Parada P201 removida hoje — nenhum aluno embarca nela.",
-        "Percurso: 24.8 km → 24.2 km (−0.6 km) e 49 min → 44 min (−5 min).",
+        "Percurso: 24.8 km → 24.2 km (−0.6 km) e 54 min → 50 min (−4 min).",
         "Com 20 alunos, a viagem cabe hoje num Micro-ônibus 20 lugares no lugar do Ônibus escolar 31 lugares."
       ],
       "segundos": 0.0
@@ -95,61 +95,183 @@
   ],
   "porta_a_porta": [
     {
-      "cancelado": "U079",
-      "encaixado": "U091",
-      "km_antes": 34.2,
-      "km_depois": 28.0,
-      "economia_km": 6.2,
+      "cancelado": "U073",
+      "encaixado": "U081",
+      "km_antes": 27.9,
+      "km_depois": 28.4,
+      "economia_km": -0.5,
       "agenda": [
         {
           "tipo": "embarque",
-          "usuario": "U074",
-          "hora": "07h18"
+          "usuario": "U003",
+          "hora": "08h08"
         },
         {
           "tipo": "embarque",
-          "usuario": "U019",
+          "usuario": "U023",
+          "hora": "08h15"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U063",
+          "hora": "08h26"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U057",
+          "hora": "08h38"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U057",
+          "hora": "09h00"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U003",
+          "hora": "09h10"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U063",
+          "hora": "09h13"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U023",
+          "hora": "09h17"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U081",
+          "hora": "10h54"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U081",
+          "hora": "11h00"
+        }
+      ],
+      "diff": [
+        "Usuário U073 cancelou: embarque e desembarque retirados da rota.",
+        "Percurso: 27.9 km → 24.8 km (−3.1 km).",
+        "Usuário U081 entrou da fila de espera no lugar liberado (+3.6 km, ainda -0.5 km em relação ao plano original)."
+      ],
+      "segundos": 0.049
+    },
+    {
+      "cancelado": "U047",
+      "encaixado": "U094",
+      "km_antes": 61.8,
+      "km_depois": 55.1,
+      "economia_km": 6.7,
+      "agenda": [
+        {
+          "tipo": "embarque",
+          "usuario": "U018",
           "hora": "07h24"
         },
         {
           "tipo": "embarque",
-          "usuario": "U069",
-          "hora": "07h27"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U091",
-          "hora": "07h43"
+          "usuario": "U048",
+          "hora": "07h28"
         },
         {
           "tipo": "desembarque",
-          "usuario": "U091",
-          "hora": "07h51"
+          "usuario": "U048",
+          "hora": "07h54"
         },
         {
           "tipo": "desembarque",
-          "usuario": "U069",
-          "hora": "07h57"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U074",
+          "usuario": "U018",
           "hora": "08h00"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U019",
-          "hora": "08h10"
         },
         {
           "tipo": "embarque",
           "usuario": "U031",
-          "hora": "08h50"
+          "hora": "08h49"
         },
         {
           "tipo": "desembarque",
           "usuario": "U031",
           "hora": "09h00"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U045",
+          "hora": "09h44"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U015",
+          "hora": "10h00"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U094",
+          "hora": "10h04"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U051",
+          "hora": "10h23"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U051",
+          "hora": "10h27"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U045",
+          "hora": "10h30"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U015",
+          "hora": "10h40"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U094",
+          "hora": "10h44"
+        }
+      ],
+      "diff": [
+        "Usuário U047 cancelou: embarque e desembarque retirados da rota.",
+        "Percurso: 61.8 km → 52.6 km (−9.2 km).",
+        "Usuário U094 entrou da fila de espera no lugar liberado (+2.5 km, ainda +6.7 km em relação ao plano original)."
+      ],
+      "segundos": 0.058
+    }
+  ],
+  "pedidos_novos": [
+    {
+      "usuario": "U081",
+      "aceito": true,
+      "rota": "PP11",
+      "km_extra": 3.0,
+      "segundos": 0.063,
+      "agenda": [
+        {
+          "tipo": "embarque",
+          "usuario": "U055",
+          "hora": "07h56"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U020",
+          "hora": "08h05"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U055",
+          "hora": "08h30"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U020",
+          "hora": "08h40"
         },
         {
           "tipo": "embarque",
@@ -170,56 +292,11 @@
           "tipo": "desembarque",
           "usuario": "U046",
           "hora": "09h40"
-        }
-      ],
-      "diff": [
-        "Usuário U079 cancelou: embarque e desembarque retirados da rota.",
-        "Percurso: 34.2 km → 27.8 km (−6.4 km).",
-        "Usuário U091 entrou da fila de espera no lugar liberado (+0.2 km, ainda +6.2 km em relação ao plano original)."
-      ],
-      "segundos": 0.058
-    },
-    {
-      "cancelado": "U016",
-      "encaixado": "U081",
-      "km_antes": 28.1,
-      "km_depois": 24.1,
-      "economia_km": 4.0,
-      "agenda": [
-        {
-          "tipo": "embarque",
-          "usuario": "U055",
-          "hora": "07h58"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U020",
-          "hora": "08h07"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U055",
-          "hora": "08h30"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U020",
-          "hora": "08h40"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U056",
-          "hora": "09h55"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U056",
-          "hora": "10h00"
         },
         {
           "tipo": "embarque",
           "usuario": "U081",
-          "hora": "10h55"
+          "hora": "10h54"
         },
         {
           "tipo": "desembarque",
@@ -228,341 +305,70 @@
         }
       ],
       "diff": [
-        "Usuário U016 cancelou: embarque e desembarque retirados da rota.",
-        "Percurso: 28.1 km → 19.7 km (−8.5 km).",
-        "Usuário U081 entrou da fila de espera no lugar liberado (+4.5 km, ainda +4.0 km em relação ao plano original)."
-      ],
-      "segundos": 0.045
-    }
-  ],
-  "pedidos_novos": [
-    {
-      "usuario": "U081",
-      "aceito": true,
-      "rota": "PP06",
-      "km_extra": 2.7,
-      "segundos": 0.065,
-      "agenda": [
-        {
-          "tipo": "embarque",
-          "usuario": "U032",
-          "hora": "07h26"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U028",
-          "hora": "07h56"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U032",
-          "hora": "08h20"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U028",
-          "hora": "08h27"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U080",
-          "hora": "08h47"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U039",
-          "hora": "08h59"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U004",
-          "hora": "09h04"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U080",
-          "hora": "09h24"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U039",
-          "hora": "09h30"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U004",
-          "hora": "09h40"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U051",
-          "hora": "10h23"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U081",
-          "hora": "10h27"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U051",
-          "hora": "10h30"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U081",
-          "hora": "10h40"
-        }
-      ],
-      "diff": [
-        "Pedido de U081 aceito na rota PP06 com 2.7 km a mais — a rota mais barata entre as 11 do dia."
+        "Pedido de U081 aceito na rota PP11 com 3.0 km a mais — a rota mais barata entre as 12 do dia."
       ]
     },
     {
       "usuario": "U082",
       "aceito": true,
-      "rota": "PP05",
-      "km_extra": 0.8,
-      "segundos": 0.069,
-      "agenda": [
-        {
-          "tipo": "embarque",
-          "usuario": "U033",
-          "hora": "07h13"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U048",
-          "hora": "07h26"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U018",
-          "hora": "07h33"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U033",
-          "hora": "07h51"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U048",
-          "hora": "07h54"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U018",
-          "hora": "08h00"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U037",
-          "hora": "08h57"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U072",
-          "hora": "09h00"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U077",
-          "hora": "09h05"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U082",
-          "hora": "09h13"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U026",
-          "hora": "09h26"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U072",
-          "hora": "09h30"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U082",
-          "hora": "09h40"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U037",
-          "hora": "09h48"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U077",
-          "hora": "09h52"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U026",
-          "hora": "09h55"
-        }
-      ],
-      "diff": [
-        "Pedido de U082 aceito na rota PP05 com 0.8 km a mais — a rota mais barata entre as 11 do dia."
-      ]
-    },
-    {
-      "usuario": "U083",
-      "aceito": true,
-      "rota": "PP07",
+      "rota": "PP04",
       "km_extra": 10.1,
-      "segundos": 0.063,
+      "segundos": 0.062,
       "agenda": [
         {
           "tipo": "embarque",
-          "usuario": "U073",
-          "hora": "07h56"
+          "usuario": "U042",
+          "hora": "07h32"
         },
         {
           "tipo": "embarque",
-          "usuario": "U083",
-          "hora": "08h05"
+          "usuario": "U032",
+          "hora": "07h43"
         },
         {
           "tipo": "embarque",
-          "usuario": "U003",
-          "hora": "08h17"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U023",
-          "hora": "08h23"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U063",
-          "hora": "08h34"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U073",
-          "hora": "08h56"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U083",
-          "hora": "09h00"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U003",
-          "hora": "09h10"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U063",
-          "hora": "09h13"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U021",
-          "hora": "09h22"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U023",
-          "hora": "09h30"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U021",
-          "hora": "09h40"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U015",
-          "hora": "10h22"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U054",
-          "hora": "10h36"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U014",
-          "hora": "10h39"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U014",
-          "hora": "10h54"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U054",
-          "hora": "10h57"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U015",
-          "hora": "11h00"
-        }
-      ],
-      "diff": [
-        "Pedido de U083 aceito na rota PP07 com 10.1 km a mais — a rota mais barata entre as 11 do dia."
-      ]
-    },
-    {
-      "usuario": "U084",
-      "aceito": true,
-      "rota": "PP02",
-      "km_extra": 7.2,
-      "segundos": 0.064,
-      "agenda": [
-        {
-          "tipo": "embarque",
-          "usuario": "U084",
-          "hora": "07h05"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U016",
-          "hora": "07h19"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U084",
-          "hora": "07h23"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U016",
-          "hora": "07h30"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U055",
+          "usuario": "U052",
           "hora": "07h58"
         },
         {
           "tipo": "embarque",
-          "usuario": "U020",
+          "usuario": "U022",
           "hora": "08h07"
         },
         {
           "tipo": "desembarque",
-          "usuario": "U055",
+          "usuario": "U042",
+          "hora": "08h18"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U022",
+          "hora": "08h24"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U032",
           "hora": "08h30"
         },
         {
           "tipo": "desembarque",
-          "usuario": "U020",
+          "usuario": "U052",
           "hora": "08h40"
         },
         {
           "tipo": "embarque",
+          "usuario": "U082",
+          "hora": "09h33"
+        },
+        {
+          "tipo": "embarque",
           "usuario": "U056",
-          "hora": "09h55"
+          "hora": "09h48"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U082",
+          "hora": "09h54"
         },
         {
           "tipo": "desembarque",
@@ -571,107 +377,25 @@
         }
       ],
       "diff": [
-        "Pedido de U084 aceito na rota PP02 com 7.2 km a mais — a rota mais barata entre as 11 do dia."
+        "Pedido de U082 aceito na rota PP04 com 10.1 km a mais — a rota mais barata entre as 12 do dia."
       ]
     },
     {
-      "usuario": "U085",
-      "aceito": true,
-      "rota": "PP03",
-      "km_extra": 0.9,
-      "segundos": 0.064,
-      "agenda": [
-        {
-          "tipo": "embarque",
-          "usuario": "U070",
-          "hora": "07h00"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U010",
-          "hora": "07h11"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U005",
-          "hora": "07h22"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U041",
-          "hora": "07h40"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U070",
-          "hora": "07h48"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U005",
-          "hora": "07h51"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U041",
-          "hora": "07h56"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U010",
-          "hora": "08h00"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U065",
-          "hora": "08h58"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U065",
-          "hora": "09h14"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U045",
-          "hora": "09h42"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U085",
-          "hora": "10h02"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U040",
-          "hora": "10h05"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U085",
-          "hora": "10h20"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U040",
-          "hora": "10h24"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U045",
-          "hora": "10h30"
-        }
-      ],
+      "usuario": "U083",
+      "aceito": false,
+      "rota_candidata": "PP02",
+      "km_extra": 20.7,
+      "segundos": 0.061,
       "diff": [
-        "Pedido de U085 aceito na rota PP03 com 0.9 km a mais — a rota mais barata entre as 11 do dia."
+        "Pedido de U083 caberia na rota PP02, mas custaria 20.7 km a mais — acima do limite de 15 km por encaixe. Vale mais programar uma viagem dedicada."
       ]
     },
     {
-      "usuario": "U086",
+      "usuario": "U084",
       "aceito": true,
-      "rota": "PP09",
-      "km_extra": 0.1,
-      "segundos": 0.064,
+      "rota": "PP08",
+      "km_extra": 6.7,
+      "segundos": 0.061,
       "agenda": [
         {
           "tipo": "embarque",
@@ -680,33 +404,157 @@
         },
         {
           "tipo": "embarque",
+          "usuario": "U079",
+          "hora": "06h34"
+        },
+        {
+          "tipo": "embarque",
           "usuario": "U030",
-          "hora": "06h39"
+          "hora": "06h48"
         },
         {
           "tipo": "embarque",
-          "usuario": "U050",
-          "hora": "06h51"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U025",
-          "hora": "06h58"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U086",
-          "hora": "07h10"
+          "usuario": "U084",
+          "hora": "07h02"
         },
         {
           "tipo": "desembarque",
-          "usuario": "U025",
-          "hora": "07h16"
+          "usuario": "U030",
+          "hora": "07h18"
         },
         {
           "tipo": "desembarque",
           "usuario": "U009",
-          "hora": "07h19"
+          "hora": "07h24"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U084",
+          "hora": "07h30"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U079",
+          "hora": "07h40"
+        }
+      ],
+      "diff": [
+        "Pedido de U084 aceito na rota PP08 com 6.7 km a mais — a rota mais barata entre as 12 do dia."
+      ]
+    },
+    {
+      "usuario": "U085",
+      "aceito": true,
+      "rota": "PP12",
+      "km_extra": 2.0,
+      "segundos": 0.061,
+      "agenda": [
+        {
+          "tipo": "embarque",
+          "usuario": "U068",
+          "hora": "07h33"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U078",
+          "hora": "07h40"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U071",
+          "hora": "07h53"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U071",
+          "hora": "08h00"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U078",
+          "hora": "08h10"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U068",
+          "hora": "08h14"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U065",
+          "hora": "09h05"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U021",
+          "hora": "09h21"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U065",
+          "hora": "09h30"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U021",
+          "hora": "09h40"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U085",
+          "hora": "10h07"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U040",
+          "hora": "10h10"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U085",
+          "hora": "10h26"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U040",
+          "hora": "10h30"
+        }
+      ],
+      "diff": [
+        "Pedido de U085 aceito na rota PP12 com 2.0 km a mais — a rota mais barata entre as 12 do dia."
+      ]
+    },
+    {
+      "usuario": "U086",
+      "aceito": true,
+      "rota": "PP08",
+      "km_extra": 1.7,
+      "segundos": 0.061,
+      "agenda": [
+        {
+          "tipo": "embarque",
+          "usuario": "U009",
+          "hora": "06h27"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U079",
+          "hora": "06h43"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U030",
+          "hora": "06h57"
+        },
+        {
+          "tipo": "embarque",
+          "usuario": "U086",
+          "hora": "07h17"
+        },
+        {
+          "tipo": "desembarque",
+          "usuario": "U086",
+          "hora": "07h21"
         },
         {
           "tipo": "desembarque",
@@ -715,106 +563,26 @@
         },
         {
           "tipo": "desembarque",
-          "usuario": "U086",
-          "hora": "07h27"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U050",
+          "usuario": "U009",
           "hora": "07h30"
         },
         {
-          "tipo": "embarque",
-          "usuario": "U042",
-          "hora": "07h55"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U052",
-          "hora": "08h08"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U022",
-          "hora": "08h17"
-        },
-        {
           "tipo": "desembarque",
-          "usuario": "U022",
-          "hora": "08h27"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U042",
-          "hora": "08h30"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U052",
-          "hora": "08h40"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U012",
-          "hora": "09h48"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U007",
-          "hora": "10h01"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U002",
-          "hora": "10h10"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U011",
-          "hora": "10h20"
-        },
-        {
-          "tipo": "embarque",
-          "usuario": "U061",
-          "hora": "10h23"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U061",
-          "hora": "10h27"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U012",
-          "hora": "10h30"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U007",
-          "hora": "10h40"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U011",
-          "hora": "10h45"
-        },
-        {
-          "tipo": "desembarque",
-          "usuario": "U002",
-          "hora": "10h49"
+          "usuario": "U079",
+          "hora": "07h40"
         }
       ],
       "diff": [
-        "Pedido de U086 aceito na rota PP09 com 0.1 km a mais — a rota mais barata entre as 11 do dia."
+        "Pedido de U086 aceito na rota PP08 com 1.7 km a mais — a rota mais barata entre as 12 do dia."
       ]
     }
   ],
   "resumo": {
     "eventos": 10,
-    "tempo_max_s": 0.069,
-    "tempo_medio_s": 0.049,
-    "km_economizados": 10.8,
-    "pedidos_aceitos": 6,
+    "tempo_max_s": 0.063,
+    "tempo_medio_s": 0.048,
+    "km_economizados": 6.8,
+    "pedidos_aceitos": 5,
     "pedidos_avaliados": 6
   }
 }

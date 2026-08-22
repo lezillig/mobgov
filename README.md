@@ -18,13 +18,18 @@ auditáveis, nada de número mágico.
 | 2 | `painel/` (agent-painel) | **Painel de economia** — a tela da demo: antes vs depois em R$, km, litros, CO₂ e veículos, simulador de cenários, memória de cálculo e exportação em PDF |
 | 3 | `motor/escala.py` + `dados/` | **Roteirização multiviagem**: cada veículo encadeia várias viagens por turno, como a prefeitura opera de verdade. Destrava a demanda real (~3.000 alunos, dois turnos) e a frota atual passa a ser derivada de premissas declaradas |
 | 4 | `dados/tempos.py`, `motor/porta_a_porta.py`, `motor/reotimizar.py` | **Trânsito variável** por faixa horária e zona (com provedor externo plugável), **porta a porta n:n** para o vertical PCD (PDPTW) e **reotimização do dia**: falta informada, cancelamento e inserção dinâmica de pedido novo |
+| 5 | `dados/osrm.py`, `aprendizado/`, `painel/graficos.py` | **Malha viária real** (cliente OSRM com blocos, cache, retry e fallback), **ciclo de aprendizado** com versionamento e rollback — o que a operação mostra volta para o motor — e **mapa das rotas** desenhado em SVG, sem tiles e sem internet |
 
-Resultado atual do Município Modelo: **30 → 22 veículos (−26,7%)**, R$ 160.112/mês,
-R$ 1,92 mi/ano, −1.374 km/dia, −281 litros/dia, −199,1 tCO₂/ano — com 106 viagens
-diárias, ocupação média de 93,7% e nenhum aluno mais de 63 min dentro do veículo
-(o limite da secretaria é 75). No porta a porta, 80 viagens/dia em 11 veículos com
-100% dentro do limite de tempo a bordo; e a reotimização do dia responde em
-menos de 0,1 segundo.
+Resultado atual do Município Modelo: **30 → 23 veículos (−23,3%)**, R$ 141.122/mês,
+R$ 1,69 mi/ano — com 107 viagens diárias, ocupação média de 93% e nenhum aluno
+além do limite de 75 min dentro do veículo. No porta a porta, 80 viagens/dia em
+12 veículos com 100% dentro do limite de tempo a bordo; a reotimização do dia
+responde em menos de 0,1 segundo; e o ciclo de aprendizado derrubou o erro do
+tempo estimado de 5,88 para 2,03 min em cinco semanas (em simulação).
+
+> A frota necessária subiu de 22 para 23 depois do aprendizado. Não é
+> regressão: o ciclo mostrou que o trânsito real é pior que o estimado, e o
+> motor corrigiu. Economia menor, plano que não estoura na rua.
 
 ## Como rodar
 
@@ -33,8 +38,12 @@ pip install -r requirements.txt      # só o motor precisa de dependência (OR-T
 
 python motor/dimensionar.py          # 1) planejamento escolar (~5 min)
 python motor/rodar_dia.py            # 2) porta a porta + eventos do dia (~40 s)
-python -m painel.render              # 3) gera relatorios/painel-economia.html
-python -m painel.servidor            # 4) ou sirva em http://127.0.0.1:8000/
+python motor/rodar_aprendizado.py    # 3) ciclo de aprendizado (~5 s)
+python -m painel.render              # 4) gera relatorios/painel-economia.html
+python -m painel.servidor            # 5) ou sirva em http://127.0.0.1:8000/
+
+# malha viária real (ver docs/osrm-como-rodar.md)
+export MOBGOV_OSRM_URL=http://localhost:5000
 ```
 
 O painel também aceita premissas pela linha de comando:
@@ -177,9 +186,28 @@ que acontecem depois:
 
 Tudo em Python puro, respondendo em milissegundos (a meta do MVP é 30 s).
 
+## O ciclo de aprendizado
+
+`aprendizado/` fecha o laço que o prompt-mestre chama de "IA que aprende":
+
+1. a operação devolve observações (tempo real por trecho, tempo de embarque
+   por ponto, faltas por dia) — hoje de um simulador com uma **verdade
+   oculta**, amanhã do app do motorista;
+2. o ciclo estima fatores de trânsito, tempo extra de parada e taxa de
+   ausência, sempre por mediana e só com amostra suficiente;
+3. o modelo novo é validado num conjunto que ele não viu e **só entra se o
+   erro cair** — senão, rollback, com o motivo registrado;
+4. os fatores vão para `relatorios/fatores_transito.json`, e o motor de rotas
+   passa a planejar com eles na rodada seguinte. Sem intervenção humana.
+
+O painel mostra a curva do erro e o selo da origem dos dados — *demonstração*,
+*simulação* ou *medido com GPS* —, porque apresentar simulação como medição
+seria exatamente o tipo de número mágico que o projeto proíbe.
+
 ## Próximos passos
 
-- **Motor**: malha viária real (OSRM) no lugar da distância em linha reta.
+- **App do motorista** (offline-first): é o que troca o selo de *simulação*
+  por *medido com GPS* em todo o sistema.
 - **Painel**: mapa das rotas (MapLibre) e tela de planejamento (importar
   planilha → otimizar → aprovar e publicar).
 - **App do motorista**: GPS real alimentando o ciclo de aprendizado, que troca

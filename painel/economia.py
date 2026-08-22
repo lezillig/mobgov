@@ -382,6 +382,9 @@ def montar_painel(rel: dict, premissas: Premissas = None,
         "memoria_calculo": memoria_de_calculo(
             r["atual"], r["otimizada"], premissas, tipos),
     }
+    if rel.get("geografia"):
+        painel["geografia"] = rel["geografia"]
+        painel["viagens_mapa"] = rel["frota_otimizada"]["viagens"]
     if rel.get("porta_a_porta"):
         painel["porta_a_porta"] = rel["porta_a_porta"]
     if rel.get("reotimizacao"):

@@ -247,6 +247,14 @@ def main():
                 for t in TIPOS_VEICULO
             },
         },
+        # Coordenadas vão para o relatório porque o painel desenha o mapa a
+        # partir DELE, não do gerador: com a planilha real de um município, o
+        # mapa tem que sair igual sem o painel conhecer o Município Modelo.
+        "geografia": {
+            "escolas": [{"id": e.id, "nome": e.nome, "lat": e.lat, "lon": e.lon}
+                        for e in ESCOLAS],
+            "pontos": {p.id: [round(p.lat, 6), round(p.lon, 6)] for p in pontos},
+        },
         "demanda": {
             "alunos": sum(p.total_alunos() for p in pontos),
             "alunos_por_turno": {
