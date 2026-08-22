@@ -1,0 +1,363 @@
+{
+  "municipio": "Ribeirão Modelo (sintético)",
+  "gerado_em": "2026-08-22 13:36",
+  "premissas": {
+    "dias_letivos_mes": 22,
+    "preco_diesel_l": 6.1,
+    "fator_co2_kg_l": 2.68,
+    "tempo_max_trajeto_min": 75,
+    "viagens_por_dia": 2,
+    "fonte_tempos": "OSRM/haversine com fator rural 1.35 (corrigido depois pelo aprendizado com GPS real)",
+    "custos_por_tipo": {
+      "ONIBUS31": {
+        "nome": "Ônibus escolar 31 lugares",
+        "capacidade": 31,
+        "posicoes_cadeirante": 0,
+        "fixo_mes": 14500.0,
+        "custo_km": 3.1,
+        "consumo_km_l": 3.2
+      },
+      "MICRO20": {
+        "nome": "Micro-ônibus 20 lugares",
+        "capacidade": 20,
+        "posicoes_cadeirante": 0,
+        "fixo_mes": 11800.0,
+        "custo_km": 2.4,
+        "consumo_km_l": 4.5
+      },
+      "VAN15A": {
+        "nome": "Van acessível 15 lugares",
+        "capacidade": 15,
+        "posicoes_cadeirante": 2,
+        "fixo_mes": 10200.0,
+        "custo_km": 1.95,
+        "consumo_km_l": 6.0
+      }
+    }
+  },
+  "demanda": {
+    "alunos": 466,
+    "cadeirantes": 1,
+    "pontos_embarque": 83,
+    "escolas": 3
+  },
+  "frota_atual": {
+    "composicao": {
+      "ONIBUS31": 14,
+      "MICRO20": 8,
+      "VAN15A": 3
+    },
+    "total_veiculos": 25,
+    "km_dia": 1180.0,
+    "custo_mes": 399078,
+    "litros_dia": 314.0
+  },
+  "frota_otimizada": {
+    "composicao": {
+      "ONIBUS31": 16,
+      "VAN15A": 1
+    },
+    "total_veiculos": 17,
+    "km_dia": 472.8,
+    "custo_mes": 273741,
+    "litros_dia": 143.7,
+    "rotas": [
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Centro",
+        "paradas": [
+          "P014",
+          "P015",
+          "P021",
+          "P006"
+        ],
+        "alunos": 27,
+        "cadeirantes": 0,
+        "km_viagem": 5.3,
+        "min_viagem": 8,
+        "ocupacao_pct": 87
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Centro",
+        "paradas": [
+          "P018",
+          "P012",
+          "P019",
+          "P007"
+        ],
+        "alunos": 23,
+        "cadeirantes": 0,
+        "km_viagem": 6.1,
+        "min_viagem": 9,
+        "ocupacao_pct": 74
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Centro",
+        "paradas": [
+          "P008",
+          "P017",
+          "P016",
+          "P010"
+        ],
+        "alunos": 29,
+        "cadeirantes": 0,
+        "km_viagem": 6.1,
+        "min_viagem": 8,
+        "ocupacao_pct": 94
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Centro",
+        "paradas": [
+          "P026",
+          "P020",
+          "P013",
+          "P005"
+        ],
+        "alunos": 29,
+        "cadeirantes": 0,
+        "km_viagem": 5.8,
+        "min_viagem": 8,
+        "ocupacao_pct": 94
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Centro",
+        "paradas": [
+          "P023",
+          "P024",
+          "P002"
+        ],
+        "alunos": 26,
+        "cadeirantes": 0,
+        "km_viagem": 3.1,
+        "min_viagem": 5,
+        "ocupacao_pct": 84
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Centro",
+        "paradas": [
+          "P003",
+          "P025",
+          "P001",
+          "P011"
+        ],
+        "alunos": 28,
+        "cadeirantes": 0,
+        "km_viagem": 3.1,
+        "min_viagem": 5,
+        "ocupacao_pct": 90
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Centro",
+        "paradas": [
+          "P004",
+          "P022",
+          "P009"
+        ],
+        "alunos": 29,
+        "cadeirantes": 0,
+        "km_viagem": 6.7,
+        "min_viagem": 10,
+        "ocupacao_pct": 94
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Distrito Norte",
+        "paradas": [
+          "P036",
+          "P038",
+          "P033",
+          "P040"
+        ],
+        "alunos": 28,
+        "cadeirantes": 0,
+        "km_viagem": 8.2,
+        "min_viagem": 12,
+        "ocupacao_pct": 90
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Distrito Norte",
+        "paradas": [
+          "P052",
+          "P044",
+          "P050",
+          "P045",
+          "P048"
+        ],
+        "alunos": 31,
+        "cadeirantes": 0,
+        "km_viagem": 26.8,
+        "min_viagem": 38,
+        "ocupacao_pct": 100
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Distrito Norte",
+        "paradas": [
+          "P030",
+          "P039",
+          "P032",
+          "P028"
+        ],
+        "alunos": 25,
+        "cadeirantes": 0,
+        "km_viagem": 6.7,
+        "min_viagem": 10,
+        "ocupacao_pct": 81
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Distrito Norte",
+        "paradas": [
+          "P041",
+          "P042",
+          "P037",
+          "P027",
+          "P034"
+        ],
+        "alunos": 31,
+        "cadeirantes": 0,
+        "km_viagem": 15.2,
+        "min_viagem": 22,
+        "ocupacao_pct": 100
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Distrito Norte",
+        "paradas": [
+          "P054",
+          "P043",
+          "P056",
+          "P031",
+          "P035"
+        ],
+        "alunos": 28,
+        "cadeirantes": 0,
+        "km_viagem": 22.4,
+        "min_viagem": 32,
+        "ocupacao_pct": 90
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Distrito Norte",
+        "paradas": [
+          "P029",
+          "P049",
+          "P046",
+          "P051",
+          "P047",
+          "P053",
+          "P055"
+        ],
+        "alunos": 31,
+        "cadeirantes": 0,
+        "km_viagem": 30.4,
+        "min_viagem": 44,
+        "ocupacao_pct": 100
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Vila Rural Sul",
+        "paradas": [
+          "P068",
+          "P064",
+          "P058",
+          "P063",
+          "P060",
+          "P071",
+          "P062",
+          "P069"
+        ],
+        "alunos": 31,
+        "cadeirantes": 0,
+        "km_viagem": 24.5,
+        "min_viagem": 35,
+        "ocupacao_pct": 100
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Vila Rural Sul",
+        "paradas": [
+          "P070",
+          "P075",
+          "P074",
+          "P077",
+          "P073",
+          "P082",
+          "P072",
+          "P081",
+          "P079",
+          "P080",
+          "P083",
+          "P078",
+          "P076"
+        ],
+        "alunos": 31,
+        "cadeirantes": 0,
+        "km_viagem": 43.8,
+        "min_viagem": 63,
+        "ocupacao_pct": 100
+      },
+      {
+        "tipo": "ONIBUS31",
+        "tipo_nome": "Ônibus escolar 31 lugares",
+        "escola": "EMEF Vila Rural Sul",
+        "paradas": [
+          "P066",
+          "P057",
+          "P061",
+          "P067"
+        ],
+        "alunos": 26,
+        "cadeirantes": 0,
+        "km_viagem": 13.0,
+        "min_viagem": 19,
+        "ocupacao_pct": 84
+      },
+      {
+        "tipo": "VAN15A",
+        "tipo_nome": "Van acessível 15 lugares",
+        "escola": "EMEF Vila Rural Sul",
+        "paradas": [
+          "P059",
+          "P065"
+        ],
+        "alunos": 13,
+        "cadeirantes": 1,
+        "km_viagem": 9.2,
+        "min_viagem": 13,
+        "ocupacao_pct": 87
+      }
+    ]
+  },
+  "economia": {
+    "veiculos": 8,
+    "reducao_frota_pct": 32.0,
+    "custo_mes": 125337,
+    "custo_ano": 1504046,
+    "km_dia": 707.2,
+    "litros_dia": 170.3,
+    "tco2_ano": 120.5
+  }
+}

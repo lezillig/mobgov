@@ -1,0 +1,6 @@
+# Motor de otimização (Sprint 1)
+ortools>=9.9
+
+# O painel de economia e os testes rodam só com a biblioteca padrão do Python
+# (3.9+), de propósito: a demonstração precisa subir em máquina de prefeitura
+# sem instalar nada além disto.
