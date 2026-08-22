@@ -29,7 +29,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from dados import agrupar as agrupar_mod
 from dados import importador
-from dados.municipio_modelo import Escola, TIPOS_VEICULO, TURNOS
+from dados import perfis as perfis_mod
+from dados.municipio_modelo import Escola
 from dados.planilha import ErroDePlanilha
 from dados.planilha_exemplo import limites_do_municipio, referencias_de_bairro
 from motor import dimensionar
@@ -38,11 +39,14 @@ DIR_RELATORIOS = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "relatorios")
 
 
-def importar_planilha(caminho: str, guardar_nomes: bool = False) -> dict:
+def importar_planilha(caminho: str, guardar_nomes: bool = False,
+                      perfil=None) -> dict:
     """Lê a planilha e devolve o mesmo formato de `relatorios/importacao.json`."""
+    perfil = perfil or perfis_mod.PERFIL_ESCOLAR
     resultado = importador.importar(
         caminho, referencias=referencias_de_bairro(),
-        guardar_nomes=guardar_nomes, limites=limites_do_municipio())
+        guardar_nomes=guardar_nomes, limites=limites_do_municipio(),
+        turnos_validos=[t.id for t in perfil.turnos])
     return {
         "gerado_em": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "arquivo": os.path.basename(caminho),
@@ -53,7 +57,7 @@ def importar_planilha(caminho: str, guardar_nomes: bool = False) -> dict:
     }
 
 
-def ler_frota_declarada(caminho: str, aba: int = 1) -> dict:
+def ler_frota_declarada(caminho: str, aba: int = 1, perfil=None) -> dict:
     """Procura na planilha a aba com a frota que o município tem hoje.
 
     Prefeitura costuma mandar isso na segunda aba do mesmo arquivo ("Frota
@@ -71,8 +75,9 @@ def ler_frota_declarada(caminho: str, aba: int = 1) -> dict:
     except Exception:
         return {}
 
-    por_nome = {_normalizar(t.nome): t for t in TIPOS_VEICULO}
-    por_capacidade = {t.capacidade: t for t in TIPOS_VEICULO}
+    tipos = (perfil or perfis_mod.PERFIL_ESCOLAR).tipos_veiculo
+    por_nome = {_normalizar(t.nome): t for t in tipos}
+    por_capacidade = {t.capacidade: t for t in tipos}
     composicao, km_dia = {}, 0.0
     for linha in linhas:
         celulas = [str(c or "").strip() for c in linha]
@@ -127,7 +132,7 @@ def planejar(importacao: dict, coordenadas_escolas: dict = None,
              tempo_limite_s: int = dimensionar.TEMPO_LIMITE_SOLVER_S,
              raio_urbano: float = agrupar_mod.RAIO_URBANO_M,
              raio_rural: float = agrupar_mod.RAIO_RURAL_M,
-             progresso=None) -> dict:
+             progresso=None, perfil=None) -> dict:
     """Agrupa os alunos importados em pontos e roteiriza.
 
     O relatório sai no mesmo formato do Município Modelo — o painel, o console
@@ -138,22 +143,29 @@ def planejar(importacao: dict, coordenadas_escolas: dict = None,
     if not alunos:
         raise ValueError("A importação não tem nenhum aluno para roteirizar.")
 
-    avisar("agrupando", f"{len(alunos)} alunos em pontos de embarque")
+    perfil = perfil or perfis_mod.PERFIL_ESCOLAR
+    conhecidos = {d.nome: (d.lat, d.lon) for d in perfil.destinos}
+    conhecidos.update(coordenadas_escolas or {})
+    avisar("agrupando", f"{len(alunos)} {perfil.rotulo_passageiro_plural} em "
+                        f"pontos de embarque")
     agrupado = agrupar_mod.agrupar(
-        alunos, turnos=[t.id for t in TURNOS],
-        coordenadas_escolas=coordenadas_escolas,
+        alunos, turnos=[t.id for t in perfil.turnos],
+        coordenadas_escolas=conhecidos,
         raio_urbano=raio_urbano, raio_rural=raio_rural)
 
     escolas = [Escola(e["id"], e["nome"], e["lat"], e["lon"])
                for e in agrupado["escolas"]]
     avisar("agrupado", f"{agrupado['resumo']['pontos']} pontos · "
-                       f"{len(escolas)} escolas · caminhada média de "
+                       f"{len(escolas)} {perfil.rotulo_destino_plural} · "
+                       f"caminhada média de "
                        f"{agrupado['resumo']['caminhada_media_m']} m")
 
     relatorio = dimensionar.montar_relatorio(
-        agrupado["pontos"], escolas=escolas, turnos=TURNOS,
-        tipos=TIPOS_VEICULO,
-        municipio=municipio or "Município (planilha importada)",
+        agrupado["pontos"], escolas=escolas, turnos=perfil.turnos,
+        tipos=perfil.tipos_veiculo, perfil=perfil,
+        municipio=municipio or ("Cliente (planilha importada)"
+                                if perfil.vertical == "fretamento"
+                                else "Município (planilha importada)"),
         tempo_limite_s=tempo_limite_s, frota_declarada=frota_declarada,
         # com planilha real, o "antes" é informado ou não existe
         permitir_estimativa=False, progresso=progresso)
@@ -201,14 +213,20 @@ def main(argv=None):
                     help='frota declarada, ex.: "ONIBUS31=17,MICRO20=10,'
                          'VAN15A=3" (km/dia com --km-dia)')
     ap.add_argument("--km-dia", dest="km_dia", type=float, default=None)
+    ap.add_argument("--perfil", default="escolar",
+                    help="escolar, fretamento ou caminho de um perfil .json")
     a = ap.parse_args(argv)
 
+    perfil = perfis_mod.carregar(a.perfil)
+    print(f"Perfil: {perfil.nome} — {len(perfil.turnos)} turnos, "
+          f"{perfil.rotulo_passageiro_plural}, limite de "
+          f"{perfil.tempo_max_trajeto_min} min por trajeto")
     if a.importacao:
         with open(a.importacao, encoding="utf-8") as f:
             importacao = json.load(f)
     elif a.planilha:
         try:
-            importacao = importar_planilha(a.planilha)
+            importacao = importar_planilha(a.planilha, perfil=perfil)
         except ErroDePlanilha as erro:
             print(f"Não deu para ler a planilha: {erro}")
             return 1
@@ -226,7 +244,7 @@ def main(argv=None):
             for par in a.frota_atual.split(",") if "=" in par),
             "km_dia": a.km_dia or 0.0, "origem": "informada na linha de comando"}
     elif a.planilha:
-        frota = ler_frota_declarada(a.planilha) or None
+        frota = ler_frota_declarada(a.planilha, perfil=perfil) or None
         if frota:
             print(f"Frota atual lida da planilha ({frota['origem']}): "
                   f"{sum(frota['composicao'].values())} veículos · "
@@ -235,7 +253,7 @@ def main(argv=None):
         frota["km_dia"] = a.km_dia
 
     relatorio = planejar(
-        importacao, frota_declarada=frota,
+        importacao, frota_declarada=frota, perfil=perfil,
         municipio=a.municipio, tempo_limite_s=a.tempo_limite,
         raio_urbano=a.raio_urbano, raio_rural=a.raio_rural,
         progresso=lambda etapa, detalhe="": print(f"  {etapa}: {detalhe}",
@@ -249,6 +267,18 @@ def main(argv=None):
               f"(−{e['reducao_frota_pct']}%) · R$ {e['custo_mes']:,}/mês")
     else:
         print(relatorio["comparacao_indisponivel"])
+    equipe = relatorio.get("equipe")
+    if equipe:
+        r = equipe["resumo"]
+        media = int(round(r["jornada_media_min"]))
+        print(f"Equipe: {r['motoristas']} motoristas · jornada média de "
+              f"{media // 60}h{media % 60:02d}"
+              f" ({r['ocupacao_da_jornada_pct']}% da jornada normal) · "
+              f"{r['com_dupla_pegada']} com dupla pegada · "
+              f"{r['escalas_com_problema']} escalas com problema")
+        print(f"        custo da equipe: R$ {equipe['custo_equipe_mes']:,}/mês")
+        for linha in equipe["explicacao"][:3]:
+            print(f"  - {linha}")
     for aviso in relatorio.get("coerencia") or []:
         print(f"\n  ⚠ {aviso}")
     nao = relatorio.get("demanda_nao_atendida") or {}

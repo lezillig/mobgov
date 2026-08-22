@@ -31,6 +31,11 @@ class Turno:
     nome: str
     janela_chegada: tuple    # (min_inicio, min_fim) minutos desde 00:00
     jornada_max_min: int     # tempo disponível para coletar antes do sinal
+    # Quanto dura o turno de quem foi transportado. Serve para saber QUANDO é
+    # a dispersão — no escolar dá para viver sem (o mesmo veículo leva e traz
+    # e ninguém pergunta quem dirige); no fretamento é o que separa a conta de
+    # veículos da conta de motoristas. 0 = não modelada.
+    duracao_min: int = 0
 
 
 @dataclass

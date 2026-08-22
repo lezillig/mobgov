@@ -86,7 +86,7 @@ def viagens_pelo_tempo(tempo, paradas_min, limite=None) -> int:
     return math.ceil(n / paradas_por_viagem)
 
 
-def _separar_inviaveis(escola, turno, pontos, dist, tempo):
+def _separar_inviaveis(escola, turno, pontos, dist, tempo, limite=None):
     """Tira da conta os pontos que não cabem em rota nenhuma — e diz por quê.
 
     Um ponto cujo trajeto mínimo (escola → ponto → embarque → escola) já passa
@@ -102,7 +102,7 @@ def _separar_inviaveis(escola, turno, pontos, dist, tempo):
     (que é regra da secretaria), nem deixar a criança fora da rota em silêncio.
     Então ele roteiriza o resto e devolve estes casos por escrito.
     """
-    limite = TEMPO_MAX_TRAJETO_MIN
+    limite = limite or TEMPO_MAX_TRAJETO_MIN
     dentro, fora = [], []
     for i, p in enumerate(pontos, start=1):
         minimo = tempo[0][i] + tempo_parada_min(p, turno.id) + tempo[i][0]
@@ -138,7 +138,7 @@ def _separar_inviaveis(escola, turno, pontos, dist, tempo):
 
 def resolver_viagens(escola, turno, pontos, tipos,
                      tempo_limite_s=TEMPO_LIMITE_SOLVER_S, provedor=None,
-                     inviaveis=None):
+                     inviaveis=None, tempo_max_min=None):
     """Resolve as viagens de coleta de uma escola em um turno.
 
     `inviaveis`: lista onde são anotados os pontos que NÃO cabem em rota
@@ -154,8 +154,9 @@ def resolver_viagens(escola, turno, pontos, tipos,
     zonas = [tempos_mod.zona_de(l) for l in locais]
     dist, tempo = provedor.matriz(locais, partida_min=partida, zonas=zonas)
 
+    tempo_max_min = tempo_max_min or TEMPO_MAX_TRAJETO_MIN
     pontos, dist, tempo, fora = _separar_inviaveis(escola, turno, pontos,
-                                                   dist, tempo)
+                                                   dist, tempo, tempo_max_min)
     if fora and inviaveis is not None:
         inviaveis.extend(fora)
     if not pontos:
@@ -175,7 +176,7 @@ def resolver_viagens(escola, turno, pontos, tipos,
     # sem solução para a escola do centro.
     maior_capacidade = max(t.capacidade for t in tipos)
     minimo = math.ceil(sum(demandas) / maior_capacidade)
-    base = max(minimo, viagens_pelo_tempo(tempo, paradas_min))
+    base = max(minimo, viagens_pelo_tempo(tempo, paradas_min, tempo_max_min))
     oferta = {
         "ONIBUS31": base + 4,
         "MICRO20": max(3, base // 4),
@@ -191,17 +192,18 @@ def resolver_viagens(escola, turno, pontos, tipos,
             frota += [t] * (oferta.get(t.id, 2) + extra)
         viagens = _resolver_com_frota(
             escola, turno, pontos, frota, dist, tempo, demandas, cadeirantes,
-            paradas_min, tempo_limite_s)
+            paradas_min, tempo_limite_s, tempo_max_min)
         if viagens is not None:
             return viagens
     raise RuntimeError(
         f"Sem solução para {escola.nome} / {turno.nome} mesmo com frota "
-        f"reforçada — reveja o tempo máximo de trajeto ({TEMPO_MAX_TRAJETO_MIN} "
-        f"min) ou o raio de agrupamento dos pontos.")
+        f"reforçada — reveja o tempo máximo de trajeto ({tempo_max_min} min) "
+        f"ou o raio de agrupamento dos pontos.")
 
 
 def _resolver_com_frota(escola, turno, pontos, frota, dist, tempo, demandas,
-                        cadeirantes, paradas_min, tempo_limite_s):
+                        cadeirantes, paradas_min, tempo_limite_s,
+                        tempo_max_min=None):
     """Resolve o CVRP com uma oferta de viagens dada. None = sem solução."""
     locais = [(escola.lat, escola.lon)] + [(p.lat, p.lon) for p in pontos]
     n_veic = len(frota)
@@ -239,7 +241,8 @@ def _resolver_com_frota(escola, turno, pontos, frota, dist, tempo, demandas,
         ccap, 0, [t.posicoes_cadeirante for t in frota], True, "Cadeirantes")
 
     # tempo máximo da viagem (proxy do tempo do 1º aluno embarcado)
-    routing.AddDimension(ti, 0, TEMPO_MAX_TRAJETO_MIN, True, "Tempo")
+    routing.AddDimension(ti, 0, tempo_max_min or TEMPO_MAX_TRAJETO_MIN, True,
+                         "Tempo")
 
     # Estratégias de solução inicial em ordem de preferência. Com muitas
     # paradas e tempo máximo por viagem apertado, a construção gulosa clássica
@@ -298,14 +301,15 @@ def _resolver_com_frota(escola, turno, pontos, frota, dist, tempo, demandas,
 
 
 # ------------------------------------------------------------------ custos ---
-def custos_frota(composicao, km_dia, tipos_por_id):
+def custos_frota(composicao, km_dia, tipos_por_id, dias=None):
     """Custo mensal estimado de uma composição de frota + km diário."""
+    dias = dias or DIAS_LETIVOS_MES
     fixo = sum(tipos_por_id[t].custo_fixo_mes * q for t, q in composicao.items())
     tot = sum(composicao.values())
     if tot == 0:
         return 0, 0, 0
     ckm = sum(tipos_por_id[t].custo_km * q for t, q in composicao.items()) / tot
-    var = km_dia * DIAS_LETIVOS_MES * ckm
+    var = km_dia * dias * ckm
     litros_dia = sum(
         (km_dia * q / tot) / tipos_por_id[t].consumo_km_l
         for t, q in composicao.items()
@@ -317,7 +321,7 @@ def montar_relatorio(pontos, escolas=None, turnos=None, tipos=None,
                      municipio="Ribeirão Modelo (sintético)",
                      tempo_limite_s=TEMPO_LIMITE_SOLVER_S,
                      frota_declarada=None, permitir_estimativa=True,
-                     progresso=None) -> dict:
+                     progresso=None, perfil=None) -> dict:
     """Roda as duas fases e devolve o relatório completo.
 
     Separado de `main()` na Sprint 8 para que a MESMA conta sirva ao Município
@@ -340,9 +344,18 @@ def montar_relatorio(pontos, escolas=None, turnos=None, tipos=None,
     `progresso`: função chamada a cada etapa, para a tela mostrar em que pé
     está (o solver leva minutos).
     """
+    # O perfil (dados/perfis.py) traz turnos, destinos, tipos, limite de
+    # trajeto e as regras de jornada. Sem ele, vale o escolar de sempre.
+    if perfil is not None:
+        escolas = escolas if escolas is not None else perfil.destinos
+        turnos = turnos if turnos is not None else perfil.turnos
+        tipos = tipos if tipos is not None else perfil.tipos_veiculo
     escolas = escolas if escolas is not None else ESCOLAS
     turnos = turnos if turnos is not None else TURNOS
     tipos = tipos if tipos is not None else TIPOS_VEICULO
+    tempo_max_min = (perfil.tempo_max_trajeto_min if perfil
+                     else TEMPO_MAX_TRAJETO_MIN)
+    dias_mes = perfil.dias_operacao_mes if perfil else DIAS_LETIVOS_MES
     tipos_por_id = {t.id: t for t in tipos}
     avisar = progresso or (lambda etapa, detalhe="": None)
 
@@ -355,7 +368,8 @@ def montar_relatorio(pontos, escolas=None, turnos=None, tipos=None,
             avisar("roteirizando", f"{e.nome} · {turno.nome}")
             viagens_turno += resolver_viagens(e, turno, pts_e, tipos,
                                               tempo_limite_s=tempo_limite_s,
-                                              inviaveis=inviaveis)
+                                              inviaveis=inviaveis,
+                                              tempo_max_min=tempo_max_min)
         veiculos_por_turno[turno.id] = montar_jornadas(
             viagens_turno, turno, tipos_por_id,
             partida_min=turno.janela_chegada[0] - MINUTOS_ANTES_DA_JANELA)
@@ -396,21 +410,40 @@ def montar_relatorio(pontos, escolas=None, turnos=None, tipos=None,
             "relatório do PNATE.")
 
     custo_otim, litros_otim, n_otim = custos_frota(
-        comp_otim, km_dia_otim, tipos_por_id)
+        comp_otim, km_dia_otim, tipos_por_id, dias_mes)
     if frota_atual is not None:
         custo_atual, litros_atual, n_atual = custos_frota(
-            frota_atual.composicao, frota_atual.km_dia_declarado, tipos_por_id)
+            frota_atual.composicao, frota_atual.km_dia_declarado, tipos_por_id,
+            dias_mes)
     else:
         custo_atual = litros_atual = n_atual = 0
+
+    # ---------------------------------------------------------------- equipe
+    # No fretamento o motorista é custo próprio e tem lei própria: quantos a
+    # operação exige é conta separada da frota, e é ela que decide a proposta.
+    equipe = None
+    if perfil is not None and perfil.separa_custo_do_motorista:
+        from motor import jornada as jornada_mod
+        equipe = jornada_mod.escalar_operacao(
+            veiculos_por_turno, turnos, perfil.regras_jornada,
+            tempo_antes_min=MINUTOS_ANTES_DA_JANELA)
+        n_motoristas = equipe["resumo"]["motoristas"]
+        custo_otim += n_motoristas * perfil.custo_motorista_mes
+        if frota_atual is not None:
+            # o "antes" paga motorista para cada veículo do contrato, que é
+            # como o fretamento é cobrado hoje
+            custo_atual += n_atual * perfil.custo_motorista_mes
+        avisar("equipe", f"{n_motoristas} motoristas para "
+                         f"{len(equipe['blocos'])} blocos de trabalho")
 
     resultado = {
         "municipio": municipio,
         "gerado_em": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "premissas": {
-            "dias_letivos_mes": DIAS_LETIVOS_MES,
+            "dias_letivos_mes": dias_mes,
             "preco_diesel_l": PRECO_DIESEL,
             "fator_co2_kg_l": FATOR_CO2_KG_L,
-            "tempo_max_trajeto_min": TEMPO_MAX_TRAJETO_MIN,
+            "tempo_max_trajeto_min": tempo_max_min,
             "tempo_virada_min": TEMPO_VIRADA_MIN,
             "jornada_max_turno_min": {t.id: t.jornada_max_min for t in turnos},
             "viagens_por_rota": VIAGENS_POR_ROTA,
@@ -482,16 +515,35 @@ def montar_relatorio(pontos, escolas=None, turnos=None, tipos=None,
         "km_dia": round(frota_atual.km_dia_declarado - km_dia_otim, 1),
         "litros_dia": round(litros_atual - litros_otim, 1),
         "tco2_ano": round(
-            (litros_atual - litros_otim) * DIAS_LETIVOS_MES * 12
+            (litros_atual - litros_otim) * dias_mes * 12
             * FATOR_CO2_KG_L / 1000, 1),
     }
     if comparacao_indisponivel:
         resultado["comparacao_indisponivel"] = comparacao_indisponivel
     resultado["coerencia"] = _conferir_coerencia(resultado, frota_atual,
-                                                 tipos_por_id, turnos)
+                                                 tipos_por_id, turnos, perfil)
     # Demanda que não coube em rota nenhuma dentro da regra da secretaria.
     # Fica no relatório em campo próprio, porque é decisão de gente — e porque
     # um plano que esconde a criança que ficou de fora não vale nada.
+    if perfil is not None:
+        resultado["perfil"] = perfil.como_dicionario()
+    if equipe is not None:
+        resultado["equipe"] = {
+            "resumo": equipe["resumo"],
+            "regras": equipe["regras"],
+            "custo_motorista_mes": perfil.custo_motorista_mes,
+            "custo_equipe_mes": round(
+                equipe["resumo"]["motoristas"] * perfil.custo_motorista_mes),
+            "motoristas": [{k: v for k, v in m.items() if k != "blocos"}
+                           for m in equipe["motoristas"]],
+            "escalas": [{"motorista": m["id"],
+                         "blocos": [{"veiculo": b["veiculo"],
+                                     "turno": b["turno_nome"],
+                                     "inicio": b["inicio"], "fim": b["fim"]}
+                                    for b in m["blocos"]]}
+                        for m in equipe["motoristas"]],
+            "explicacao": jornada_mod.explicar(equipe),
+        }
     resultado["demanda_nao_atendida"] = {
         "pontos": inviaveis,
         "alunos": sum(i["alunos"] for i in inviaveis),
@@ -512,7 +564,8 @@ def montar_relatorio(pontos, escolas=None, turnos=None, tipos=None,
     return resultado
 
 
-def _conferir_coerencia(resultado, frota_atual, tipos_por_id, turnos) -> list:
+def _conferir_coerencia(resultado, frota_atual, tipos_por_id, turnos,
+                        perfil=None) -> list:
     """Confere se demanda e frota declarada contam a mesma história.
 
     Apareceu na primeira planilha real que passou pelo sistema: 297 alunos e
@@ -527,6 +580,9 @@ def _conferir_coerencia(resultado, frota_atual, tipos_por_id, turnos) -> list:
     avisos = []
     if frota_atual is None:
         return avisos
+    passageiros = perfil.rotulo_passageiro_plural if perfil else "alunos"
+    quem = "o município" if not perfil or perfil.vertical == "escolar" \
+        else "a empresa"
     lugares = sum(tipos_por_id[t].capacidade * q
                   for t, q in frota_atual.composicao.items()
                   if t in tipos_por_id)
@@ -534,14 +590,15 @@ def _conferir_coerencia(resultado, frota_atual, tipos_por_id, turnos) -> list:
     if maior_turno and lugares > maior_turno * 2:
         avisos.append(
             f"A frota declarada oferece {lugares} lugares por viagem, para um "
-            f"turno de {maior_turno} alunos ({lugares / maior_turno:.1f}× a "
-            f"demanda). Confira se a planilha de alunos cobre o município "
-            f"inteiro — comparar a frota do município com uma parte dos alunos "
-            f"produz uma economia que não existe.")
+            f"turno de {maior_turno} {passageiros} "
+            f"({lugares / maior_turno:.1f}× a demanda). Confira se a planilha "
+            f"cobre {quem} inteir{'o' if quem.endswith('município') else 'a'} "
+            f"— comparar a frota inteira com uma parte d{'os' if passageiros.endswith('s') else 'o'} "
+            f"{passageiros} produz uma economia que não existe.")
     if maior_turno and lugares and lugares < maior_turno:
         avisos.append(
             f"A frota declarada tem {lugares} lugares por viagem para "
-            f"{maior_turno} alunos no maior turno. Ou faltam veículos na "
+            f"{maior_turno} {passageiros} no maior turno. Ou faltam veículos na "
             f"declaração, ou a operação de hoje já depende de mais viagens do "
             f"que o contrato prevê.")
     if frota_atual.km_dia_declarado <= 0:

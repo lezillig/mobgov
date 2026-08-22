@@ -62,6 +62,7 @@ previu X, aconteceu Y, ajustou Z".
 | 7 | `operacao/app_responsavel.html` — "onde está o ônibus" e aviso de falta (origem real da taxa de ausência) | ✅ pronto |
 | 8 | `painel/console.py` — a tela do sistema (Hoje, Elegibilidade, Assistente, Economia) | ✅ pronto |
 | 8 | `planejamento/` + `motor/planejar.py` + `dados/agrupar.py` — planilha → pontos → rotas → publicar | ✅ pronto |
+| 9 | `dados/perfis.py` + `motor/jornada.py` — perfil de fretamento: turnos configuráveis e jornada do motorista (Lei 13.103) como restrição | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -96,6 +97,8 @@ mobgov/                          (raiz deste repositório)
   dados/planilha.py              lê csv/tsv/xlsx sem dependência (xlsx = zip + xml)
   dados/importador.py            colunas por sinônimo, dedup, geocodificação com plano B
   dados/agrupar.py               alunos importados -> pontos de embarque (raio de caminhada)
+  dados/perfis.py                perfil de operação: escolar, fretamento ou JSON do cliente
+  motor/jornada.py               fase 3: escala de motoristas (jornada, intervalo, interjornada)
   motor/planejar.py              planilha -> importador -> agrupador -> motor -> plano
   planejamento/servidor.py       a tela da roteirização: envia, confere, ajusta, publica
   planejamento/tela.html         os cinco passos numa página só
@@ -142,6 +145,7 @@ python motor/importar.py --gerar-exemplo   # planilha bagunçada -> demanda
 python motor/rodar_rodadas.py          # reotimização contínua da manhã (~1 min)
 python -m planejamento.servidor        # tela da roteirização (127.0.0.1:8090)
 python motor/planejar.py planilha.xlsx # mesmo caminho pela linha de comando
+python motor/planejar.py rh.csv --perfil fretamento --frota-atual "RODO46=9,EXEC28=6"
 python -m painel.console               # gera relatorios/console.html
 python -m operacao.servidor            # apps do motorista e do responsável (8080)
 python conversa/cli.py --offline "quanto eu economizo por mês?"
@@ -187,6 +191,22 @@ python -m unittest discover -s testes -v
 - **Teste antes de commitar.** As fórmulas, a coerência dos indicadores e a meta
   de ≥20% de redução de frota são cobertas por testes; se a economia cair abaixo
   disso, a suíte quebra de propósito.
+
+## Os dois verticais (o motor é o mesmo; a moldura, não)
+
+| | Escolar (prefeitura) | Fretamento (empresa) |
+|---|---|---|
+| Turnos | 2, sinal fixo | 3 ou 4, virada quebrada, configuráveis |
+| Destino | escola | planta, unidade, obra |
+| Passageiro | aluno (≤75 min) | colaborador (≤90 min) |
+| "Antes" | frota do PNATE | contrato de fretamento vigente |
+| Motorista | embutido no custo do veículo | **custo próprio, com lei própria** |
+| Volta | não modelada | bloco de dispersão no fim do turno |
+
+A última linha é a que muda o resultado: no fretamento, o veículo roda os
+quatro turnos e o motorista não pode. **7 veículos exigiram 16 motoristas** na
+demonstração — é essa conta que decide o preço da proposta, e ela vive em
+`motor/jornada.py`.
 
 ## Os dois tipos de rota (não confundir)
 
@@ -271,6 +291,18 @@ python -m unittest discover -s testes -v
   `_conferir_coerencia` avisa quando os lugares declarados passam de 2× o
   maior turno — foi o caso da primeira planilha real: frota do município
   inteiro contra 297 alunos.
+- **Separador de CSV não se decide pela primeira linha.** Planilha de verdade
+  começa com título sem separador nenhum; `_separador` olha 12 linhas. Antes,
+  um CSV de RH inteiro virava uma coluna só e o importador respondia "não
+  reconheci as colunas" — a mensagem mais frustrante possível para quem
+  mandou o arquivo certo.
+- **Contar só a ida subdimensiona a equipe.** Quem foi levado às 6h volta às
+  14h: cada bloco de coleta tem o par dele na dispersão quando o turno declara
+  `duracao_min`. Na demonstração de fretamento isso levou a equipe de 11 para
+  16 motoristas.
+- **As regras de jornada são parâmetros declarados**, não constantes
+  escondidas: acordo coletivo muda quase todas, e elas vão para o relatório
+  para o jurídico da empresa conferir.
 - **`urlparse` corta o que vem depois de `;`** no último segmento da URL (vira
   `params`) — e o OSRM separa coordenadas com `;`. Qualquer código que
   interprete URLs do OSRM precisa recolar `path + ';' + params`.

@@ -1,0 +1,2818 @@
+{
+  "municipio": "Empresa Modelo S.A.",
+  "gerado_em": "2026-08-22 21:20",
+  "premissas": {
+    "dias_letivos_mes": 22,
+    "preco_diesel_l": 6.1,
+    "fator_co2_kg_l": 2.68,
+    "tempo_max_trajeto_min": 90,
+    "tempo_virada_min": 5,
+    "jornada_max_turno_min": {
+      "t1": 120,
+      "adm": 120,
+      "t2": 120,
+      "t3": 120
+    },
+    "viagens_por_rota": 2,
+    "fonte_tempos": "OSRM/haversine com fator rural 1.35 + tempo de embarque por parada (corrigidos depois pelo aprendizado com GPS real)",
+    "custos_por_tipo": {
+      "RODO46": {
+        "nome": "Ônibus rodoviário 46 lugares",
+        "capacidade": 46,
+        "posicoes_cadeirante": 0,
+        "fixo_mes": 9800.0,
+        "custo_km": 3.4,
+        "consumo_km_l": 2.9
+      },
+      "EXEC28": {
+        "nome": "Micro-ônibus executivo 28 lugares",
+        "capacidade": 28,
+        "posicoes_cadeirante": 0,
+        "fixo_mes": 7200.0,
+        "custo_km": 2.6,
+        "consumo_km_l": 4.2
+      },
+      "VAN16": {
+        "nome": "Van executiva 16 lugares",
+        "capacidade": 16,
+        "posicoes_cadeirante": 0,
+        "fixo_mes": 4900.0,
+        "custo_km": 1.8,
+        "consumo_km_l": 8.5
+      },
+      "VANPCD": {
+        "nome": "Van acessível 12 lugares",
+        "capacidade": 12,
+        "posicoes_cadeirante": 2,
+        "fixo_mes": 5600.0,
+        "custo_km": 1.95,
+        "consumo_km_l": 7.8
+      }
+    }
+  },
+  "geografia": {
+    "escolas": [
+      {
+        "id": "E1",
+        "nome": "Escritório administrativo",
+        "lat": -21.158,
+        "lon": -47.802,
+        "alunos": 73,
+        "origem_da_coordenada": "informada pelo município"
+      },
+      {
+        "id": "E2",
+        "nome": "Planta 1 — Fábrica",
+        "lat": -21.14,
+        "lon": -47.79,
+        "alunos": 132,
+        "origem_da_coordenada": "informada pelo município"
+      },
+      {
+        "id": "E3",
+        "nome": "Planta 2 — Centro de distribuição",
+        "lat": -21.205,
+        "lon": -47.845,
+        "alunos": 134,
+        "origem_da_coordenada": "informada pelo município"
+      }
+    ],
+    "pontos": {
+      "P001": [
+        -21.226378,
+        -47.859082
+      ],
+      "P002": [
+        -21.219981,
+        -47.869723
+      ],
+      "P003": [
+        -21.207786,
+        -47.889454
+      ],
+      "P004": [
+        -21.206376,
+        -47.847108
+      ],
+      "P005": [
+        -21.205347,
+        -47.871705
+      ],
+      "P006": [
+        -21.197632,
+        -47.883575
+      ],
+      "P007": [
+        -21.189041,
+        -47.848612
+      ],
+      "P008": [
+        -21.1847,
+        -47.858192
+      ],
+      "P009": [
+        -21.178907,
+        -47.821591
+      ],
+      "P010": [
+        -21.17625,
+        -47.861537
+      ],
+      "P011": [
+        -21.174868,
+        -47.799111
+      ],
+      "P012": [
+        -21.174772,
+        -47.821218
+      ],
+      "P013": [
+        -21.168726,
+        -47.802374
+      ],
+      "P014": [
+        -21.167801,
+        -47.834738
+      ],
+      "P015": [
+        -21.16491,
+        -47.812537
+      ],
+      "P016": [
+        -21.163644,
+        -47.808401
+      ],
+      "P017": [
+        -21.163342,
+        -47.798624
+      ],
+      "P018": [
+        -21.161759,
+        -47.811788
+      ],
+      "P019": [
+        -21.160609,
+        -47.793846
+      ],
+      "P020": [
+        -21.160209,
+        -47.815958
+      ],
+      "P021": [
+        -21.159595,
+        -47.822238
+      ],
+      "P022": [
+        -21.158908,
+        -47.783316
+      ],
+      "P023": [
+        -21.158816,
+        -47.796068
+      ],
+      "P024": [
+        -21.15875,
+        -47.811148
+      ],
+      "P025": [
+        -21.158261,
+        -47.789254
+      ],
+      "P026": [
+        -21.158084,
+        -47.830757
+      ],
+      "P027": [
+        -21.156257,
+        -47.802796
+      ],
+      "P028": [
+        -21.156573,
+        -47.776317
+      ],
+      "P029": [
+        -21.155405,
+        -47.79347
+      ],
+      "P030": [
+        -21.154489,
+        -47.808567
+      ],
+      "P031": [
+        -21.153748,
+        -47.79744
+      ],
+      "P032": [
+        -21.153568,
+        -47.805448
+      ],
+      "P033": [
+        -21.152134,
+        -47.774956
+      ],
+      "P034": [
+        -21.150909,
+        -47.808282
+      ],
+      "P035": [
+        -21.150849,
+        -47.797569
+      ],
+      "P036": [
+        -21.150085,
+        -47.804918
+      ],
+      "P037": [
+        -21.149441,
+        -47.785935
+      ],
+      "P038": [
+        -21.147296,
+        -47.795869
+      ],
+      "P039": [
+        -21.147369,
+        -47.80464
+      ],
+      "P040": [
+        -21.146523,
+        -47.800391
+      ],
+      "P041": [
+        -21.143651,
+        -47.778568
+      ],
+      "P042": [
+        -21.14183,
+        -47.801611
+      ],
+      "P043": [
+        -21.14089,
+        -47.781977
+      ],
+      "P044": [
+        -21.138464,
+        -47.792812
+      ],
+      "P045": [
+        -21.129261,
+        -47.752921
+      ],
+      "P046": [
+        -21.116615,
+        -47.77763
+      ],
+      "P047": [
+        -21.09773,
+        -47.721736
+      ],
+      "P048": [
+        -21.095511,
+        -47.730149
+      ],
+      "P049": [
+        -21.088207,
+        -47.753464
+      ],
+      "P050": [
+        -21.081452,
+        -47.780946
+      ],
+      "P051": [
+        -21.078929,
+        -47.790057
+      ],
+      "P052": [
+        -21.071302,
+        -47.732956
+      ],
+      "P053": [
+        -21.06428,
+        -47.740699
+      ],
+      "P054": [
+        -21.064489,
+        -47.767138
+      ],
+      "P055": [
+        -21.060635,
+        -47.757088
+      ],
+      "P056": [
+        -21.229994,
+        -47.85779
+      ],
+      "P057": [
+        -21.228723,
+        -47.873055
+      ],
+      "P058": [
+        -21.228273,
+        -47.84856
+      ],
+      "P059": [
+        -21.223464,
+        -47.862561
+      ],
+      "P060": [
+        -21.219429,
+        -47.868671
+      ],
+      "P061": [
+        -21.2116,
+        -47.840733
+      ],
+      "P062": [
+        -21.212485,
+        -47.875991
+      ],
+      "P063": [
+        -21.201401,
+        -47.886307
+      ],
+      "P064": [
+        -21.203762,
+        -47.850727
+      ],
+      "P065": [
+        -21.19602,
+        -47.878047
+      ],
+      "P066": [
+        -21.196875,
+        -47.840869
+      ],
+      "P067": [
+        -21.191381,
+        -47.850484
+      ],
+      "P068": [
+        -21.190709,
+        -47.863612
+      ],
+      "P069": [
+        -21.187734,
+        -47.883417
+      ],
+      "P070": [
+        -21.186636,
+        -47.80723
+      ],
+      "P071": [
+        -21.182814,
+        -47.87199
+      ],
+      "P072": [
+        -21.179993,
+        -47.818881
+      ],
+      "P073": [
+        -21.17956,
+        -47.815134
+      ],
+      "P074": [
+        -21.179257,
+        -47.830125
+      ],
+      "P075": [
+        -21.179091,
+        -47.798906
+      ],
+      "P076": [
+        -21.17865,
+        -47.822764
+      ],
+      "P077": [
+        -21.175536,
+        -47.810171
+      ],
+      "P078": [
+        -21.174666,
+        -47.830766
+      ],
+      "P079": [
+        -21.174361,
+        -47.803389
+      ],
+      "P080": [
+        -21.172286,
+        -47.810013
+      ],
+      "P081": [
+        -21.172143,
+        -47.799798
+      ],
+      "P082": [
+        -21.169928,
+        -47.80407
+      ],
+      "P083": [
+        -21.167242,
+        -47.808176
+      ],
+      "P084": [
+        -21.167205,
+        -47.795774
+      ],
+      "P085": [
+        -21.166091,
+        -47.803366
+      ],
+      "P086": [
+        -21.166748,
+        -47.799502
+      ],
+      "P087": [
+        -21.165407,
+        -47.786319
+      ],
+      "P088": [
+        -21.165312,
+        -47.810643
+      ],
+      "P089": [
+        -21.165121,
+        -47.829473
+      ],
+      "P090": [
+        -21.165104,
+        -47.820919
+      ],
+      "P091": [
+        -21.163861,
+        -47.805323
+      ],
+      "P092": [
+        -21.162135,
+        -47.808163
+      ],
+      "P093": [
+        -21.162699,
+        -47.792877
+      ],
+      "P094": [
+        -21.16214,
+        -47.78499
+      ],
+      "P095": [
+        -21.162106,
+        -47.813575
+      ],
+      "P096": [
+        -21.161018,
+        -47.796647
+      ],
+      "P097": [
+        -21.160851,
+        -47.77973
+      ],
+      "P098": [
+        -21.158403,
+        -47.817344
+      ],
+      "P099": [
+        -21.156213,
+        -47.811662
+      ],
+      "P100": [
+        -21.155792,
+        -47.796049
+      ],
+      "P101": [
+        -21.155479,
+        -47.823487
+      ],
+      "P102": [
+        -21.154846,
+        -47.799413
+      ],
+      "P103": [
+        -21.154907,
+        -47.787803
+      ],
+      "P104": [
+        -21.155283,
+        -47.779824
+      ],
+      "P105": [
+        -21.153999,
+        -47.806867
+      ],
+      "P106": [
+        -21.154551,
+        -47.780426
+      ],
+      "P107": [
+        -21.153804,
+        -47.793749
+      ],
+      "P108": [
+        -21.153394,
+        -47.783986
+      ],
+      "P109": [
+        -21.150188,
+        -47.803207
+      ],
+      "P110": [
+        -21.15031,
+        -47.797347
+      ],
+      "P111": [
+        -21.149734,
+        -47.809738
+      ],
+      "P112": [
+        -21.146761,
+        -47.788122
+      ],
+      "P113": [
+        -21.146097,
+        -47.803861
+      ],
+      "P114": [
+        -21.145661,
+        -47.780148
+      ],
+      "P115": [
+        -21.140223,
+        -47.778675
+      ],
+      "P116": [
+        -21.140029,
+        -47.798158
+      ],
+      "P117": [
+        -21.137341,
+        -47.794571
+      ],
+      "P118": [
+        -21.133477,
+        -47.787441
+      ],
+      "P119": [
+        -21.128221,
+        -47.741186
+      ],
+      "P120": [
+        -21.128106,
+        -47.725768
+      ],
+      "P121": [
+        -21.126042,
+        -47.767284
+      ],
+      "P122": [
+        -21.124303,
+        -47.748472
+      ],
+      "P123": [
+        -21.123302,
+        -47.731907
+      ],
+      "P124": [
+        -21.114102,
+        -47.776975
+      ],
+      "P125": [
+        -21.114085,
+        -47.752418
+      ],
+      "P126": [
+        -21.103808,
+        -47.774204
+      ],
+      "P127": [
+        -21.100396,
+        -47.786378
+      ],
+      "P128": [
+        -21.099138,
+        -47.733831
+      ],
+      "P129": [
+        -21.092961,
+        -47.722886
+      ],
+      "P130": [
+        -21.083967,
+        -47.732145
+      ],
+      "P131": [
+        -21.082638,
+        -47.768849
+      ],
+      "P132": [
+        -21.078731,
+        -47.763366
+      ],
+      "P133": [
+        -21.0721,
+        -47.732823
+      ],
+      "P134": [
+        -21.071149,
+        -47.780603
+      ],
+      "P135": [
+        -21.070327,
+        -47.771508
+      ],
+      "P136": [
+        -21.067589,
+        -47.763367
+      ],
+      "P137": [
+        -21.234923,
+        -47.861257
+      ],
+      "P138": [
+        -21.230762,
+        -47.875134
+      ],
+      "P139": [
+        -21.229759,
+        -47.852661
+      ],
+      "P140": [
+        -21.221229,
+        -47.876328
+      ],
+      "P141": [
+        -21.222411,
+        -47.863122
+      ],
+      "P142": [
+        -21.2141,
+        -47.838435
+      ],
+      "P143": [
+        -21.212211,
+        -47.871702
+      ],
+      "P144": [
+        -21.204447,
+        -47.835987
+      ],
+      "P145": [
+        -21.202838,
+        -47.846788
+      ],
+      "P146": [
+        -21.198596,
+        -47.873855
+      ],
+      "P147": [
+        -21.188087,
+        -47.852373
+      ],
+      "P148": [
+        -21.188567,
+        -47.840114
+      ],
+      "P149": [
+        -21.187649,
+        -47.81946
+      ],
+      "P150": [
+        -21.185876,
+        -47.822088
+      ],
+      "P151": [
+        -21.185639,
+        -47.862672
+      ],
+      "P152": [
+        -21.184355,
+        -47.817297
+      ],
+      "P153": [
+        -21.182112,
+        -47.824297
+      ],
+      "P154": [
+        -21.181941,
+        -47.799492
+      ],
+      "P155": [
+        -21.181336,
+        -47.827119
+      ],
+      "P156": [
+        -21.180316,
+        -47.871483
+      ],
+      "P157": [
+        -21.180235,
+        -47.830058
+      ],
+      "P158": [
+        -21.177236,
+        -47.830134
+      ],
+      "P159": [
+        -21.176109,
+        -47.796266
+      ],
+      "P160": [
+        -21.175088,
+        -47.818427
+      ],
+      "P161": [
+        -21.174616,
+        -47.799639
+      ],
+      "P162": [
+        -21.174572,
+        -47.821898
+      ],
+      "P163": [
+        -21.173739,
+        -47.807779
+      ],
+      "P164": [
+        -21.171294,
+        -47.830092
+      ],
+      "P165": [
+        -21.171834,
+        -47.819608
+      ],
+      "P166": [
+        -21.16961,
+        -47.826491
+      ],
+      "P167": [
+        -21.169349,
+        -47.800903
+      ],
+      "P168": [
+        -21.168258,
+        -47.80655
+      ],
+      "P169": [
+        -21.168135,
+        -47.798183
+      ],
+      "P170": [
+        -21.164998,
+        -47.808685
+      ],
+      "P171": [
+        -21.164563,
+        -47.801938
+      ],
+      "P172": [
+        -21.163809,
+        -47.805806
+      ],
+      "P173": [
+        -21.163628,
+        -47.812091
+      ],
+      "P174": [
+        -21.161817,
+        -47.799384
+      ],
+      "P175": [
+        -21.162691,
+        -47.787138
+      ],
+      "P176": [
+        -21.162661,
+        -47.781483
+      ],
+      "P177": [
+        -21.161861,
+        -47.795917
+      ],
+      "P178": [
+        -21.160543,
+        -47.813316
+      ],
+      "P179": [
+        -21.160127,
+        -47.779873
+      ],
+      "P180": [
+        -21.158394,
+        -47.810688
+      ],
+      "P181": [
+        -21.158894,
+        -47.797924
+      ],
+      "P182": [
+        -21.156965,
+        -47.807755
+      ],
+      "P183": [
+        -21.157267,
+        -47.784796
+      ],
+      "P184": [
+        -21.156705,
+        -47.829466
+      ],
+      "P185": [
+        -21.155384,
+        -47.804518
+      ],
+      "P186": [
+        -21.155131,
+        -47.793237
+      ],
+      "P187": [
+        -21.155135,
+        -47.790209
+      ],
+      "P188": [
+        -21.154945,
+        -47.814976
+      ],
+      "P189": [
+        -21.154913,
+        -47.812058
+      ],
+      "P190": [
+        -21.154482,
+        -47.778565
+      ],
+      "P191": [
+        -21.150666,
+        -47.794527
+      ],
+      "P192": [
+        -21.152115,
+        -47.797675
+      ],
+      "P193": [
+        -21.151456,
+        -47.816392
+      ],
+      "P194": [
+        -21.151372,
+        -47.805177
+      ],
+      "P195": [
+        -21.150495,
+        -47.776535
+      ],
+      "P196": [
+        -21.14868,
+        -47.785494
+      ],
+      "P197": [
+        -21.147448,
+        -47.803639
+      ],
+      "P198": [
+        -21.146079,
+        -47.775654
+      ],
+      "P199": [
+        -21.14466,
+        -47.793126
+      ],
+      "P200": [
+        -21.144401,
+        -47.764958
+      ],
+      "P201": [
+        -21.143444,
+        -47.800872
+      ],
+      "P202": [
+        -21.142462,
+        -47.784056
+      ],
+      "P203": [
+        -21.139643,
+        -47.780405
+      ],
+      "P204": [
+        -21.136621,
+        -47.740217
+      ],
+      "P205": [
+        -21.136524,
+        -47.787076
+      ],
+      "P206": [
+        -21.131435,
+        -47.768117
+      ],
+      "P207": [
+        -21.129652,
+        -47.793767
+      ],
+      "P208": [
+        -21.127307,
+        -47.744021
+      ],
+      "P209": [
+        -21.122325,
+        -47.730858
+      ],
+      "P210": [
+        -21.11492,
+        -47.753079
+      ],
+      "P211": [
+        -21.114977,
+        -47.725375
+      ],
+      "P212": [
+        -21.097708,
+        -47.723744
+      ],
+      "P213": [
+        -21.093529,
+        -47.783834
+      ],
+      "P214": [
+        -21.088878,
+        -47.744046
+      ],
+      "P215": [
+        -21.085268,
+        -47.730602
+      ],
+      "P216": [
+        -21.077998,
+        -47.762687
+      ],
+      "P217": [
+        -21.073268,
+        -47.75837
+      ],
+      "P218": [
+        -21.075775,
+        -47.780193
+      ],
+      "P219": [
+        -21.072512,
+        -47.729925
+      ],
+      "P220": [
+        -21.061528,
+        -47.767224
+      ]
+    }
+  },
+  "demanda": {
+    "alunos": 339,
+    "alunos_por_turno": {
+      "t1": 148,
+      "adm": 73,
+      "t2": 87,
+      "t3": 31
+    },
+    "cadeirantes": 4,
+    "cadeirantes_por_turno": {
+      "t1": 1,
+      "adm": 1,
+      "t2": 1,
+      "t3": 1
+    },
+    "pontos_embarque": 220,
+    "escolas": 3,
+    "turnos": [
+      {
+        "id": "t1",
+        "nome": "1º turno (06h)",
+        "jornada_max_min": 120
+      },
+      {
+        "id": "adm",
+        "nome": "Administrativo (08h)",
+        "jornada_max_min": 120
+      },
+      {
+        "id": "t2",
+        "nome": "2º turno (14h20)",
+        "jornada_max_min": 120
+      },
+      {
+        "id": "t3",
+        "nome": "3º turno (22h)",
+        "jornada_max_min": 120
+      }
+    ]
+  },
+  "frota_atual": {
+    "composicao": {
+      "RODO46": 9,
+      "EXEC28": 6,
+      "VAN16": 4,
+      "VANPCD": 2
+    },
+    "total_veiculos": 21,
+    "km_dia": 1980.0,
+    "custo_mes": 444857,
+    "litros_dia": 495.9,
+    "viagens_por_veiculo_turno": null,
+    "como_foi_estimada": [
+      "A frota atual foi INFORMADA pelo município, não estimada.",
+      "Quilometragem declarada: 1980.0 km/dia."
+    ]
+  },
+  "frota_otimizada": {
+    "composicao": {
+      "RODO46": 1,
+      "EXEC28": 3,
+      "VAN16": 2,
+      "VANPCD": 1
+    },
+    "total_veiculos": 7,
+    "km_dia": 1519.0,
+    "custo_mes": 251564,
+    "litros_dia": 308.7,
+    "viagens": [
+      {
+        "id": "E2-t1-01",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "escola_id": "E2",
+        "escola": "Planta 1 — Fábrica",
+        "tipo_sugerido": "RODO46",
+        "paradas": [
+          "P110",
+          "P102",
+          "P092",
+          "P088",
+          "P083",
+          "P080",
+          "P072",
+          "P066",
+          "P064",
+          "P061",
+          "P056",
+          "P057",
+          "P060",
+          "P062",
+          "P063",
+          "P069",
+          "P065",
+          "P067",
+          "P078",
+          "P101",
+          "P098",
+          "P095",
+          "P109",
+          "P113"
+        ],
+        "alunos": 38,
+        "cadeirantes": 0,
+        "km_viagem": 47.4,
+        "min_viagem": 90,
+        "veiculo": "VT01",
+        "tipo": "RODO46",
+        "tipo_nome": "Ônibus rodoviário 46 lugares",
+        "ocupacao_pct": 83
+      },
+      {
+        "id": "E2-t1-02",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "escola_id": "E2",
+        "escola": "Planta 1 — Fábrica",
+        "tipo_sugerido": "EXEC28",
+        "paradas": [
+          "P114",
+          "P115",
+          "P122",
+          "P120",
+          "P128",
+          "P129",
+          "P130",
+          "P133",
+          "P136",
+          "P135",
+          "P134",
+          "P131",
+          "P127",
+          "P126",
+          "P124"
+        ],
+        "alunos": 21,
+        "cadeirantes": 0,
+        "km_viagem": 41.0,
+        "min_viagem": 74,
+        "veiculo": "VT04",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "ocupacao_pct": 75
+      },
+      {
+        "id": "E2-t1-03",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "escola_id": "E2",
+        "escola": "Planta 1 — Fábrica",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P112",
+          "P103",
+          "P106",
+          "P097",
+          "P094",
+          "P087",
+          "P075",
+          "P070",
+          "P077",
+          "P079",
+          "P082",
+          "P091",
+          "P096",
+          "P107"
+        ],
+        "alunos": 15,
+        "cadeirantes": 0,
+        "km_viagem": 18.7,
+        "min_viagem": 39,
+        "veiculo": "VT05",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "ocupacao_pct": 94
+      },
+      {
+        "id": "E3-t1-01",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "EXEC28",
+        "paradas": [
+          "P177",
+          "P183",
+          "P190",
+          "P195",
+          "P198",
+          "P200",
+          "P204",
+          "P209",
+          "P211",
+          "P212",
+          "P219",
+          "P210",
+          "P191",
+          "P185",
+          "P180",
+          "P178"
+        ],
+        "alunos": 21,
+        "cadeirantes": 0,
+        "km_viagem": 55.1,
+        "min_viagem": 90,
+        "veiculo": "VT02",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "ocupacao_pct": 75
+      },
+      {
+        "id": "E3-t1-02",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "EXEC28",
+        "paradas": [
+          "P152",
+          "P161",
+          "P169",
+          "P175",
+          "P187",
+          "P196",
+          "P203",
+          "P217",
+          "P220",
+          "P205",
+          "P199",
+          "P192",
+          "P181",
+          "P174",
+          "P171",
+          "P172",
+          "P163"
+        ],
+        "alunos": 25,
+        "cadeirantes": 0,
+        "km_viagem": 52.6,
+        "min_viagem": 90,
+        "veiculo": "VT03",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "ocupacao_pct": 89
+      },
+      {
+        "id": "E3-t1-03",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P148",
+          "P157",
+          "P158",
+          "P164",
+          "P166",
+          "P184",
+          "P193",
+          "P197",
+          "P194",
+          "P173",
+          "P165",
+          "P160",
+          "P162",
+          "P155"
+        ],
+        "alunos": 16,
+        "cadeirantes": 0,
+        "km_viagem": 23.1,
+        "min_viagem": 49,
+        "veiculo": "VT05",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "ocupacao_pct": 100
+      },
+      {
+        "id": "E3-t1-04",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "VANPCD",
+        "paradas": [
+          "P144",
+          "P149",
+          "P153",
+          "P147",
+          "P151",
+          "P156",
+          "P140",
+          "P141",
+          "P145"
+        ],
+        "alunos": 12,
+        "cadeirantes": 1,
+        "km_viagem": 24.9,
+        "min_viagem": 49,
+        "veiculo": "VT06",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "ocupacao_pct": 100
+      },
+      {
+        "id": "E1-adm-01",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "escola_id": "E1",
+        "escola": "Escritório administrativo",
+        "tipo_sugerido": "EXEC28",
+        "paradas": [
+          "P018",
+          "P015",
+          "P012",
+          "P009",
+          "P007",
+          "P004",
+          "P001",
+          "P002",
+          "P005",
+          "P003",
+          "P006",
+          "P008",
+          "P010",
+          "P014",
+          "P026",
+          "P021",
+          "P020",
+          "P024"
+        ],
+        "alunos": 25,
+        "cadeirantes": 0,
+        "km_viagem": 37.9,
+        "min_viagem": 89,
+        "veiculo": "VA01",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "ocupacao_pct": 89
+      },
+      {
+        "id": "E1-adm-02",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "escola_id": "E1",
+        "escola": "Escritório administrativo",
+        "tipo_sugerido": "EXEC28",
+        "paradas": [
+          "P031",
+          "P043",
+          "P051",
+          "P050",
+          "P054",
+          "P055",
+          "P053",
+          "P052",
+          "P048",
+          "P047",
+          "P045",
+          "P041",
+          "P037",
+          "P029"
+        ],
+        "alunos": 19,
+        "cadeirantes": 0,
+        "km_viagem": 42.6,
+        "min_viagem": 89,
+        "veiculo": "VA02",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "ocupacao_pct": 68
+      },
+      {
+        "id": "E1-adm-03",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "escola_id": "E1",
+        "escola": "Escritório administrativo",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P017",
+          "P011",
+          "P013",
+          "P016",
+          "P030",
+          "P034",
+          "P036",
+          "P040",
+          "P038",
+          "P035"
+        ],
+        "alunos": 15,
+        "cadeirantes": 0,
+        "km_viagem": 10.5,
+        "min_viagem": 36,
+        "veiculo": "VA04",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "ocupacao_pct": 94
+      },
+      {
+        "id": "E1-adm-04",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "escola_id": "E1",
+        "escola": "Escritório administrativo",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P027"
+        ],
+        "alunos": 2,
+        "cadeirantes": 0,
+        "km_viagem": 0.6,
+        "min_viagem": 5,
+        "veiculo": "VA01",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "ocupacao_pct": 7
+      },
+      {
+        "id": "E1-adm-05",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "escola_id": "E1",
+        "escola": "Escritório administrativo",
+        "tipo_sugerido": "VANPCD",
+        "paradas": [
+          "P032",
+          "P039",
+          "P042",
+          "P044",
+          "P046",
+          "P049",
+          "P033",
+          "P028",
+          "P022",
+          "P025",
+          "P019",
+          "P023"
+        ],
+        "alunos": 12,
+        "cadeirantes": 1,
+        "km_viagem": 28.0,
+        "min_viagem": 72,
+        "veiculo": "VA03",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "ocupacao_pct": 100
+      },
+      {
+        "id": "E2-t2-01",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "escola_id": "E2",
+        "escola": "Planta 1 — Fábrica",
+        "tipo_sugerido": "RODO46",
+        "paradas": [
+          "P117",
+          "P116",
+          "P111",
+          "P099",
+          "P090",
+          "P089",
+          "P074",
+          "P067",
+          "P071",
+          "P063",
+          "P062",
+          "P056",
+          "P061",
+          "P073",
+          "P085",
+          "P086",
+          "P084",
+          "P096",
+          "P091",
+          "P092",
+          "P105",
+          "P109"
+        ],
+        "alunos": 30,
+        "cadeirantes": 0,
+        "km_viagem": 46.2,
+        "min_viagem": 89,
+        "veiculo": "VT03",
+        "tipo": "RODO46",
+        "tipo_nome": "Ônibus rodoviário 46 lugares",
+        "ocupacao_pct": 65
+      },
+      {
+        "id": "E2-t2-02",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "escola_id": "E2",
+        "escola": "Planta 1 — Fábrica",
+        "tipo_sugerido": "VANPCD",
+        "paradas": [
+          "P118",
+          "P127",
+          "P132",
+          "P125",
+          "P123",
+          "P119",
+          "P121",
+          "P114",
+          "P108",
+          "P103",
+          "P093",
+          "P100"
+        ],
+        "alunos": 12,
+        "cadeirantes": 1,
+        "km_viagem": 34.8,
+        "min_viagem": 66,
+        "veiculo": "VT04",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "ocupacao_pct": 100
+      },
+      {
+        "id": "E3-t2-01",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "EXEC28",
+        "paradas": [
+          "P155",
+          "P188",
+          "P189",
+          "P180",
+          "P182",
+          "P185",
+          "P194",
+          "P197",
+          "P201",
+          "P207",
+          "P213",
+          "P216",
+          "P217",
+          "P205",
+          "P192",
+          "P174",
+          "P170",
+          "P150"
+        ],
+        "alunos": 23,
+        "cadeirantes": 0,
+        "km_viagem": 49.0,
+        "min_viagem": 90,
+        "veiculo": "VT01",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "ocupacao_pct": 82
+      },
+      {
+        "id": "E3-t2-02",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P154",
+          "P176",
+          "P195",
+          "P204",
+          "P208",
+          "P215",
+          "P219",
+          "P214",
+          "P206",
+          "P202",
+          "P196",
+          "P186",
+          "P153"
+        ],
+        "alunos": 14,
+        "cadeirantes": 0,
+        "km_viagem": 54.5,
+        "min_viagem": 90,
+        "veiculo": "VT02",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "ocupacao_pct": 88
+      },
+      {
+        "id": "E3-t2-03",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P139",
+          "P137",
+          "P141",
+          "P140",
+          "P146",
+          "P148",
+          "P144"
+        ],
+        "alunos": 8,
+        "cadeirantes": 0,
+        "km_viagem": 21.1,
+        "min_viagem": 39,
+        "veiculo": "VT05",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "ocupacao_pct": 50
+      },
+      {
+        "id": "E2-t3-01",
+        "turno": "t3",
+        "turno_nome": "3º turno (22h)",
+        "escola_id": "E2",
+        "escola": "Planta 1 — Fábrica",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P105",
+          "P089",
+          "P068",
+          "P059",
+          "P056",
+          "P058",
+          "P061",
+          "P076",
+          "P083",
+          "P082",
+          "P081",
+          "P085"
+        ],
+        "alunos": 12,
+        "cadeirantes": 0,
+        "km_viagem": 38.0,
+        "min_viagem": 67,
+        "veiculo": "VT02",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "ocupacao_pct": 75
+      },
+      {
+        "id": "E2-t3-02",
+        "turno": "t3",
+        "turno_nome": "3º turno (22h)",
+        "escola_id": "E2",
+        "escola": "Planta 1 — Fábrica",
+        "tipo_sugerido": "VANPCD",
+        "paradas": [
+          "P104",
+          "P123",
+          "P115",
+          "P118"
+        ],
+        "alunos": 4,
+        "cadeirantes": 1,
+        "km_viagem": 20.6,
+        "min_viagem": 35,
+        "veiculo": "VT03",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "ocupacao_pct": 33
+      },
+      {
+        "id": "E3-t3-01",
+        "turno": "t3",
+        "turno_nome": "3º turno (22h)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P142",
+          "P138",
+          "P143",
+          "P146",
+          "P147"
+        ],
+        "alunos": 5,
+        "cadeirantes": 0,
+        "km_viagem": 18.4,
+        "min_viagem": 31,
+        "veiculo": "VT03",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "ocupacao_pct": 42
+      },
+      {
+        "id": "E3-t3-02",
+        "turno": "t3",
+        "turno_nome": "3º turno (22h)",
+        "escola_id": "E3",
+        "escola": "Planta 2 — Centro de distribuição",
+        "tipo_sugerido": "VAN16",
+        "paradas": [
+          "P159",
+          "P179",
+          "P204",
+          "P220",
+          "P218",
+          "P197",
+          "P186",
+          "P167",
+          "P168",
+          "P153"
+        ],
+        "alunos": 10,
+        "cadeirantes": 0,
+        "km_viagem": 56.7,
+        "min_viagem": 88,
+        "veiculo": "VT01",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "ocupacao_pct": 62
+      }
+    ],
+    "veiculos": [
+      {
+        "id": "VT01",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "tipo": "RODO46",
+        "tipo_nome": "Ônibus rodoviário 46 lugares",
+        "capacidade": 46,
+        "viagens": [
+          "E2-t1-01"
+        ],
+        "min_turno": 90,
+        "km_turno": 47.4,
+        "alunos": 38,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 83,
+        "folga_jornada_min": 30
+      },
+      {
+        "id": "VT02",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "capacidade": 28,
+        "viagens": [
+          "E3-t1-01"
+        ],
+        "min_turno": 90,
+        "km_turno": 55.1,
+        "alunos": 21,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 75,
+        "folga_jornada_min": 30
+      },
+      {
+        "id": "VT03",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "capacidade": 28,
+        "viagens": [
+          "E3-t1-02"
+        ],
+        "min_turno": 90,
+        "km_turno": 52.6,
+        "alunos": 25,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 89,
+        "folga_jornada_min": 30
+      },
+      {
+        "id": "VT04",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "capacidade": 28,
+        "viagens": [
+          "E2-t1-02"
+        ],
+        "min_turno": 74,
+        "km_turno": 41.0,
+        "alunos": 21,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 75,
+        "folga_jornada_min": 46
+      },
+      {
+        "id": "VT05",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "capacidade": 16,
+        "viagens": [
+          "E3-t1-03",
+          "E2-t1-03"
+        ],
+        "min_turno": 119,
+        "km_turno": 60.7,
+        "alunos": 31,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 97,
+        "folga_jornada_min": 1
+      },
+      {
+        "id": "VT06",
+        "turno": "t1",
+        "turno_nome": "1º turno (06h)",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "capacidade": 12,
+        "viagens": [
+          "E3-t1-04"
+        ],
+        "min_turno": 49,
+        "km_turno": 24.9,
+        "alunos": 12,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 100,
+        "folga_jornada_min": 71
+      },
+      {
+        "id": "VA01",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "capacidade": 28,
+        "viagens": [
+          "E1-adm-01",
+          "E1-adm-04"
+        ],
+        "min_turno": 99,
+        "km_turno": 38.5,
+        "alunos": 27,
+        "ultima_escola": "E1",
+        "ocupacao_media_pct": 48,
+        "folga_jornada_min": 21
+      },
+      {
+        "id": "VA02",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "capacidade": 28,
+        "viagens": [
+          "E1-adm-02"
+        ],
+        "min_turno": 89,
+        "km_turno": 42.6,
+        "alunos": 19,
+        "ultima_escola": "E1",
+        "ocupacao_media_pct": 68,
+        "folga_jornada_min": 31
+      },
+      {
+        "id": "VA03",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "capacidade": 12,
+        "viagens": [
+          "E1-adm-05"
+        ],
+        "min_turno": 72,
+        "km_turno": 28.0,
+        "alunos": 12,
+        "ultima_escola": "E1",
+        "ocupacao_media_pct": 100,
+        "folga_jornada_min": 48
+      },
+      {
+        "id": "VA04",
+        "turno": "adm",
+        "turno_nome": "Administrativo (08h)",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "capacidade": 16,
+        "viagens": [
+          "E1-adm-03"
+        ],
+        "min_turno": 36,
+        "km_turno": 10.5,
+        "alunos": 15,
+        "ultima_escola": "E1",
+        "ocupacao_media_pct": 94,
+        "folga_jornada_min": 84
+      },
+      {
+        "id": "VT01",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "tipo": "EXEC28",
+        "tipo_nome": "Micro-ônibus executivo 28 lugares",
+        "capacidade": 28,
+        "viagens": [
+          "E3-t2-01"
+        ],
+        "min_turno": 90,
+        "km_turno": 49.0,
+        "alunos": 23,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 82,
+        "folga_jornada_min": 30
+      },
+      {
+        "id": "VT02",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "capacidade": 16,
+        "viagens": [
+          "E3-t2-02"
+        ],
+        "min_turno": 90,
+        "km_turno": 54.5,
+        "alunos": 14,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 88,
+        "folga_jornada_min": 30
+      },
+      {
+        "id": "VT03",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "tipo": "RODO46",
+        "tipo_nome": "Ônibus rodoviário 46 lugares",
+        "capacidade": 46,
+        "viagens": [
+          "E2-t2-01"
+        ],
+        "min_turno": 89,
+        "km_turno": 46.2,
+        "alunos": 30,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 65,
+        "folga_jornada_min": 31
+      },
+      {
+        "id": "VT04",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "capacidade": 12,
+        "viagens": [
+          "E2-t2-02"
+        ],
+        "min_turno": 66,
+        "km_turno": 34.8,
+        "alunos": 12,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 100,
+        "folga_jornada_min": 54
+      },
+      {
+        "id": "VT05",
+        "turno": "t2",
+        "turno_nome": "2º turno (14h20)",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "capacidade": 16,
+        "viagens": [
+          "E3-t2-03"
+        ],
+        "min_turno": 39,
+        "km_turno": 21.1,
+        "alunos": 8,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 50,
+        "folga_jornada_min": 81
+      },
+      {
+        "id": "VT01",
+        "turno": "t3",
+        "turno_nome": "3º turno (22h)",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "capacidade": 16,
+        "viagens": [
+          "E3-t3-02"
+        ],
+        "min_turno": 88,
+        "km_turno": 56.7,
+        "alunos": 10,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 62,
+        "folga_jornada_min": 32
+      },
+      {
+        "id": "VT02",
+        "turno": "t3",
+        "turno_nome": "3º turno (22h)",
+        "tipo": "VAN16",
+        "tipo_nome": "Van executiva 16 lugares",
+        "capacidade": 16,
+        "viagens": [
+          "E2-t3-01"
+        ],
+        "min_turno": 67,
+        "km_turno": 38.0,
+        "alunos": 12,
+        "ultima_escola": "E2",
+        "ocupacao_media_pct": 75,
+        "folga_jornada_min": 53
+      },
+      {
+        "id": "VT03",
+        "turno": "t3",
+        "turno_nome": "3º turno (22h)",
+        "tipo": "VANPCD",
+        "tipo_nome": "Van acessível 12 lugares",
+        "capacidade": 12,
+        "viagens": [
+          "E2-t3-02",
+          "E3-t3-01"
+        ],
+        "min_turno": 97,
+        "km_turno": 57.9,
+        "alunos": 9,
+        "ultima_escola": "E3",
+        "ocupacao_media_pct": 38,
+        "folga_jornada_min": 23
+      }
+    ],
+    "viagens_por_veiculo_turno": 1.17,
+    "por_turno": {
+      "t1": {
+        "viagens": 7,
+        "veiculos": 6
+      },
+      "adm": {
+        "viagens": 5,
+        "veiculos": 4
+      },
+      "t2": {
+        "viagens": 5,
+        "veiculos": 5
+      },
+      "t3": {
+        "viagens": 4,
+        "veiculos": 3
+      }
+    }
+  },
+  "economia": {
+    "veiculos": 14,
+    "reducao_frota_pct": 66.7,
+    "custo_mes": 193292,
+    "custo_ano": 2319505,
+    "km_dia": 461.0,
+    "litros_dia": 187.1,
+    "tco2_ano": 132.4
+  },
+  "coerencia": [
+    "A frota declarada oferece 670 lugares por viagem, para um turno de 148 colaboradores (4.5× a demanda). Confira se a planilha cobre a empresa inteira — comparar a frota inteira com uma parte dos colaboradores produz uma economia que não existe."
+  ],
+  "perfil": {
+    "id": "fretamento",
+    "nome": "Fretamento corporativo",
+    "vertical": "fretamento",
+    "rotulo_passageiro": "colaborador",
+    "rotulo_passageiro_plural": "colaboradores",
+    "rotulo_destino": "planta",
+    "rotulo_destino_plural": "plantas",
+    "tempo_max_trajeto_min": 90,
+    "dias_operacao_mes": 22,
+    "custo_motorista_mes": 7800.0,
+    "turnos": [
+      {
+        "id": "t1",
+        "nome": "1º turno (06h)",
+        "janela_chegada": [
+          360,
+          370
+        ],
+        "jornada_max_min": 120,
+        "duracao_min": 480
+      },
+      {
+        "id": "adm",
+        "nome": "Administrativo (08h)",
+        "janela_chegada": [
+          480,
+          490
+        ],
+        "jornada_max_min": 120,
+        "duracao_min": 540
+      },
+      {
+        "id": "t2",
+        "nome": "2º turno (14h20)",
+        "janela_chegada": [
+          860,
+          870
+        ],
+        "jornada_max_min": 120,
+        "duracao_min": 480
+      },
+      {
+        "id": "t3",
+        "nome": "3º turno (22h)",
+        "janela_chegada": [
+          1320,
+          1330
+        ],
+        "jornada_max_min": 120,
+        "duracao_min": 480
+      }
+    ],
+    "destinos": [
+      {
+        "id": "PL1",
+        "nome": "Planta 1 — Fábrica",
+        "lat": -21.14,
+        "lon": -47.79
+      },
+      {
+        "id": "PL2",
+        "nome": "Planta 2 — Centro de distribuição",
+        "lat": -21.205,
+        "lon": -47.845
+      },
+      {
+        "id": "PL3",
+        "nome": "Escritório administrativo",
+        "lat": -21.158,
+        "lon": -47.802
+      }
+    ],
+    "tipos_veiculo": [
+      {
+        "id": "RODO46",
+        "nome": "Ônibus rodoviário 46 lugares",
+        "capacidade": 46,
+        "posicoes_cadeirante": 0,
+        "custo_km": 3.4,
+        "custo_fixo_mes": 9800.0,
+        "consumo_km_l": 2.9
+      },
+      {
+        "id": "EXEC28",
+        "nome": "Micro-ônibus executivo 28 lugares",
+        "capacidade": 28,
+        "posicoes_cadeirante": 0,
+        "custo_km": 2.6,
+        "custo_fixo_mes": 7200.0,
+        "consumo_km_l": 4.2
+      },
+      {
+        "id": "VAN16",
+        "nome": "Van executiva 16 lugares",
+        "capacidade": 16,
+        "posicoes_cadeirante": 0,
+        "custo_km": 1.8,
+        "custo_fixo_mes": 4900.0,
+        "consumo_km_l": 8.5
+      },
+      {
+        "id": "VANPCD",
+        "nome": "Van acessível 12 lugares",
+        "capacidade": 12,
+        "posicoes_cadeirante": 2,
+        "custo_km": 1.95,
+        "custo_fixo_mes": 5600.0,
+        "consumo_km_l": 7.8
+      }
+    ],
+    "regras_jornada": {
+      "jornada_normal_min": 480,
+      "hora_extra_max_min": 120,
+      "direcao_continua_max_min": 330,
+      "parada_obrigatoria_min": 30,
+      "intervalo_refeicao_min": 60,
+      "interjornada_min": 660,
+      "amplitude_max_min": 840,
+      "permite_dupla_pegada": true,
+      "tempo_troca_veiculo_min": 15
+    }
+  },
+  "equipe": {
+    "resumo": {
+      "motoristas": 16,
+      "blocos": 36,
+      "jornada_media_min": 246.8,
+      "jornada_maxima_min": 496,
+      "com_hora_extra": 1,
+      "hora_extra_total_min": 16,
+      "com_dupla_pegada": 11,
+      "escalas_com_problema": 0,
+      "por_turno": {
+        "adm": 8,
+        "t1": 9,
+        "t2": 8,
+        "t3": 6
+      },
+      "ocupacao_da_jornada_pct": 51.4
+    },
+    "regras": {
+      "jornada_normal_min": 480,
+      "hora_extra_max_min": 120,
+      "direcao_continua_max_min": 330,
+      "parada_obrigatoria_min": 30,
+      "intervalo_refeicao_min": 60,
+      "interjornada_min": 660,
+      "amplitude_max_min": 840,
+      "permite_dupla_pegada": true,
+      "tempo_troca_veiculo_min": 15
+    },
+    "custo_motorista_mes": 7800.0,
+    "custo_equipe_mes": 124800,
+    "motoristas": [
+      {
+        "id": "M01",
+        "turnos": [
+          "adm",
+          "t1"
+        ],
+        "veiculos": [
+          "VA03",
+          "VT05"
+        ],
+        "inicio": "03h31",
+        "fim": "16h29",
+        "jornada_min": 400,
+        "amplitude_min": 778,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 149.4,
+        "problemas": []
+      },
+      {
+        "id": "M02",
+        "turnos": [
+          "adm",
+          "t2"
+        ],
+        "veiculos": [
+          "VA01",
+          "VT02"
+        ],
+        "inicio": "05h51",
+        "fim": "14h20",
+        "jornada_min": 249,
+        "amplitude_min": 509,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 93.0,
+        "problemas": []
+      },
+      {
+        "id": "M03",
+        "turnos": [
+          "adm",
+          "t2",
+          "t3"
+        ],
+        "veiculos": [
+          "VA01",
+          "VT01",
+          "VT03"
+        ],
+        "inicio": "12h20",
+        "fim": "00h20",
+        "jornada_min": 496,
+        "amplitude_min": 720,
+        "dupla_pegada": true,
+        "hora_extra_min": 16,
+        "km": 194.4,
+        "problemas": []
+      },
+      {
+        "id": "M04",
+        "turnos": [
+          "adm",
+          "t1",
+          "t3"
+        ],
+        "veiculos": [
+          "VA02",
+          "VT01",
+          "VT03"
+        ],
+        "inicio": "06h00",
+        "fim": "18h59",
+        "jornada_min": 366,
+        "amplitude_min": 779,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 147.9,
+        "problemas": []
+      },
+      {
+        "id": "M05",
+        "turnos": [
+          "adm",
+          "t1"
+        ],
+        "veiculos": [
+          "VA04",
+          "VT01",
+          "VT02"
+        ],
+        "inicio": "04h00",
+        "fim": "16h00",
+        "jornada_min": 306,
+        "amplitude_min": 720,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 113.0,
+        "problemas": []
+      },
+      {
+        "id": "M06",
+        "turnos": [
+          "t1"
+        ],
+        "veiculos": [
+          "VT02",
+          "VT03"
+        ],
+        "inicio": "04h00",
+        "fim": "16h00",
+        "jornada_min": 240,
+        "amplitude_min": 720,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 107.7,
+        "problemas": []
+      },
+      {
+        "id": "M07",
+        "turnos": [
+          "t1",
+          "t2"
+        ],
+        "veiculos": [
+          "VT03"
+        ],
+        "inicio": "04h00",
+        "fim": "14h20",
+        "jornada_min": 239,
+        "amplitude_min": 620,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 98.8,
+        "problemas": []
+      },
+      {
+        "id": "M08",
+        "turnos": [
+          "adm",
+          "t1",
+          "t2",
+          "t3"
+        ],
+        "veiculos": [
+          "VA03",
+          "VT01",
+          "VT02",
+          "VT04"
+        ],
+        "inicio": "14h00",
+        "fim": "00h20",
+        "jornada_min": 444,
+        "amplitude_min": 620,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 180.2,
+        "problemas": []
+      },
+      {
+        "id": "M09",
+        "turnos": [
+          "adm",
+          "t1"
+        ],
+        "veiculos": [
+          "VA02",
+          "VT06"
+        ],
+        "inicio": "06h01",
+        "fim": "15h19",
+        "jornada_min": 198,
+        "amplitude_min": 558,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 67.5,
+        "problemas": []
+      },
+      {
+        "id": "M10",
+        "turnos": [
+          "adm",
+          "t2",
+          "t3"
+        ],
+        "veiculos": [
+          "VA04",
+          "VT02",
+          "VT03",
+          "VT04"
+        ],
+        "inicio": "12h44",
+        "fim": "00h19",
+        "jornada_min": 378,
+        "amplitude_min": 695,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 129.5,
+        "problemas": []
+      },
+      {
+        "id": "M11",
+        "turnos": [
+          "t2",
+          "t3"
+        ],
+        "veiculos": [
+          "VT01",
+          "VT05"
+        ],
+        "inicio": "06h00",
+        "fim": "14h20",
+        "jornada_min": 187,
+        "amplitude_min": 500,
+        "dupla_pegada": true,
+        "hora_extra_min": 0,
+        "km": 77.8,
+        "problemas": []
+      },
+      {
+        "id": "M12",
+        "turnos": [
+          "t1"
+        ],
+        "veiculos": [
+          "VT04"
+        ],
+        "inicio": "04h16",
+        "fim": "06h00",
+        "jornada_min": 104,
+        "amplitude_min": 104,
+        "dupla_pegada": false,
+        "hora_extra_min": 0,
+        "km": 41.0,
+        "problemas": []
+      },
+      {
+        "id": "M13",
+        "turnos": [
+          "t3"
+        ],
+        "veiculos": [
+          "VT02"
+        ],
+        "inicio": "06h00",
+        "fim": "07h37",
+        "jornada_min": 97,
+        "amplitude_min": 97,
+        "dupla_pegada": false,
+        "hora_extra_min": 0,
+        "km": 38.0,
+        "problemas": []
+      },
+      {
+        "id": "M14",
+        "turnos": [
+          "t2"
+        ],
+        "veiculos": [
+          "VT04"
+        ],
+        "inicio": "22h20",
+        "fim": "23h56",
+        "jornada_min": 96,
+        "amplitude_min": 96,
+        "dupla_pegada": false,
+        "hora_extra_min": 0,
+        "km": 34.8,
+        "problemas": []
+      },
+      {
+        "id": "M15",
+        "turnos": [
+          "t1"
+        ],
+        "veiculos": [
+          "VT06"
+        ],
+        "inicio": "04h41",
+        "fim": "06h00",
+        "jornada_min": 79,
+        "amplitude_min": 79,
+        "dupla_pegada": false,
+        "hora_extra_min": 0,
+        "km": 24.9,
+        "problemas": []
+      },
+      {
+        "id": "M16",
+        "turnos": [
+          "t2"
+        ],
+        "veiculos": [
+          "VT05"
+        ],
+        "inicio": "22h20",
+        "fim": "23h29",
+        "jornada_min": 69,
+        "amplitude_min": 69,
+        "dupla_pegada": false,
+        "hora_extra_min": 0,
+        "km": 21.1,
+        "problemas": []
+      }
+    ],
+    "escalas": [
+      {
+        "motorista": "M01",
+        "blocos": [
+          {
+            "veiculo": "VT05",
+            "turno": "1º turno (06h)",
+            "inicio": 211,
+            "fim": 360
+          },
+          {
+            "veiculo": "VA03",
+            "turno": "Administrativo (08h)",
+            "inicio": 378,
+            "fim": 480
+          },
+          {
+            "veiculo": "VT05",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 989
+          }
+        ]
+      },
+      {
+        "motorista": "M02",
+        "blocos": [
+          {
+            "veiculo": "VA01",
+            "turno": "Administrativo (08h)",
+            "inicio": 351,
+            "fim": 480
+          },
+          {
+            "veiculo": "VT02",
+            "turno": "2º turno (14h20)",
+            "inicio": 740,
+            "fim": 860
+          }
+        ]
+      },
+      {
+        "motorista": "M03",
+        "blocos": [
+          {
+            "veiculo": "VT01",
+            "turno": "2º turno (14h20)",
+            "inicio": 740,
+            "fim": 860
+          },
+          {
+            "veiculo": "VA01",
+            "turno": "Administrativo (08h) (volta)",
+            "inicio": 1020,
+            "fim": 1149
+          },
+          {
+            "veiculo": "VT03",
+            "turno": "3º turno (22h)",
+            "inicio": 1193,
+            "fim": 1320
+          },
+          {
+            "veiculo": "VT01",
+            "turno": "2º turno (14h20) (volta)",
+            "inicio": 1340,
+            "fim": 1460
+          }
+        ]
+      },
+      {
+        "motorista": "M04",
+        "blocos": [
+          {
+            "veiculo": "VT03",
+            "turno": "3º turno (22h) (volta)",
+            "inicio": 360,
+            "fim": 487
+          },
+          {
+            "veiculo": "VT01",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 960
+          },
+          {
+            "veiculo": "VA02",
+            "turno": "Administrativo (08h) (volta)",
+            "inicio": 1020,
+            "fim": 1139
+          }
+        ]
+      },
+      {
+        "motorista": "M05",
+        "blocos": [
+          {
+            "veiculo": "VT01",
+            "turno": "1º turno (06h)",
+            "inicio": 240,
+            "fim": 360
+          },
+          {
+            "veiculo": "VA04",
+            "turno": "Administrativo (08h)",
+            "inicio": 414,
+            "fim": 480
+          },
+          {
+            "veiculo": "VT02",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 960
+          }
+        ]
+      },
+      {
+        "motorista": "M06",
+        "blocos": [
+          {
+            "veiculo": "VT02",
+            "turno": "1º turno (06h)",
+            "inicio": 240,
+            "fim": 360
+          },
+          {
+            "veiculo": "VT03",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 960
+          }
+        ]
+      },
+      {
+        "motorista": "M07",
+        "blocos": [
+          {
+            "veiculo": "VT03",
+            "turno": "1º turno (06h)",
+            "inicio": 240,
+            "fim": 360
+          },
+          {
+            "veiculo": "VT03",
+            "turno": "2º turno (14h20)",
+            "inicio": 741,
+            "fim": 860
+          }
+        ]
+      },
+      {
+        "motorista": "M08",
+        "blocos": [
+          {
+            "veiculo": "VT04",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 944
+          },
+          {
+            "veiculo": "VA03",
+            "turno": "Administrativo (08h) (volta)",
+            "inicio": 1020,
+            "fim": 1122
+          },
+          {
+            "veiculo": "VT01",
+            "turno": "3º turno (22h)",
+            "inicio": 1202,
+            "fim": 1320
+          },
+          {
+            "veiculo": "VT02",
+            "turno": "2º turno (14h20) (volta)",
+            "inicio": 1340,
+            "fim": 1460
+          }
+        ]
+      },
+      {
+        "motorista": "M09",
+        "blocos": [
+          {
+            "veiculo": "VA02",
+            "turno": "Administrativo (08h)",
+            "inicio": 361,
+            "fim": 480
+          },
+          {
+            "veiculo": "VT06",
+            "turno": "1º turno (06h) (volta)",
+            "inicio": 840,
+            "fim": 919
+          }
+        ]
+      },
+      {
+        "motorista": "M10",
+        "blocos": [
+          {
+            "veiculo": "VT04",
+            "turno": "2º turno (14h20)",
+            "inicio": 764,
+            "fim": 860
+          },
+          {
+            "veiculo": "VA04",
+            "turno": "Administrativo (08h) (volta)",
+            "inicio": 1020,
+            "fim": 1086
+          },
+          {
+            "veiculo": "VT02",
+            "turno": "3º turno (22h)",
+            "inicio": 1223,
+            "fim": 1320
+          },
+          {
+            "veiculo": "VT03",
+            "turno": "2º turno (14h20) (volta)",
+            "inicio": 1340,
+            "fim": 1459
+          }
+        ]
+      },
+      {
+        "motorista": "M11",
+        "blocos": [
+          {
+            "veiculo": "VT01",
+            "turno": "3º turno (22h) (volta)",
+            "inicio": 360,
+            "fim": 478
+          },
+          {
+            "veiculo": "VT05",
+            "turno": "2º turno (14h20)",
+            "inicio": 791,
+            "fim": 860
+          }
+        ]
+      },
+      {
+        "motorista": "M12",
+        "blocos": [
+          {
+            "veiculo": "VT04",
+            "turno": "1º turno (06h)",
+            "inicio": 256,
+            "fim": 360
+          }
+        ]
+      },
+      {
+        "motorista": "M13",
+        "blocos": [
+          {
+            "veiculo": "VT02",
+            "turno": "3º turno (22h) (volta)",
+            "inicio": 360,
+            "fim": 457
+          }
+        ]
+      },
+      {
+        "motorista": "M14",
+        "blocos": [
+          {
+            "veiculo": "VT04",
+            "turno": "2º turno (14h20) (volta)",
+            "inicio": 1340,
+            "fim": 1436
+          }
+        ]
+      },
+      {
+        "motorista": "M15",
+        "blocos": [
+          {
+            "veiculo": "VT06",
+            "turno": "1º turno (06h)",
+            "inicio": 281,
+            "fim": 360
+          }
+        ]
+      },
+      {
+        "motorista": "M16",
+        "blocos": [
+          {
+            "veiculo": "VT05",
+            "turno": "2º turno (14h20) (volta)",
+            "inicio": 1340,
+            "fim": 1409
+          }
+        ]
+      }
+    ],
+    "explicacao": [
+      "M01: 03h31–16h29 (6h40 de jornada) · turnos adm, t1 · veículos VA03, VT05 · dupla pegada",
+      "M02: 05h51–14h20 (4h09 de jornada) · turnos adm, t2 · veículos VA01, VT02 · dupla pegada",
+      "M03: 12h20–00h20 (8h16 de jornada) · turnos adm, t2, t3 · veículos VA01, VT01, VT03 · 16 min de hora extra · dupla pegada",
+      "M04: 06h00–18h59 (6h06 de jornada) · turnos adm, t1, t3 · veículos VA02, VT01, VT03 · dupla pegada",
+      "M05: 04h00–16h00 (5h06 de jornada) · turnos adm, t1 · veículos VA04, VT01, VT02 · dupla pegada"
+    ]
+  },
+  "demanda_nao_atendida": {
+    "pontos": [],
+    "alunos": 0,
+    "por_turno": {
+      "t1": 0,
+      "adm": 0,
+      "t2": 0,
+      "t3": 0
+    }
+  },
+  "origem": {
+    "tipo": "planilha_importada",
+    "arquivo": "planilha-fretamento-demo.csv",
+    "importado_em": "2026-08-22 21:19",
+    "alunos_na_planilha": 339,
+    "erros_na_importacao": 101,
+    "avisos_na_importacao": 79
+  },
+  "agrupamento": {
+    "alunos": 339,
+    "pontos": 220,
+    "alunos_por_ponto": 1.54,
+    "caminhada_media_m": 109,
+    "caminhada_maxima_m": 573,
+    "pontos_exclusivos_de_cadeirante": 4,
+    "raio_urbano_m": 300,
+    "raio_rural_m": 800,
+    "escolas": 3,
+    "escolas_com_coordenada_estimada": 0,
+    "avisos": []
+  }
+}

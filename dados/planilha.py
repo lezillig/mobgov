@@ -46,11 +46,25 @@ def _decodificar(bruto: bytes) -> str:
     return bruto.decode("utf-8", errors="replace")
 
 
-def _separador(texto: str) -> str:
-    cabecalho = texto.splitlines()[0] if texto.splitlines() else ""
-    candidatos = {";": cabecalho.count(";"), ",": cabecalho.count(","),
-                  "\t": cabecalho.count("\t")}
-    return max(candidatos, key=candidatos.get) if any(candidatos.values()) else ","
+def _separador(texto: str, amostra: int = 12) -> str:
+    """Descobre o separador olhando VÁRIAS linhas, não só a primeira.
+
+    A primeira linha de uma planilha de verdade costuma ser título — "RELAÇÃO
+    DE COLABORADORES 2026" — sem separador nenhum. Decidindo por ela, o
+    arquivo inteiro virava uma coluna só e o importador respondia "não
+    reconheci as colunas", que é a mensagem mais frustrante possível para
+    quem mandou o arquivo certo.
+    """
+    linhas = [l for l in texto.splitlines()[:amostra] if l.strip()]
+    candidatos = {}
+    for separador in (";", ",", "\t"):
+        # conta em quantas linhas ele aparece e quantas vezes ao todo: o
+        # separador de verdade se repete em quase todas as linhas
+        contagens = [l.count(separador) for l in linhas]
+        presente = sum(1 for c in contagens if c)
+        candidatos[separador] = (presente, sum(contagens))
+    melhor = max(candidatos, key=lambda s: candidatos[s])
+    return melhor if candidatos[melhor][0] else ","
 
 
 def ler_csv(caminho: str) -> list:

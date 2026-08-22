@@ -35,27 +35,42 @@ from dados.planilha import ler
 # --------------------------------------------------------------- sinônimos ---
 SINONIMOS = {
     "nome": ["nome", "nome do aluno", "aluno", "aluna", "estudante",
-             "nome completo", "nome aluno", "nome do estudante", "aluno a"],
+             "nome completo", "nome aluno", "nome do estudante", "aluno a",
+             # fretamento: a planilha vem do RH, não da secretaria
+             "colaborador", "colaboradora", "funcionario", "funcionaria",
+             "empregado", "nome do colaborador", "nome do funcionario"],
     "endereco": ["endereco", "logradouro", "rua", "endereco completo",
                  "residencia", "endereco residencial", "local de embarque"],
     "numero": ["numero", "n", "no", "num", "numero casa"],
     "bairro": ["bairro", "distrito", "localidade", "comunidade", "zona",
                "povoado", "assentamento", "regiao"],
     "escola": ["escola", "unidade", "unidade escolar", "destino",
-               "escola de destino", "estabelecimento"],
-    "turno": ["turno", "periodo", "horario", "turno escolar"],
+               "escola de destino", "estabelecimento",
+               # fretamento: o destino é a planta onde a pessoa trabalha
+               "planta", "fabrica", "filial", "local de trabalho", "obra",
+               "centro de custo", "unidade de destino", "site"],
+    "turno": ["turno", "periodo", "horario", "turno escolar",
+              "turno de trabalho", "escala", "jornada"],
     "cadeirante": ["cadeirante", "cadeira de rodas", "usa cadeira de rodas",
-                   "pcd", "deficiencia", "necessidade especial"],
+                   "pcd", "deficiencia", "necessidade especial",
+                   "mobilidade reduzida", "acessibilidade"],
     "acompanhante": ["acompanhante", "monitor", "necessita acompanhante",
                      "responsavel acompanha"],
     "latitude": ["latitude", "lat", "coord lat"],
     "longitude": ["longitude", "long", "lon", "coord long"],
 }
 
+# Turnos reconhecidos. Os quatro primeiros são do escolar; os de fretamento
+# vêm da indústria, onde "T1" e "1o turno" são o jeito de todo mundo escrever.
 TURNOS = {
     "manha": ["manha", "matutino", "m", "manha 1", "1", "mat"],
     "tarde": ["tarde", "vespertino", "t", "2", "vesp"],
     "noite": ["noite", "noturno", "n", "3", "not"],
+    "t1": ["t1", "1o turno", "1 turno", "primeiro turno", "turno 1", "a"],
+    "t2": ["t2", "2o turno", "2 turno", "segundo turno", "turno 2", "b"],
+    "t3": ["t3", "3o turno", "3 turno", "terceiro turno", "turno 3", "c"],
+    "adm": ["adm", "administrativo", "comercial", "horario administrativo",
+            "escritorio", "geral"],
 }
 
 AFIRMATIVOS = {"sim", "s", "x", "1", "true", "verdadeiro", "v", "sim ",
@@ -124,10 +139,17 @@ def _achar_cabecalho(linhas: list, limite: int = 10) -> int:
 
 
 # ------------------------------------------------------------- conversões ---
-def converter_turno(valor: str):
+def converter_turno(valor: str, validos=None):
+    """Traduz o que está escrito na célula para um id de turno.
+
+    `validos` é a lista de turnos que a operação tem de fato (do perfil): sem
+    ela, uma planilha de fretamento com "T1" entraria como turno inexistente
+    numa operação escolar de manhã e tarde — e o aluno cairia num turno que
+    ninguém opera.
+    """
     alvo = normalizar(valor)
     for turno, opcoes in TURNOS.items():
-        if alvo in opcoes:
+        if alvo in opcoes and (validos is None or turno in validos):
             return turno
     return None
 
@@ -192,7 +214,7 @@ class Importacao:
 
 
 def importar(caminho: str, referencias: dict = None, guardar_nomes: bool = False,
-             limites=None) -> Importacao:
+             limites=None, turnos_validos=None) -> Importacao:
     """Lê a planilha e devolve a demanda pronta para o motor.
 
     `referencias`: {bairro_normalizado: (lat, lon)} — o ponto de referência
@@ -201,6 +223,8 @@ def importar(caminho: str, referencias: dict = None, guardar_nomes: bool = False
     é descartar o nome depois de gerar o pseudônimo.
     `limites`: (lat_min, lat_max, lon_min, lon_max) para pegar coordenada
     trocada de lugar ou digitada errada.
+    `turnos_validos`: os turnos que a operação tem (vêm do perfil). Sem isso,
+    "T1" de uma planilha de fábrica viraria turno numa operação escolar.
     """
     referencias = {normalizar(k): v for k, v in (referencias or {}).items()}
     resultado = Importacao()
@@ -227,7 +251,7 @@ def importar(caminho: str, referencias: dict = None, guardar_nomes: bool = False
         if not any((c or "").strip() for c in linha):
             continue                              # linha em branco no meio
         aluno = _converter_linha(linha, numero_linha, resultado, referencias,
-                                 limites)
+                                 limites, turnos_validos)
         if aluno is None:
             continue
         chave = aluno["id"]
@@ -247,7 +271,8 @@ def importar(caminho: str, referencias: dict = None, guardar_nomes: bool = False
     return resultado
 
 
-def _converter_linha(linha, numero_linha, resultado, referencias, limites):
+def _converter_linha(linha, numero_linha, resultado, referencias, limites,
+                     turnos_validos=None):
     def campo(nome):
         indice = resultado.colunas.get(nome)
         if indice is None or indice >= len(linha):
@@ -265,14 +290,17 @@ def _converter_linha(linha, numero_linha, resultado, referencias, limites):
                            "aviso")
         return None
 
-    turno = converter_turno(campo("turno"))
+    turno = converter_turno(campo("turno"), turnos_validos)
     if turno is None:
+        padrao = (turnos_validos or ["manha"])[0]
+        aceitos = ", ".join(turnos_validos) if turnos_validos else \
+            "manhã, tarde ou noite (aceito também matutino, vespertino, M, T, N)"
         resultado.problema(
             numero_linha, "turno", campo("turno"),
             "Turno não reconhecido.",
-            "Use manhã, tarde ou noite (aceito também matutino, vespertino, "
-            "M, T, N). Assumi manhã para não perder o aluno.", "aviso")
-        turno = "manha"
+            f"Turnos desta operação: {aceitos}. Assumi “{padrao}” para não "
+            f"perder a pessoa — confira.", "aviso")
+        turno = padrao
 
     cadeirante = converter_sim_nao(campo("cadeirante"))
     if cadeirante is None and campo("cadeirante"):
