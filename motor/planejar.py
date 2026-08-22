@@ -23,6 +23,7 @@ import os
 import re
 import sys
 import unicodedata
+from dataclasses import replace
 from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -130,11 +131,16 @@ def planejar(importacao: dict, coordenadas_escolas: dict = None,
              tempo_limite_s: int = dimensionar.TEMPO_LIMITE_SOLVER_S,
              raio_urbano: float = agrupar_mod.RAIO_URBANO_M,
              raio_rural: float = agrupar_mod.RAIO_RURAL_M,
-             progresso=None, perfil=None) -> dict:
+             progresso=None, perfil=None,
+             tempo_max_trajeto_min: int = None) -> dict:
     """Agrupa os alunos importados em pontos e roteiriza.
 
     O relatório sai no mesmo formato do Município Modelo — o painel, o console
     e os apps não precisam saber de onde a demanda veio.
+
+    `tempo_max_trajeto_min` sobrescreve o teto do perfil só nesta rodada: é o
+    parâmetro que a secretaria mexe para ver o preço de apertar ou afrouxar o
+    tempo da criança no veículo, sem reconfigurar a operação inteira.
     """
     avisar = progresso or (lambda etapa, detalhe="": None)
     alunos = importacao.get("alunos") or []
@@ -142,6 +148,9 @@ def planejar(importacao: dict, coordenadas_escolas: dict = None,
         raise ValueError("A importação não tem nenhum aluno para roteirizar.")
 
     perfil = perfil or perfis_mod.PERFIL_ESCOLAR
+    if tempo_max_trajeto_min:
+        perfil = replace(perfil,
+                         tempo_max_trajeto_min=int(tempo_max_trajeto_min))
     conhecidos = {d.nome: (d.lat, d.lon) for d in perfil.destinos}
     conhecidos.update(coordenadas_escolas or {})
     avisar("agrupando", f"{len(alunos)} {perfil.rotulo_passageiro_plural} em "

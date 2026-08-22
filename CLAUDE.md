@@ -64,7 +64,7 @@ previu X, aconteceu Y, ajustou Z".
 | 8 | `planejamento/` + `motor/planejar.py` + `dados/agrupar.py` — planilha → pontos → rotas → publicar | ✅ pronto |
 | 9 | `dados/perfis.py` + `motor/jornada.py` — perfil de fretamento: turnos configuráveis e jornada do motorista (Lei 13.103) como restrição | ✅ pronto |
 | 10 | `comercial/` — precificação (custo → preço com margem por divisão) e diagnóstico da operação existente | ✅ pronto |
-| 11 | `ui/` — o sistema remodelado por momento de trabalho (Início · Planejar · Operar · Vender), descrito em `docs/ux-modelo.md` | ✅ pronto |
+| 11 | `ui/` — o sistema remodelado por momento de trabalho (Início · Planejar · Operar · Vender · Ajustes), descrito em `docs/ux-modelo.md` | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -109,7 +109,7 @@ mobgov/                          (raiz deste repositório)
   planejamento/servidor.py       a tela da roteirização: envia, confere, ajusta, publica
   planejamento/tela.html         os cinco passos numa página só
   planejamento/multipart.py      envio de arquivo sem dependência (o cgi saiu do 3.13)
-  ui/app.html                    o sistema remodelado: 4 destinos, mapa vivo, trilha
+  ui/app.html                    o sistema remodelado: 5 destinos, mapa vivo, trilha
   ui/gerar.py                    monta o payload real e escreve a tela autocontida
   painel/console.py              console: Hoje, Elegibilidade, Equipe, Assistente
   docs/demonstracao/gerar_telas_estaticas.py  todas as telas em HTML autocontido
@@ -213,6 +213,26 @@ python -m unittest discover -s testes -v
   fretamento.
 - **Número que o sistema duvida não aparece limpo.** Se `coerencia` traz aviso
   sobre a base de comparação, o cartão de economia diz isso ao lado do número.
+- **Parâmetro que decide rota, frota ou preço mora numa tela.** O tempo
+  máximo a bordo, o raio de caminhada, o catálogo de tipos de veículo, os
+  turnos, a jornada e os custos ficam em Ajustes (`ui/app.html`) e são
+  gravados pelo `POST /api/perfil`. Regra que decide quanto tempo uma criança
+  fica dentro do ônibus não pode morar numa constante de módulo.
+- **São dois tetos de tempo a bordo, não um.** Na rota coletiva vale
+  `tempo_max_trajeto_min`, igual para todos; no porta a porta vale
+  `direto × fator_tempo_bordo + folga_tempo_bordo_min`, relativo ao trajeto de
+  cada um — 20 min de casa até a escola não podem virar 75 só porque o limite
+  geral permite. `planejar(tempo_max_trajeto_min=...)` e o campo na tela
+  sobrescrevem o teto só naquela rodada, e a tela mostra sempre o valor que o
+  motor **usou**, não o padrão do perfil.
+- **O motor só usa tipo de veículo cadastrado.** Salvar um perfil sem nenhum
+  tipo é recusado no `POST /api/perfil` (400): `de_dicionario` trata lista
+  vazia como "não configurado" e devolveria o catálogo padrão — apagar tudo na
+  tela é decisão, não omissão.
+- **Frota por tipo, nunca só o total.** O total não compra nada: quem licita
+  precisa de "19 ônibus de 31 lugares, 3 vans acessíveis, 1 micro". Tipo que a
+  operação tem hoje e o plano não usa mais continua na tabela com quantidade
+  zero — sumir da lista esconderia o corte.
 - **Contraparte é um campo só, com rótulo dos dois lados.** `Contraparte` em
   `dados/perfis.py` é o FORNECEDOR do lote quando quem usa é a prefeitura, e o
   CLIENTE dono da planta quando quem usa é a transportadora. O vínculo é com o

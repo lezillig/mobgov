@@ -124,14 +124,26 @@ def gerar_pedidos(quantidade: int = PEDIDOS_POR_DIA) -> list:
     return pedidos
 
 
-def tempo_embarque_min(pedido: PedidoPCD) -> int:
-    return (EMBARQUE_CADEIRANTE_MIN if pedido.cadeirante
-            else EMBARQUE_COMUM_MIN)
+def tempo_embarque_min(pedido: PedidoPCD, perfil=None) -> int:
+    if pedido.cadeirante:
+        return (getattr(perfil, "embarque_cadeirante_min", None)
+                or EMBARQUE_CADEIRANTE_MIN)
+    return getattr(perfil, "embarque_comum_min", None) or EMBARQUE_COMUM_MIN
 
 
-def limite_tempo_bordo_min(tempo_direto_min: int) -> int:
-    """Quanto tempo o usuário pode ficar dentro do veículo, no máximo."""
-    return math.ceil(tempo_direto_min * FATOR_TEMPO_BORDO) + FOLGA_TEMPO_BORDO_MIN
+def limite_tempo_bordo_min(tempo_direto_min: int, perfil=None) -> int:
+    """Quanto tempo o usuário pode ficar dentro do veículo, no máximo.
+
+    Os dois números saem do perfil da operação quando ele é passado; as
+    constantes acima são só o padrão de quem não configurou nada. Regra que
+    decide quanto tempo uma criança fica dentro do ônibus não pode morar
+    escondida numa constante de módulo.
+    """
+    fator = getattr(perfil, "fator_tempo_bordo", None) or FATOR_TEMPO_BORDO
+    folga = getattr(perfil, "folga_tempo_bordo_min", None)
+    if folga is None:
+        folga = FOLGA_TEMPO_BORDO_MIN
+    return math.ceil(tempo_direto_min * fator) + folga
 
 
 if __name__ == "__main__":

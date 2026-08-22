@@ -99,11 +99,54 @@ class Estado:
             "rotulo_passageiro_plural": perfil.rotulo_passageiro_plural,
             "rotulo_destino_plural": perfil.rotulo_destino_plural,
             "separa_custo_do_motorista": perfil.separa_custo_do_motorista,
+            "tempo_max_trajeto_min": perfil.tempo_max_trajeto_min,
+            "fator_tempo_bordo": perfil.fator_tempo_bordo,
+            "folga_tempo_bordo_min": perfil.folga_tempo_bordo_min,
             "turnos": [{"id": t.id, "nome": t.nome} for t in perfil.turnos],
+            # a frota disponível, inteira: é aqui que se cadastra o tipo de
+            # veículo que a operação pode usar, e o solver não usa nenhum tipo
+            # que não esteja nesta lista
             "tipos_veiculo": [{"id": t.id, "nome": t.nome,
-                               "capacidade": t.capacidade}
+                               "capacidade": t.capacidade,
+                               "posicoes_cadeirante": t.posicoes_cadeirante,
+                               "custo_km": t.custo_km,
+                               "custo_fixo_mes": t.custo_fixo_mes,
+                               "consumo_km_l": t.consumo_km_l}
                               for t in perfil.tipos_veiculo],
         }
+
+    # ------------------------------------------------------------- parâmetros
+    def gravar_perfil(self, dados: dict) -> dict:
+        """Salva o perfil editado na tela e passa a usá-lo.
+
+        Vai para arquivo porque parâmetro de operação sobrevive ao processo:
+        quem cadastrou a frota na sexta não recadastra na segunda.
+        """
+        # `de_dicionario` trata lista vazia como "não configurado" e devolve o
+        # catálogo padrão — o que é certo para um JSON parcial e errado aqui:
+        # apagar todos os tipos na tela é uma decisão, não uma omissão.
+        if "tipos_veiculo" in dados and not dados["tipos_veiculo"]:
+            raise ValueError("A operação precisa de pelo menos um tipo de "
+                             "veículo cadastrado.")
+        perfil = perfis_mod.de_dicionario(dados)
+        if not perfil.tipos_veiculo:
+            raise ValueError("A operação precisa de pelo menos um tipo de "
+                             "veículo cadastrado.")
+        if perfil.tempo_max_trajeto_min <= 0:
+            raise ValueError("O tempo máximo a bordo precisa ser maior que "
+                             "zero.")
+        os.makedirs(DIR_TRABALHO, exist_ok=True)
+        with open(os.path.join(DIR_TRABALHO, "perfil.json"), "w",
+                  encoding="utf-8") as f:
+            json.dump(perfil.como_dicionario(), f, ensure_ascii=False, indent=2)
+        self.perfil = perfil
+        return self.perfil_em_dicionario()
+
+    def recuperar_perfil(self):
+        caminho = os.path.join(DIR_TRABALHO, "perfil.json")
+        if os.path.exists(caminho):
+            with open(caminho, encoding="utf-8") as f:
+                self.perfil = perfis_mod.de_dicionario(json.load(f))
 
     def resumo_da_importacao(self) -> dict:
         if not self.importacao:
@@ -169,6 +212,8 @@ def roteirizar_em_segundo_plano(opcoes: dict):
                 tempo_limite_s=int(opcoes.get("tempo_limite") or 20),
                 raio_urbano=float(opcoes.get("raio_urbano") or 300),
                 raio_rural=float(opcoes.get("raio_rural") or 800),
+                tempo_max_trajeto_min=int(
+                    opcoes.get("tempo_max_trajeto") or 0) or None,
                 progresso=ESTADO.anotar)
             ESTADO.plano = plano
             ESTADO.anotar("concluido",
@@ -258,6 +303,8 @@ class Planejamento(BaseHTTPRequestHandler):
                 return self._enviar_linhas()
             if caminho == "/api/precificar":
                 return self._precificar()
+            if caminho == "/api/perfil":
+                return self._gravar_perfil()
         except (multipart.ErroDeEnvio, ErroDePlanilha) as erro:
             return self._json({"erro": str(erro)}, 400)
         except Exception as erro:
@@ -377,6 +424,14 @@ class Planejamento(BaseHTTPRequestHandler):
         return self._json({"erro": f"Aluno {alvo} não está nesta importação."},
                           404)
 
+    def _gravar_perfil(self):
+        """Cadastro dos parâmetros da operação — a frota disponível inclusive."""
+        pedido = json.loads(self._corpo().decode("utf-8") or "{}")
+        try:
+            return self._json({"ok": True, "perfil": ESTADO.gravar_perfil(pedido)})
+        except (ValueError, KeyError, TypeError) as erro:
+            return self._json({"erro": str(erro)}, 400)
+
     def _roteirizar(self):
         if not ESTADO.importacao:
             return self._json({"erro": "Envie a planilha primeiro."}, 400)
@@ -424,6 +479,7 @@ def main(argv=None):
     ap.add_argument("--host", default="127.0.0.1")
     a = ap.parse_args(argv)
 
+    ESTADO.recuperar_perfil()
     ESTADO.recuperar()
     servidor = ThreadingHTTPServer((a.host, a.porta), Planejamento)
     print(f"Planejamento em http://{a.host}:{a.porta}/")

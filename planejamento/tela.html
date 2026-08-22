@@ -421,6 +421,10 @@ select{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--linha)
       + campo("Km por dia (hoje)", "frota-km", frota.km_dia || 0)
       + campo("Raio urbano (m)", "raio-urbano", 300)
       + campo("Raio rural (m)", "raio-rural", 800)
+      // o teto de tempo a bordo é a promessa feita à família: fica editável
+      // aqui para a secretaria ver o preço de apertar, sem mexer no perfil
+      + campo("Tempo máximo a bordo (min)", "tempo-max-trajeto",
+              (estado.perfil && estado.perfil.tempo_max_trajeto_min) || 75)
       + campo("Tempo do solver (s)", "tempo-limite", 20);
   }
 
@@ -707,6 +711,7 @@ select{font:inherit;padding:10px;border-radius:8px;border:1px solid var(--linha)
         frota_declarada: total ? {composicao: frota, km_dia: valor("frota-km"),
                                   origem: "informada na tela"} : null,
         raio_urbano: valor("raio-urbano"), raio_rural: valor("raio-rural"),
+        tempo_max_trajeto: valor("tempo-max-trajeto"),
         tempo_limite: valor("tempo-limite")})
     }).then(function (r) { return r.json(); }).then(function () {
       acompanhar();

@@ -215,6 +215,108 @@ class TestContrato(unittest.TestCase):
         self.assertEqual(ui._contrato(perfil), {})
 
 
+class TestAjustes(unittest.TestCase):
+    """Parâmetro que decide rota, frota ou preço mora numa tela, não numa
+    constante de módulo."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.dados = ui.montar()
+        cls.ajustes = cls.dados["ajustes"]
+
+    def test_tempo_a_bordo_e_parametro_visivel(self):
+        tempo = self.ajustes["tempo"]
+        self.assertTrue(tempo["max_trajeto_min"])
+        self.assertTrue(tempo["fator_porta_a_porta"])
+        self.assertIsNotNone(tempo["folga_porta_a_porta_min"])
+
+    def test_o_tempo_mostrado_e_o_que_o_motor_usou(self):
+        """Mostrar o padrão do perfil quando a rodada usou outro seria
+        mentir sobre a rota que está na rua."""
+        self.assertEqual(
+            self.ajustes["tempo"]["max_trajeto_min"],
+            self.dados["planejar"]["premissas"]["tempo_max_trajeto_min"])
+
+    def test_catalogo_de_tipos_tem_o_que_o_motor_precisa(self):
+        tipos = self.ajustes["tipos_veiculo"]
+        self.assertTrue(tipos)
+        for t in tipos:
+            for campo in ("id", "nome", "capacidade", "custo_km",
+                          "custo_fixo_mes", "consumo_km_l"):
+                self.assertIn(campo, t)
+                self.assertIsNotNone(t[campo], f"{t['id']}.{campo}")
+
+    def test_todo_tipo_usado_no_plano_esta_no_catalogo(self):
+        catalogo = {t["id"] for t in self.ajustes["tipos_veiculo"]}
+        usados = {l["id"] for l in self.dados["planejar"]["frota_por_tipo"]
+                  if l["quantos"]}
+        self.assertTrue(usados)
+        self.assertTrue(usados <= catalogo, usados - catalogo)
+
+    def test_turno_aparece_com_a_janela_inteira(self):
+        for turno in self.ajustes["turnos"]:
+            self.assertTrue(turno["nome"])
+            self.assertEqual(len(turno["janela_chegada"]), 2)
+            self.assertTrue(turno["jornada_max_min"])
+
+
+class TestFrotaPorTipo(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.dados = ui.montar()
+        cls.linhas = cls.dados["planejar"]["frota_por_tipo"]
+
+    def test_a_soma_por_tipo_e_a_frota(self):
+        self.assertEqual(sum(l["quantos"] for l in self.linhas),
+                         self.dados["resumo"]["veiculos"])
+
+    def test_tipo_que_some_da_frota_continua_na_tabela(self):
+        """Cortar 10 micro-ônibus é o resultado; escondê-lo é omissão."""
+        atual = ui.economia_mod.carregar_relatorio(
+            ui.economia_mod.RELATORIO_PADRAO)["frota_atual"]["composicao"]
+        for tipo in atual:
+            self.assertIn(tipo, {l["id"] for l in self.linhas})
+
+    def test_lugares_batem_com_capacidade(self):
+        for l in self.linhas:
+            self.assertEqual(l["lugares"], (l["capacidade"] or 0) * l["quantos"])
+
+
+class TestTempoABordoParametrizavel(unittest.TestCase):
+    """O limite do porta a porta sai do perfil, não de constante fixa."""
+
+    def test_perfil_aperta_e_afrouxa_o_limite(self):
+        from dados import perfis as perfis_mod
+        from dados.demanda_pcd import limite_tempo_bordo_min
+        from dataclasses import replace
+
+        padrao = limite_tempo_bordo_min(20)
+        apertado = replace(perfis_mod.PERFIL_ESCOLAR, fator_tempo_bordo=1.2,
+                           folga_tempo_bordo_min=5)
+        frouxo = replace(perfis_mod.PERFIL_ESCOLAR, fator_tempo_bordo=2.0,
+                         folga_tempo_bordo_min=30)
+        self.assertLess(limite_tempo_bordo_min(20, apertado), padrao)
+        self.assertGreater(limite_tempo_bordo_min(20, frouxo), padrao)
+
+    def test_limite_sempre_maior_que_o_trajeto_direto(self):
+        from dados.demanda_pcd import limite_tempo_bordo_min
+        for direto in (5, 20, 45):
+            self.assertGreater(limite_tempo_bordo_min(direto), direto)
+
+    def test_perfil_de_arquivo_carrega_os_novos_parametros(self):
+        from dados import perfis as perfis_mod
+        perfil = perfis_mod.de_dicionario({
+            "base": "escolar", "tempo_max_trajeto_min": 50,
+            "fator_tempo_bordo": 1.3, "folga_tempo_bordo_min": 10})
+        self.assertEqual(perfil.tempo_max_trajeto_min, 50)
+        self.assertEqual(perfil.fator_tempo_bordo, 1.3)
+        self.assertEqual(perfil.folga_tempo_bordo_min, 10)
+        # e sobrevive à ida e volta pelo JSON que a tela grava
+        volta = perfis_mod.de_dicionario(perfil.como_dicionario())
+        self.assertEqual(volta.tempo_max_trajeto_min, 50)
+        self.assertEqual(volta.fator_tempo_bordo, 1.3)
+
+
 class TestHtmlGerado(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

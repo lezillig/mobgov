@@ -153,6 +153,9 @@ h3{font-size:16px}
   border-color:var(--marca);font-weight:600}
 .abas .aba[aria-selected="true"] small{background:rgba(255,255,255,.22);color:#fff}
 .lista .marca-contrato{margin-top:4px;font-size:12px;color:var(--tinta-2)}
+.numero.campo code{font-size:11.5px;color:var(--tinta-2);background:var(--superficie-2);
+  border-radius:5px;padding:1px 6px}
+.numero.campo .valor{font-size:23px;font-weight:700;margin:6px 0 4px}
 .lista .itens{max-height:520px;overflow:auto}
 .lista button.item{display:block;width:100%;text-align:left;background:none;
   border:0;border-bottom:1px solid var(--linha);padding:13px 16px;cursor:pointer}
@@ -242,6 +245,11 @@ demonstração, nada aqui é publicado de verdade</div>
       <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2"><path d="M4 20V8m5 12V4m5 16v-7m5 7V10"/></svg>
       <span>Vender<small>quanto custa, por quanto</small></span></a>
+    <a href="#ajustes" data-destino="ajustes">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><circle cx="12" cy="12" r="3"/>
+        <path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10l2.1 2.1m0-14.2l-2.1 2.1m-10 10l-2.1 2.1"/></svg>
+      <span>Ajustes<small>as regras desta operação</small></span></a>
     <div class="rodape" id="rodape-rail"></div>
   </nav>
 
@@ -413,6 +421,15 @@ var DADOS = __DADOS__;
     var hoje = DADOS.hoje || {};
     var rod = hoje.rodadas || {};
 
+    function porTipoEmTexto() {
+      var linhas = ((DADOS.planejar || {}).frota_por_tipo || [])
+        .filter(function (l) { return l.quantos; });
+      if (!linhas.length) { return "—"; }
+      return linhas.map(function (l) {
+        return num(l.quantos) + " " + l.nome.toLowerCase();
+      }).join(", ");
+    }
+
     /* Número que o próprio sistema duvida não aparece limpo: se a base de
        comparação tem aviso, a economia diz isso ao lado. */
     function duvidaDaComparacao() {
@@ -431,7 +448,8 @@ var DADOS = __DADOS__;
           r.motoristas ? num(r.motoristas) + " motoristas na escala"
             : "o mesmo veículo atende mais de um turno",
           {porque: "A frota é o pior turno, não a soma dos turnos: o mesmo "
-            + "veículo atende manhã e tarde."})
+            + "veículo atende manhã e tarde. Por tipo: " + porTipoEmTexto()
+            + "."})
       + numeroCartao("Ocupação média", num(r.ocupacao_pct, 1) + "%",
           "dos lugares ofertados")
       + (r.economia_mes ? numeroCartao("Economia", reaisCurto(r.economia_mes),
@@ -634,12 +652,41 @@ var DADOS = __DADOS__;
       + '<select id="cenario" style="padding:10px;border-radius:8px;'
       + 'border:1px solid var(--linha);width:100%;max-width:340px">' + opcoes
       + '</select></div><div id="saida-cenario"></div></div>'
-      + '<div class="cartao"><h3>Como os turnos ficaram</h3>'
+      + '<div class="cartao"><h3>Quantos veículos de cada tipo</h3>'
+      + '<p class="chamada">O total não compra nada: quem vai licitar precisa '
+      + 'da linha por tipo.</p>'
+      + tabelaFrotaPorTipo(pl.frota_por_tipo || [])
+      + '</div></div>'
+      + '<div class="cartao" style="margin-top:16px">'
+      + '<h3>Como os turnos ficaram</h3>'
       + '<div class="rolagem"><table style="margin-top:10px"><thead><tr>'
       + '<th>Turno</th>'
       + '<th class="num">Pessoas</th><th class="num">Viagens</th>'
       + '<th class="num">Veículos</th><th>Ocupação</th></tr></thead>'
-      + '<tbody>' + turnos + '</tbody></table></div></div></div>';
+      + '<tbody>' + turnos + '</tbody></table></div></div>';
+  }
+
+  function tabelaFrotaPorTipo(linhas) {
+    if (!linhas.length) { return '<p class="chamada">—</p>'; }
+    var temHoje = linhas.some(function (l) { return l.hoje !== null
+      && l.hoje !== undefined; });
+    var corpo = linhas.map(function (l) {
+      var dif = l.diferenca;
+      return '<tr><td><b>' + esc(l.nome) + '</b>'
+        + '<div class="apoio" style="color:var(--tinta-2);font-size:12.5px">'
+        + num(l.capacidade) + ' lugares'
+        + (l.posicoes_cadeirante ? ' · ' + num(l.posicoes_cadeirante)
+            + ' cadeirante' : "") + '</div></td>'
+        + '<td class="num"><b>' + num(l.quantos) + '</b></td>'
+        + (temHoje ? '<td class="num">' + num(l.hoje) + '</td>'
+            + '<td class="num">' + (dif === null || dif === undefined ? "—"
+              : (dif > 0 ? "+" : "") + num(dif)) + '</td>' : "")
+        + '</tr>';
+    }).join("");
+    return '<div class="rolagem" style="margin-top:10px"><table><thead><tr>'
+      + '<th>Tipo</th><th class="num">No plano</th>'
+      + (temHoje ? '<th class="num">Hoje</th><th class="num">Diferença</th>' : "")
+      + '</tr></thead><tbody>' + corpo + '</tbody></table></div>';
   }
 
   function pintarCenario(indice) {
@@ -949,9 +996,181 @@ var DADOS = __DADOS__;
     });
   }
 
+  /* ------------------------------------------------------------- ajustes */
+  function telaAjustes() {
+    var a = DADOS.ajustes || {};
+    var t = a.tempo || {}, c = a.caminhada || {}, k = a.custos || {};
+    return '<h1>Ajustes</h1>'
+      + '<p class="chamada">As regras desta operação. Tudo nesta tela muda a '
+      + 'rota, o número de veículos ou o preço — por isso fica aqui, à vista, '
+      + 'e não num arquivo de configuração.</p>'
+
+      + '<section class="secao"><header>'
+      + '<h2>Tempo do ' + esc(DADOS.operacao.passageiro) + ' dentro do veículo</h2>'
+      + '</header>'
+      + '<p class="chamada" style="margin-bottom:14px">São dois tetos porque '
+      + 'são duas promessas diferentes: na rota coletiva vale um limite igual '
+      + 'para todo mundo; no porta a porta o limite é relativo ao trajeto '
+      + 'direto de cada um — 20 minutos de casa até a ' + esc(DADOS.operacao.destino)
+      + ' não podem virar ' + num(t.max_trajeto_min) + ' só porque o limite '
+      + 'geral permite.</p>'
+      + '<div class="grade n3">'
+      + campo("Máximo na rota coletiva", num(t.max_trajeto_min) + " min",
+          "restrição dura do motor: rota que passa disso não é gerada",
+          "tempo_max_trajeto_min")
+      + campo("Porta a porta: fator", num(t.fator_porta_a_porta, 1) + "×",
+          "sobre o trajeto direto do próprio usuário", "fator_tempo_bordo")
+      + campo("Porta a porta: folga", num(t.folga_porta_a_porta_min) + " min",
+          "somados ao trajeto direto × fator", "folga_tempo_bordo_min")
+      + campo("Embarque na parada", num(t.embarque_comum_min) + " min",
+          "tempo parado por embarque comum", "embarque_comum_min")
+      + campo("Embarque com cadeira", num(t.embarque_cadeirante_min) + " min",
+          "rampa ou elevador", "embarque_cadeirante_min")
+      + campo("Virada entre viagens", num(t.virada_min) + " min",
+          "o veículo não teleporta entre uma viagem e a próxima",
+          "tempo_virada_min")
+      + '</div>'
+      + '<div class="aviso" style="margin-top:12px">Apertar o tempo máximo '
+      + 'quase sempre aumenta a frota: menos gente cabe em cada viagem. '
+      + 'Roteirize com o valor novo antes de assinar — o plano diz o preço '
+      + 'de cada minuto a menos.</div>'
+      + '</section>'
+
+      + '<section class="secao"><header><h2>Frota disponível</h2>'
+      + selo({rotulo: "planejado", explicacao:
+          "o motor só usa tipo de veículo cadastrado aqui"}) + '</header>'
+      + '<p class="chamada" style="margin-bottom:14px">O cadastro de tipos é o '
+      + 'que o motor pode escolher. Tipo que não está nesta lista não entra em '
+      + 'rota nenhuma, por mais que caiba.</p>'
+      + tabelaTipos(a.tipos_veiculo || [])
+      + '</section>'
+
+      + '<section class="secao"><header><h2>Caminhada até o ponto</h2>'
+      + '</header><div class="grade n2">'
+      + campo("Raio urbano", num(c.raio_urbano_m) + " m",
+          "quem mora dentro desse raio embarca no mesmo ponto", "raio_urbano")
+      + campo("Raio rural", num(c.raio_rural_m) + " m",
+          "distância maior, casa mais espalhada", "raio_rural")
+      + '</div>'
+      + '<div class="aviso" style="margin-top:12px">Cadeirante nunca é '
+      + 'agrupado: o ponto dele é a casa dele, qualquer que seja o raio.</div>'
+      + '</section>'
+
+      + secaoTurnos(a.turnos || [])
+      + secaoJornada(a.jornada)
+
+      + '<section class="secao"><header><h2>Custos e calendário</h2></header>'
+      + '<div class="grade n3">'
+      + campo("Diesel", reais(k.diesel_l, 2) + "/l", "preço praticado hoje",
+          "preco_diesel_l")
+      + campo("Dias de operação", num(k.dias_mes) + " por mês",
+          "dias letivos ou dias úteis do contrato", "dias_letivos_mes")
+      + (k.motorista_mes
+          ? campo("Motorista", reaisCurto(k.motorista_mes) + "/mês",
+              "salário, encargos e benefícios", "custo_motorista_mes")
+          : campo("Motorista", "no custo do veículo",
+              "a prefeitura contrata veículo com motorista", "—"))
+      + '</div>'
+      + (a.fonte_tempos ? '<p class="chamada" style="margin-top:12px">'
+          + '<b>Como o tempo é estimado:</b> ' + esc(a.fonte_tempos) + '</p>' : "")
+      + '</section>'
+
+      + '<section class="secao"><header><h2>Como salvar</h2></header>'
+      + '<div class="cartao"><p class="chamada">Nesta demonstração os campos '
+      + 'são leitura: o arquivo é estático. No sistema, salvar aqui grava o '
+      + 'perfil da operação (<code>' + esc(a.endpoint || "POST /api/perfil")
+      + '</code>) e vale da próxima roteirização em diante — o plano que já '
+      + 'está publicado não muda sozinho, porque mudar rota de gente na rua é '
+      + 'decisão, não efeito colateral de salvar um formulário.</p></div>'
+      + '</section>';
+  }
+
+  function campo(rotulo, valor, apoio, chave) {
+    return '<div class="numero campo"><div class="rotulo"><span>'
+      + esc(rotulo) + '</span><code>' + esc(chave) + '</code></div>'
+      + '<div class="valor">' + valor + '</div>'
+      + '<div class="apoio">' + esc(apoio) + '</div></div>';
+  }
+
+  function tabelaTipos(tipos) {
+    var uso = {};
+    ((DADOS.planejar || {}).frota_por_tipo || []).forEach(function (l) {
+      uso[l.id] = l;
+    });
+    var linhas = tipos.map(function (t) {
+      var u = uso[t.id] || {};
+      return '<tr><td><b>' + esc(t.nome) + '</b>'
+        + '<div class="apoio" style="color:var(--tinta-2);font-size:12.5px">'
+        + esc(t.id) + '</div></td>'
+        + '<td class="num">' + num(t.capacidade) + '</td>'
+        + '<td class="num">' + num(t.posicoes_cadeirante || 0) + '</td>'
+        + '<td class="num">' + reais(t.custo_fixo_mes) + '</td>'
+        + '<td class="num">' + reais(t.custo_km, 2) + '</td>'
+        + '<td class="num">' + num(t.consumo_km_l, 1) + '</td>'
+        + '<td class="num">' + (u.quantos === undefined ? "—"
+            : '<b>' + num(u.quantos) + '</b>') + '</td></tr>';
+    }).join("");
+    return '<div class="rolagem"><table><thead><tr><th>Tipo</th>'
+      + '<th class="num">Lugares</th><th class="num">Cadeirante</th>'
+      + '<th class="num">Fixo/mês</th><th class="num">Por km</th>'
+      + '<th class="num">km/l</th><th class="num">No plano</th>'
+      + '</tr></thead><tbody>' + linhas + '</tbody></table></div>';
+  }
+
+  function secaoTurnos(turnos) {
+    if (!turnos.length) { return ""; }
+    var linhas = turnos.map(function (t) {
+      var janela = t.janela_chegada
+        ? horas(t.janela_chegada[0]) + " – " + horas(t.janela_chegada[1])
+        : "—";
+      return '<tr><td><b>' + esc(t.nome) + '</b></td>'
+        + '<td>' + janela + '</td>'
+        + '<td class="num">' + (t.jornada_max_min
+            ? num(t.jornada_max_min) + " min" : "—") + '</td>'
+        + '<td class="num">' + (t.duracao_min
+            ? horas(t.duracao_min) : "—") + '</td></tr>';
+    }).join("");
+    return '<section class="secao"><header><h2>Turnos</h2></header>'
+      + '<p class="chamada" style="margin-bottom:14px">A janela de chegada é o '
+      + 'compromisso: todo mundo desse turno precisa estar na '
+      + esc(DADOS.operacao.destino) + ' dentro dela.</p>'
+      + '<div class="rolagem"><table><thead><tr><th>Turno</th>'
+      + '<th>Janela de chegada</th><th class="num">Máximo de coleta</th>'
+      + '<th class="num">Duração</th></tr></thead><tbody>' + linhas
+      + '</tbody></table></div></section>';
+  }
+
+  function secaoJornada(j) {
+    if (!j) { return ""; }
+    var itens = [
+      ["Jornada normal", horas(j.jornada_normal_min)],
+      ["Hora extra máxima", horas(j.hora_extra_max_min)],
+      ["Direção contínua", horas(j.direcao_continua_max_min)],
+      ["Parada obrigatória", num(j.parada_obrigatoria_min) + " min"],
+      ["Intervalo de refeição", num(j.intervalo_refeicao_min) + " min"],
+      ["Interjornada", horas(j.interjornada_min)],
+      ["Amplitude máxima", horas(j.amplitude_max_min)],
+      ["Dupla pegada", j.permite_dupla_pegada ? "permitida" : "não permitida"],
+      ["Troca de veículo", num(j.tempo_troca_veiculo_min) + " min"]
+    ].map(function (par) {
+      return '<tr><td>' + esc(par[0]) + '</td><td class="num">' + par[1]
+        + '</td></tr>';
+    }).join("");
+    return '<section class="secao"><header><h2>Jornada do motorista</h2>'
+      + selo({rotulo: "planejado", explicacao:
+          "parâmetros declarados, conferidos contra a escala gerada"})
+      + '</header>'
+      + '<p class="chamada" style="margin-bottom:14px">Os padrões seguem a Lei '
+      + '13.103/2015, mas acordo coletivo muda quase todos — por isso são '
+      + 'parâmetros, e aparecem aqui para quem assina a escala conferir com o '
+      + 'jurídico.</p>'
+      + '<div class="rolagem"><table><tbody>' + itens
+      + '</tbody></table></div></section>';
+  }
+
   /* --------------------------------------------------------------- rotas */
   var TELAS = {inicio: telaInicio, planejar: telaPlanejar, operar: telaOperar,
-               vender: telaVender};
+               vender: telaVender, ajustes: telaAjustes};
 
   function pintar() {
     var destino = (location.hash || "#inicio").slice(1);

@@ -101,7 +101,16 @@ class Perfil:
     rotulo_contraparte: str = "fornecedor"
     rotulo_contraparte_plural: str = "fornecedores"
     contrapartes: list = field(default_factory=list)
+    # Tempo máximo do passageiro dentro do veículo. São dois números porque
+    # são duas promessas diferentes: na rota coletiva a secretaria fixa um
+    # teto igual para todo mundo; no porta a porta o teto é relativo ao
+    # trajeto direto de cada um — 20 min de casa até a escola não pode virar
+    # 75 min só porque o limite geral permite.
     tempo_max_trajeto_min: int = 75
+    fator_tempo_bordo: float = 1.6          # porta a porta: × o trajeto direto
+    folga_tempo_bordo_min: int = 15         # porta a porta: + folga fixa
+    embarque_comum_min: int = 2
+    embarque_cadeirante_min: int = 5
     dias_operacao_mes: int = 22
     custo_motorista_mes: float = 0.0       # 0 = já embutido no custo do veículo
     regras_jornada: RegrasDeJornada = field(default_factory=RegrasDeJornada)
@@ -132,6 +141,10 @@ class Perfil:
                               "destinos": list(c.destinos)}
                              for c in self.contrapartes],
             "tempo_max_trajeto_min": self.tempo_max_trajeto_min,
+            "fator_tempo_bordo": self.fator_tempo_bordo,
+            "folga_tempo_bordo_min": self.folga_tempo_bordo_min,
+            "embarque_comum_min": self.embarque_comum_min,
+            "embarque_cadeirante_min": self.embarque_cadeirante_min,
             "dias_operacao_mes": self.dias_operacao_mes,
             "custo_motorista_mes": self.custo_motorista_mes,
             "turnos": [{"id": t.id, "nome": t.nome,
@@ -279,6 +292,14 @@ def de_dicionario(dados: dict) -> Perfil:
         contrapartes=contrapartes,
         tempo_max_trajeto_min=dados.get("tempo_max_trajeto_min",
                                         base.tempo_max_trajeto_min),
+        fator_tempo_bordo=dados.get("fator_tempo_bordo",
+                                    base.fator_tempo_bordo),
+        folga_tempo_bordo_min=dados.get("folga_tempo_bordo_min",
+                                        base.folga_tempo_bordo_min),
+        embarque_comum_min=dados.get("embarque_comum_min",
+                                     base.embarque_comum_min),
+        embarque_cadeirante_min=dados.get("embarque_cadeirante_min",
+                                          base.embarque_cadeirante_min),
         dias_operacao_mes=dados.get("dias_operacao_mes",
                                     base.dias_operacao_mes),
         custo_motorista_mes=dados.get("custo_motorista_mes",

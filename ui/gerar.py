@@ -25,6 +25,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from comercial import diagnostico as diagnostico_mod  # noqa: E402
+from dados import agrupar as agrupar_mod  # noqa: E402
 from dados import perfis as perfis_mod  # noqa: E402
 from comercial import operacao_atual as operacao_mod  # noqa: E402
 from comercial import precificacao as precificacao_mod  # noqa: E402
@@ -101,6 +102,117 @@ def _contrato(perfil: dict) -> dict:
 
 def _chave(texto: str) -> str:
     return " ".join(str(texto or "").split()).casefold()
+
+
+def _frota_por_tipo(plano: dict) -> list:
+    """Quantos veículos de cada tipo o plano exige, e por quê aquele tipo.
+
+    O total sozinho não compra nada: quem vai licitar precisa da linha
+    "19 ônibus de 31 lugares, 3 vans acessíveis, 1 micro".
+    """
+    fo = plano.get("frota_otimizada") or {}
+    custos = (plano.get("premissas") or {}).get("custos_por_tipo") or {}
+    atual = (plano.get("frota_atual") or {}).get("composicao") or {}
+    linhas = []
+    for tipo, quantos in sorted((fo.get("composicao") or {}).items(),
+                                key=lambda kv: -kv[1]):
+        c = custos.get(tipo, {})
+        linhas.append({
+            "id": tipo, "nome": c.get("nome", tipo), "quantos": quantos,
+            "capacidade": c.get("capacidade"),
+            "posicoes_cadeirante": c.get("posicoes_cadeirante"),
+            "custo_fixo_mes": c.get("fixo_mes"),
+            "custo_km": c.get("custo_km"),
+            "consumo_km_l": c.get("consumo_km_l"),
+            "lugares": (c.get("capacidade") or 0) * quantos,
+            "hoje": atual.get(tipo),
+            "diferenca": (quantos - atual[tipo]) if tipo in atual else None,
+        })
+    # tipo que a operação tem hoje e o plano não usa mais é informação, não
+    # omissão: some da frota, e quem lê precisa saber que sumiu
+    for tipo, quantos in atual.items():
+        if tipo not in (fo.get("composicao") or {}):
+            c = custos.get(tipo, {})
+            linhas.append({
+                "id": tipo, "nome": c.get("nome", tipo), "quantos": 0,
+                "capacidade": c.get("capacidade"),
+                "posicoes_cadeirante": c.get("posicoes_cadeirante"),
+                "custo_fixo_mes": c.get("fixo_mes"),
+                "custo_km": c.get("custo_km"),
+                "consumo_km_l": c.get("consumo_km_l"),
+                "lugares": 0, "hoje": quantos, "diferenca": -quantos,
+            })
+    return linhas
+
+
+def _turnos(perfil: dict, embutido, premissas: dict) -> list:
+    """Turno com a janela inteira — meia informação vira uma coluna de '—'."""
+    turnos = perfil.get("turnos") or [
+        {"id": t.id, "nome": t.nome,
+         "janela_chegada": list(t.janela_chegada),
+         "jornada_max_min": t.jornada_max_min,
+         "duracao_min": t.duracao_min}
+        for t in embutido.turnos]
+    # o teto de coleta que o motor usou de verdade está nas premissas do plano
+    maximos = premissas.get("jornada_max_turno_min") or {}
+    return [dict(t, jornada_max_min=maximos.get(t.get("id"),
+                                                t.get("jornada_max_min")))
+            for t in turnos]
+
+
+def _ajustes(plano: dict, perfil: dict) -> dict:
+    """Os parâmetros que decidem o resultado, num lugar só.
+
+    Tudo aqui muda a rota, o número de veículos ou o preço. Por isso é uma
+    tela, e não um arquivo de configuração que ninguém acha.
+    """
+    premissas = plano.get("premissas") or {}
+    agrupamento = plano.get("agrupamento") or {}
+    embutido = perfis_mod.EMBUTIDOS.get(perfil.get("id"),
+                                        perfis_mod.PERFIL_ESCOLAR)
+
+    def do_perfil(chave):
+        return perfil.get(chave, getattr(embutido, chave, None))
+
+    tipos = perfil.get("tipos_veiculo")
+    if not tipos:
+        # plano antigo não guardou o perfil: o catálogo real é o que está nas
+        # premissas do próprio plano — foi com ele que o motor decidiu
+        tipos = [{"id": k, "nome": v.get("nome"),
+                  "capacidade": v.get("capacidade"),
+                  "posicoes_cadeirante": v.get("posicoes_cadeirante"),
+                  "custo_km": v.get("custo_km"),
+                  "custo_fixo_mes": v.get("fixo_mes"),
+                  "consumo_km_l": v.get("consumo_km_l")}
+                 for k, v in (premissas.get("custos_por_tipo") or {}).items()]
+
+    return {
+        "tempo": {
+            "max_trajeto_min": premissas.get(
+                "tempo_max_trajeto_min", do_perfil("tempo_max_trajeto_min")),
+            "fator_porta_a_porta": do_perfil("fator_tempo_bordo"),
+            "folga_porta_a_porta_min": do_perfil("folga_tempo_bordo_min"),
+            "embarque_comum_min": do_perfil("embarque_comum_min"),
+            "embarque_cadeirante_min": do_perfil("embarque_cadeirante_min"),
+            "virada_min": premissas.get("tempo_virada_min"),
+        },
+        "caminhada": {
+            "raio_urbano_m": agrupamento.get(
+                "raio_urbano_m", agrupar_mod.RAIO_URBANO_M),
+            "raio_rural_m": agrupamento.get(
+                "raio_rural_m", agrupar_mod.RAIO_RURAL_M),
+        },
+        "tipos_veiculo": tipos,
+        "turnos": _turnos(perfil, embutido, premissas),
+        "jornada": perfil.get("regras_jornada"),
+        "custos": {
+            "diesel_l": premissas.get("preco_diesel_l"),
+            "dias_mes": premissas.get("dias_letivos_mes"),
+            "motorista_mes": do_perfil("custo_motorista_mes"),
+        },
+        "fonte_tempos": premissas.get("fonte_tempos"),
+        "endpoint": "POST /api/perfil",
+    }
 
 
 def _por_contrato(viagens: list, contrato: dict) -> dict:
@@ -410,6 +522,7 @@ def montar(caminho_plano: str = None, com_comercial: bool = True,
             "nao_atendida": plano.get("demanda_nao_atendida", {}),
             "coerencia": plano.get("coerencia", []),
             "frota": painel["otimizada"],
+            "frota_por_tipo": _frota_por_tipo(plano),
             "frota_atual": painel.get("atual"),
             "economia": painel.get("economia"),
             "memoria": painel.get("memoria_calculo", []),
@@ -439,6 +552,7 @@ def montar(caminho_plano: str = None, com_comercial: bool = True,
                 "origem": (aprendizado or {}).get("origem"),
             },
         },
+        "ajustes": _ajustes(plano, perfil),
         "vender": comercial,
     }
 

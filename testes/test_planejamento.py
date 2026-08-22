@@ -335,6 +335,75 @@ class TestTelaDePlanejamento(unittest.TestCase):
         historico = os.path.join(self.mod.DIR_TRABALHO, "historico")
         self.assertTrue(os.listdir(historico))   # o antigo não foi apagado
 
+    # ------------------------------------------------- cadastro de parâmetros
+    def test_cadastro_de_tipo_de_veiculo_e_gravado_e_sobrevive(self):
+        """A frota disponível é cadastro, não constante do código."""
+        from dados import perfis as perfis_mod
+        base = perfis_mod.PERFIL_ESCOLAR.como_dicionario()
+        base["tipos_veiculo"] = base["tipos_veiculo"] + [{
+            "id": "ONIBUS44", "nome": "Ônibus 44 lugares", "capacidade": 44,
+            "posicoes_cadeirante": 0, "custo_km": 3.9,
+            "custo_fixo_mes": 16800.0, "consumo_km_l": 2.7}]
+        base["tempo_max_trajeto_min"] = 60
+
+        resposta = self.post("/api/perfil", base)
+        self.assertTrue(resposta["ok"])
+        ids = [t["id"] for t in resposta["perfil"]["tipos_veiculo"]]
+        self.assertIn("ONIBUS44", ids)
+        self.assertEqual(resposta["perfil"]["tempo_max_trajeto_min"], 60)
+
+        # gravado em disco: quem cadastrou na sexta não recadastra na segunda
+        caminho = os.path.join(self.mod.DIR_TRABALHO, "perfil.json")
+        self.assertTrue(os.path.exists(caminho))
+        self.mod.ESTADO.perfil = perfis_mod.PERFIL_ESCOLAR
+        self.mod.ESTADO.recuperar_perfil()
+        self.assertEqual(self.mod.ESTADO.perfil.tempo_max_trajeto_min, 60)
+        self.assertIn("ONIBUS44",
+                      [t.id for t in self.mod.ESTADO.perfil.tipos_veiculo])
+        self.mod.ESTADO.perfil = perfis_mod.PERFIL_ESCOLAR
+        os.remove(caminho)
+
+    def test_operacao_sem_nenhum_tipo_de_veiculo_e_recusada(self):
+        """Sem tipo cadastrado o solver não tem o que usar — recusar aqui é
+        melhor do que descobrir no meio da roteirização."""
+        from dados import perfis as perfis_mod
+        base = perfis_mod.PERFIL_ESCOLAR.como_dicionario()
+        base["tipos_veiculo"] = []
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            self.post("/api/perfil", base)
+        self.assertEqual(ctx.exception.code, 400)
+
+    def test_tempo_maximo_a_bordo_invalido_e_recusado(self):
+        from dados import perfis as perfis_mod
+        base = perfis_mod.PERFIL_ESCOLAR.como_dicionario()
+        base["tempo_max_trajeto_min"] = 0
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            self.post("/api/perfil", base)
+        self.assertEqual(ctx.exception.code, 400)
+
+    def test_tempo_a_bordo_da_rodada_chega_no_motor(self):
+        """A secretaria aperta o tempo numa rodada sem reconfigurar tudo."""
+        self.enviar_planilha()
+        recebido = {}
+        original = self.mod.planejar_mod.planejar
+
+        def espiao(*a, **kw):
+            recebido.update(kw)
+            return {"frota_otimizada": {"total_veiculos": 1, "viagens": [],
+                                        "composicao": {}, "km_dia": 0.0,
+                                        "custo_mes": 0}}
+
+        self.mod.planejar_mod.planejar = espiao
+        try:
+            self.post("/api/roteirizar", {"tempo_limite": 1,
+                                          "tempo_max_trajeto": 55})
+            for _ in range(50):
+                if not self.get("/api/estado")["rodando"]:
+                    break
+            self.assertEqual(recebido.get("tempo_max_trajeto_min"), 55)
+        finally:
+            self.mod.planejar_mod.planejar = original
+
 
 if __name__ == "__main__":
     unittest.main()
