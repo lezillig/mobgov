@@ -37,6 +37,7 @@ from comercial.precificacao import Premissas  # noqa: E402
 from docs.demonstracao import gerar_apps_estaticos as apps  # noqa: E402
 from painel import console as console_mod  # noqa: E402
 from painel import render as render_mod  # noqa: E402
+from ui import gerar as ui_mod  # noqa: E402
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DIR_BASE = os.path.dirname(os.path.dirname(DIR))
@@ -210,6 +211,15 @@ a.tela span{display:block;color:var(--fraca);font-size:15px;margin-top:4px}
 """
 
 TELAS = [
+    ("O sistema", [
+        ("0-sistema.html", "O sistema — prefeitura (escolar)",
+         "A remodelagem por momento de trabalho: Início com o que precisa de "
+         "decisão, Planejar em trilha, Operar com mapa vivo e Vender."),
+        ("0-sistema-empresa.html", "O sistema — empresa (fretamento)",
+         "O mesmo sistema na linguagem de quem opera fretamento: "
+         "colaboradores, plantas, escala de motoristas e a proposta com o "
+         "preço aberto."),
+    ]),
     ("Operação do dia", [
         ("1-console-escolar.html", "Console de operação — escolar",
          "O que está acontecendo hoje, a fila de elegibilidade ao porta a "
@@ -260,6 +270,7 @@ def main():
     os.makedirs(DIR_SAIDA, exist_ok=True)
     feitas = []
 
+    feitas += ui_mod.gerar_todas(DIR_SAIDA)
     feitas += gerar_consoles()
     feitas.append(gerar_planejamento())
 

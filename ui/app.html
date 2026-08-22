@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOBGOV — sistema</title>
+<style>
+/* =============================================================== tokens ===
+   Poucas variáveis, e todas com motivo. Contraste alto porque isto abre em
+   monitor de secretaria com brilho no talo; fonte grande porque quem opera
+   passa o dia aqui; alvo de toque de 44px porque o despachante usa com uma
+   mão só e o telefone na outra. */
+:root{
+  --fundo:#F6F8FA; --superficie:#FFFFFF; --superficie-2:#EEF3F7;
+  --tinta:#0F2231; --tinta-2:#4A6072; --linha:#D9E2EA;
+  --marca:#12508A; --marca-fraca:#E7F0F9;
+  --ok:#0B6B52; --ok-fraco:#DCEFE8;
+  --atencao:#8A5A00; --atencao-fraco:#FCF2DC;
+  --risco:#A63A17; --risco-fraco:#FAE7DF;
+  --sombra:0 1px 2px rgba(15,34,49,.06), 0 8px 24px rgba(15,34,49,.06);
+  --raio:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--fundo);color:var(--tinta);font-size:16.5px;line-height:1.5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--marca);outline-offset:2px;border-radius:6px}
+
+/* ================================================================ casca === */
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.rail{background:var(--superficie);border-right:1px solid var(--linha);
+  display:flex;flex-direction:column;padding:18px 14px;gap:6px;position:sticky;
+  top:0;height:100vh}
+.marca{display:flex;align-items:baseline;gap:8px;padding:6px 10px 18px}
+.marca b{font-size:19px;letter-spacing:.06em;color:var(--marca)}
+.marca span{font-size:12.5px;color:var(--tinta-2)}
+.rail a{display:flex;align-items:center;gap:11px;padding:12px 12px;border-radius:10px;
+  text-decoration:none;color:var(--tinta);font-weight:600;min-height:46px}
+.rail a:hover{background:var(--superficie-2)}
+.rail a[aria-current="page"]{background:var(--marca);color:#FFF}
+.rail a[aria-current="page"] .icone{opacity:1}
+.rail a .icone{width:20px;height:20px;flex:0 0 auto;opacity:.75}
+.rail a small{display:block;font-weight:400;font-size:12.5px;opacity:.75}
+.rail .rodape{margin-top:auto;font-size:12.5px;color:var(--tinta-2);padding:10px}
+.topo{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);
+  backdrop-filter:blur(6px);border-bottom:1px solid var(--linha);
+  padding:12px 26px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.contexto{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14.5px;
+  color:var(--tinta-2)}
+.contexto b{color:var(--tinta)}
+.operacoes{display:flex;gap:2px;background:var(--superficie-2);
+  border:1px solid var(--linha);border-radius:999px;padding:3px}
+.operacoes a{display:block;padding:5px 13px;border-radius:999px;font-size:13.5px;
+  color:var(--tinta-2);text-decoration:none;white-space:nowrap}
+.operacoes a:hover{color:var(--tinta)}
+.operacoes a[aria-current]{background:var(--superficie);color:var(--tinta);
+  font-weight:600;box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.busca{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--superficie-2);
+  border:1px solid var(--linha);border-radius:999px;padding:8px 14px;
+  flex:0 1 250px;min-width:150px}
+.busca input{border:0;background:transparent;width:100%;outline:none}
+.busca kbd{font-size:12px;background:var(--superficie);border:1px solid var(--linha);
+  border-radius:5px;padding:1px 6px;color:var(--tinta-2)}
+main{padding:26px}
+.folha{max-width:1180px;margin:0 auto}
+
+/* ============================================================ tipografia === */
+h1{font-size:27px;letter-spacing:-.01em}
+h2{font-size:19px;margin-bottom:4px}
+h3{font-size:16px}
+.chamada{color:var(--tinta-2);margin-top:6px;max-width:70ch}
+.secao{margin-top:32px}
+.secao > header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  margin-bottom:14px}
+.secao > header .chamada{margin-top:0}
+
+/* ================================================================ selo === */
+/* Todo número diz de onde veio. É componente, não rodapé. */
+.selo{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  letter-spacing:.03em;text-transform:uppercase;padding:3px 9px;border-radius:999px;
+  border:1px solid transparent;cursor:help}
+.selo.medido{background:var(--ok-fraco);color:var(--ok);border-color:#B7DDD0}
+.selo.planejado{background:var(--marca-fraca);color:var(--marca);border-color:#C3DAF0}
+.selo.simulado{background:var(--atencao-fraco);color:var(--atencao);border-color:#EBD9AE}
+.selo.informado{background:var(--superficie-2);color:var(--tinta-2)}
+
+/* =============================================================== cartões === */
+.cartao{background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:18px;box-shadow:var(--sombra)}
+.grade{display:grid;gap:14px}
+.grade.n2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.grade.n3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.grade.n4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+
+/* pendência: o item mais importante do sistema */
+.pendencia{display:flex;gap:14px;align-items:flex-start;background:var(--superficie);
+  border:1px solid var(--linha);border-left:5px solid var(--marca);
+  border-radius:var(--raio);padding:18px;box-shadow:var(--sombra)}
+.pendencia.alta{border-left-color:var(--risco)}
+.pendencia.media{border-left-color:var(--atencao)}
+.pendencia .corpo{flex:1;min-width:0}
+.pendencia h3{font-size:17.5px}
+.pendencia p{color:var(--tinta-2);margin-top:5px}
+.pendencia .quem{margin-top:9px;font-size:13.5px;color:var(--tinta-2)}
+.pendencia .quem b{color:var(--tinta)}
+.botao{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--marca);color:#FFF;border:0;border-radius:10px;padding:12px 18px;
+  font-weight:700;min-height:46px;cursor:pointer;text-decoration:none;
+  white-space:nowrap}
+.botao:hover{filter:brightness(1.08)}
+.botao.calmo{background:var(--superficie);color:var(--tinta);
+  border:1.5px solid var(--linha)}
+.botao.pequeno{padding:8px 12px;min-height:38px;font-size:14.5px}
+
+/* número com explicação sob demanda */
+.numero{background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:16px 18px}
+.numero .rotulo{font-size:13px;color:var(--tinta-2);display:flex;
+  align-items:center;justify-content:space-between;gap:8px}
+.numero .valor{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.numero .apoio{font-size:14px;color:var(--tinta-2);margin-top:3px}
+.porque{background:none;border:0;color:var(--marca);font-size:13px;font-weight:700;
+  cursor:pointer;padding:2px 4px}
+.explicacao{margin-top:10px;padding:10px 12px;background:var(--superficie-2);
+  border-radius:10px;font-size:14px;color:var(--tinta-2)}
+.explicacao[hidden]{display:none}
+
+/* ================================================= operação: mapa + lista === */
+.despacho{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start}
+@media (max-width:980px){.despacho{grid-template-columns:1fr}
+  .app{grid-template-columns:1fr}.rail{position:static;height:auto;
+  flex-direction:row;overflow-x:auto}.rail .marca,.rail .rodape{display:none}}
+.lista{background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);overflow:hidden;box-shadow:var(--sombra)}
+.lista header{padding:14px 16px;border-bottom:1px solid var(--linha);
+  display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.lista .conta{font-size:12.5px;color:var(--tinta-2);flex:0 0 100%}
+.lista input[type=search]{flex:1;border:1px solid var(--linha);border-radius:8px;
+  padding:9px 11px;background:var(--superficie-2)}
+.lista .itens{max-height:520px;overflow:auto}
+.lista button.item{display:block;width:100%;text-align:left;background:none;
+  border:0;border-bottom:1px solid var(--linha);padding:13px 16px;cursor:pointer}
+.lista button.item:hover{background:var(--superficie-2)}
+.lista button.item[aria-selected="true"]{background:var(--marca-fraca);
+  box-shadow:inset 3px 0 0 var(--marca)}
+.lista .titulo{font-weight:700}
+.lista .meta{font-size:13.5px;color:var(--tinta-2);margin-top:2px}
+.mapa-caixa{background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:14px;box-shadow:var(--sombra)}
+svg.mapa{width:100%;height:auto;background:#EAF0F5;border-radius:10px}
+.legenda{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--tinta-2);
+  margin-top:10px}
+.legenda i{width:11px;height:11px;border-radius:50%;display:inline-block;
+  margin-right:6px}
+
+/* ============================================================== trilha === */
+.trilha{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.marco{flex:1 1 200px;background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:15px;text-align:left;cursor:pointer;
+  box-shadow:var(--sombra)}
+.marco[aria-selected="true"]{border-color:var(--marca);box-shadow:0 0 0 3px var(--marca-fraca)}
+.marco .estado{font-size:12.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.04em}
+.marco.pronto .estado{color:var(--ok)}
+.marco.voce .estado{color:var(--risco)}
+.marco.espera .estado{color:var(--tinta-2)}
+.marco b{display:block;margin-top:5px;font-size:16.5px}
+.marco small{color:var(--tinta-2)}
+
+/* =============================================================== tabela === */
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--linha)}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--tinta-2)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.rolagem{max-height:420px;overflow:auto;border:1px solid var(--linha);
+  border-radius:12px;background:var(--superficie)}
+.barra{height:8px;background:var(--superficie-2);border-radius:999px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--marca)}
+.barra i.cheio{background:var(--ok)}
+.barra i.vazio{background:var(--atencao)}
+
+/* ============================================================== avisos === */
+.aviso{background:var(--atencao-fraco);border-left:4px solid var(--atencao);
+  border-radius:0 12px 12px 0;padding:14px 16px;margin:14px 0}
+.risco{background:var(--risco-fraco);border-left-color:var(--risco)}
+.vazio{text-align:center;color:var(--tinta-2);padding:42px 20px}
+.vazio b{display:block;color:var(--tinta);font-size:17px;margin-bottom:6px}
+
+/* ============================================================== gaveta === */
+.gaveta{position:fixed;top:0;right:0;bottom:0;width:min(460px,94vw);
+  background:var(--superficie);border-left:1px solid var(--linha);
+  box-shadow:-12px 0 40px rgba(15,34,49,.14);padding:22px;overflow:auto;z-index:40}
+.gaveta[hidden]{display:none}
+.gaveta header{display:flex;justify-content:space-between;align-items:flex-start;
+  gap:12px;margin-bottom:14px}
+.gaveta .fechar{background:none;border:0;font-size:24px;cursor:pointer;
+  color:var(--tinta-2);line-height:1;padding:4px 8px}
+.linha-tempo{margin-top:12px;border-left:2px solid var(--linha);padding-left:16px}
+.linha-tempo li{list-style:none;margin-bottom:14px;position:relative}
+.linha-tempo li::before{content:"";position:absolute;left:-22px;top:6px;width:10px;
+  height:10px;border-radius:50%;background:var(--marca)}
+.linha-tempo b{font-variant-numeric:tabular-nums}
+.faixa-demo{background:var(--atencao-fraco);color:var(--atencao);font-size:13.5px;
+  font-weight:700;text-align:center;padding:8px}
+</style>
+</head>
+<body>
+<div class="faixa-demo">Protótipo com dados reais dos relatórios do projeto —
+demonstração, nada aqui é publicado de verdade</div>
+<div class="app">
+  <nav class="rail" aria-label="Destinos">
+    <div class="marca"><b>MOBGOV</b><span>sistema</span></div>
+    <a href="#inicio" data-destino="inicio">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      <span>Início<small>o que precisa de você</small></span></a>
+    <a href="#planejar" data-destino="planejar">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><path d="M4 19V5m0 14h16"/><path d="M8 15l4-6 4 3 4-7"/></svg>
+      <span>Planejar<small>da planilha às rotas</small></span></a>
+    <a href="#operar" data-destino="operar">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      <span>Operar<small>o dia acontecendo</small></span></a>
+    <a href="#vender" data-destino="vender">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><path d="M4 20V8m5 12V4m5 16v-7m5 7V10"/></svg>
+      <span>Vender<small>quanto custa, por quanto</small></span></a>
+    <div class="rodape" id="rodape-rail"></div>
+  </nav>
+
+  <div>
+    <div class="topo">
+      <div class="contexto" id="contexto"></div>
+      <div class="operacoes" id="operacoes" role="group"
+        aria-label="Trocar de operação"></div>
+      <label class="busca">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/>
+          <path d="M20 20l-3.5-3.5"/></svg>
+        <input id="busca" type="search" placeholder="Buscar rota, ponto, veículo"
+          aria-label="Buscar">
+        <kbd>/</kbd>
+      </label>
+    </div>
+    <main><div class="folha" id="tela"></div></main>
+  </div>
+</div>
+
+<aside class="gaveta" id="gaveta" hidden aria-label="Detalhe"></aside>
+
+<script>
+var DADOS = __DADOS__;
+</script>
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------ utilidades */
+  function esc(t) {
+    return String(t === undefined || t === null ? "" : t)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function num(v, casas) {
+    if (v === undefined || v === null || isNaN(v)) { return "—"; }
+    return Number(v).toLocaleString("pt-BR", {
+      minimumFractionDigits: casas || 0, maximumFractionDigits: casas || 0});
+  }
+  function reais(v, casas) {
+    if (v === undefined || v === null) { return "—"; }
+    return "R$ " + num(v, casas === undefined ? 0 : casas);
+  }
+  function reaisCurto(v) {
+    if (v === undefined || v === null) { return "—"; }
+    var a = Math.abs(v);
+    if (a >= 1e6) { return "R$ " + num(v / 1e6, 2) + " mi"; }
+    if (a >= 1000) { return "R$ " + num(v / 1000) + " mil"; }
+    return reais(v);
+  }
+  function horas(min) {
+    if (!min && min !== 0) { return "—"; }
+    var m = Math.round(min);
+    return Math.floor(m / 60) + "h" + String(m % 60).padStart(2, "0");
+  }
+  function selo(s) {
+    if (!s || !s.rotulo) { return ""; }
+    return '<span class="selo ' + esc(s.rotulo) + '" title="' + esc(s.explicacao)
+      + '">' + esc(s.rotulo) + '</span>';
+  }
+  var contador = 0;
+  function numeroCartao(rotulo, valor, apoio, opcoes) {
+    opcoes = opcoes || {};
+    var id = "exp" + (++contador);
+    return '<div class="numero"><div class="rotulo"><span>' + esc(rotulo)
+      + '</span>' + (opcoes.selo ? selo(opcoes.selo) : "")
+      + (opcoes.porque ? '<button class="porque" data-explica="' + id
+          + '">por quê?</button>' : "")
+      + '</div><div class="valor">' + esc(valor) + '</div>'
+      + (apoio ? '<div class="apoio">' + esc(apoio) + '</div>' : "")
+      + (opcoes.porque ? '<div class="explicacao" id="' + id + '" hidden>'
+          + esc(opcoes.porque) + '</div>' : "")
+      + '</div>';
+  }
+
+  /* ---------------------------------------------------------------- mapa */
+  function desenharMapa(viagensDestacadas) {
+    var pontos = DADOS.mapa.pontos || {};
+    var ids = Object.keys(pontos);
+    if (!ids.length) { return '<div class="vazio">Sem mapa neste plano.</div>'; }
+    var lats = ids.map(function (i) { return pontos[i][0]; });
+    var lons = ids.map(function (i) { return pontos[i][1]; });
+    (DADOS.mapa.destinos || []).forEach(function (d) {
+      lats.push(d.lat); lons.push(d.lon);
+    });
+    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+    var minLon = Math.min.apply(null, lons), maxLon = Math.max.apply(null, lons);
+    var mx = (maxLon - minLon) * 0.06 || 0.01, my = (maxLat - minLat) * 0.06 || 0.01;
+    minLat -= my; maxLat += my; minLon -= mx; maxLon += mx;
+    var L = 900, A = 520;
+    function x(lon) { return ((lon - minLon) / (maxLon - minLon) * L).toFixed(1); }
+    function y(lat) { return (A - (lat - minLat) / (maxLat - minLat) * A).toFixed(1); }
+
+    var camadas = ids.map(function (i) {
+      return '<circle cx="' + x(pontos[i][1]) + '" cy="' + y(pontos[i][0])
+        + '" r="3" fill="#8FA9BC" fill-opacity=".8"/>';
+    }).join("");
+
+    (viagensDestacadas || []).forEach(function (v, indice) {
+      var cores = ["#12508A", "#0B6B52", "#A63A17", "#6B3FA0"];
+      var cor = cores[indice % cores.length];
+      var destino = (DADOS.mapa.destinos || []).filter(function (d) {
+        return d.id === v.destino_id || d.nome === v.destino;
+      })[0];
+      var caminho = (v.paradas || []).filter(function (p) { return pontos[p]; })
+        .map(function (p) { return x(pontos[p][1]) + "," + y(pontos[p][0]); });
+      if (destino) { caminho.push(x(destino.lon) + "," + y(destino.lat)); }
+      if (caminho.length > 1) {
+        camadas += '<polyline points="' + caminho.join(" ") + '" fill="none" '
+          + 'stroke="' + cor + '" stroke-width="2.5" stroke-linejoin="round" '
+          + 'stroke-opacity=".9"/>';
+      }
+      (v.paradas || []).forEach(function (p) {
+        if (!pontos[p]) { return; }
+        camadas += '<circle cx="' + x(pontos[p][1]) + '" cy="' + y(pontos[p][0])
+          + '" r="5" fill="' + cor + '"><title>' + esc(p) + '</title></circle>';
+      });
+    });
+
+    (DADOS.mapa.destinos || []).forEach(function (d) {
+      camadas += '<rect x="' + (x(d.lon) - 7) + '" y="' + (y(d.lat) - 7)
+        + '" width="14" height="14" rx="3" fill="#0F2231"><title>'
+        + esc(d.nome) + '</title></rect>';
+    });
+    (DADOS.mapa.pings || []).forEach(function (p) {
+      camadas += '<circle cx="' + x(p.lon) + '" cy="' + y(p.lat)
+        + '" r="7" fill="#0B6B52" stroke="#FFF" stroke-width="2"><title>'
+        + esc(p.veiculo || "veículo") + '</title></circle>';
+    });
+
+    return '<div class="mapa-caixa"><svg class="mapa" viewBox="0 0 ' + L + ' '
+      + A + '" role="img" aria-label="Mapa das rotas">' + camadas + '</svg>'
+      + '<div class="legenda">'
+      + '<span><i style="background:#8FA9BC"></i>pontos de embarque</span>'
+      + '<span><i style="background:#0F2231;border-radius:2px"></i>'
+      + esc(DADOS.operacao.destinos) + '</span>'
+      + '<span><i style="background:#12508A"></i>rota em destaque</span>'
+      + '<span><i style="background:#0B6B52"></i>veículo com GPS ligado</span>'
+      + '</div></div>';
+  }
+
+  /* -------------------------------------------------------------- início */
+  function telaInicio() {
+    var r = DADOS.resumo, p = DADOS.pendencias || [];
+    var hora = new Date().getHours();
+    var saudacao = hora < 12 ? "Bom dia" : (hora < 18 ? "Boa tarde" : "Boa noite");
+    var cabeca = p.length
+      ? '<h1>' + saudacao + '. ' + p.length + (p.length === 1
+          ? " coisa precisa de você." : " coisas precisam de você.") + '</h1>'
+        + '<p class="chamada">Estão em ordem de quem não pode esperar. '
+        + 'Resolvidas essas, o resto do sistema segue sozinho.</p>'
+      : '<h1>' + saudacao + '. Nada parado esperando decisão.</h1>'
+        + '<p class="chamada">Quando aparecer alguma pendência, ela aparece '
+        + 'aqui — com quem decide e o botão que resolve.</p>';
+
+    var cartoes = p.map(function (item) {
+      return '<div class="pendencia ' + esc(item.urgencia) + '">'
+        + '<div class="corpo"><h3>' + esc(item.titulo) + '</h3>'
+        + '<p>' + esc(item.detalhe) + '</p>'
+        + '<div class="quem">Quem decide: <b>' + esc(item.quem_decide)
+        + '</b></div></div>'
+        + '<a class="botao" href="#' + esc(item.destino) + '">'
+        + esc(item.acao) + '</a></div>';
+    }).join("") || '<div class="cartao vazio"><b>Tudo em dia</b>'
+      + 'Nenhuma decisão pendente neste momento.</div>';
+
+    var hoje = DADOS.hoje || {};
+    var rod = hoje.rodadas || {};
+
+    /* Número que o próprio sistema duvida não aparece limpo: se a base de
+       comparação tem aviso, a economia diz isso ao lado. */
+    function duvidaDaComparacao() {
+      return ((DADOS.planejar || {}).coerencia || []).length > 0;
+    }
+
+    return cabeca
+      + '<div class="grade" style="margin-top:20px">' + cartoes + '</div>'
+      + '<section class="secao"><header><h2>A operação em um olhar</h2>'
+      + selo(r.selo) + '</header>'
+      + '<div class="grade n4">'
+      + numeroCartao(DADOS.operacao.passageiros.charAt(0).toUpperCase()
+          + DADOS.operacao.passageiros.slice(1) + " por dia", num(r.passageiros),
+          num(r.viagens) + " viagens")
+      + numeroCartao("Veículos", num(r.veiculos),
+          r.motoristas ? num(r.motoristas) + " motoristas na escala"
+            : "o mesmo veículo atende mais de um turno",
+          {porque: "A frota é o pior turno, não a soma dos turnos: o mesmo "
+            + "veículo atende manhã e tarde."})
+      + numeroCartao("Ocupação média", num(r.ocupacao_pct, 1) + "%",
+          "dos lugares ofertados")
+      + (r.economia_mes ? numeroCartao("Economia", reaisCurto(r.economia_mes),
+          duvidaDaComparacao()
+            ? "por mês — mas há um aviso sobre a base de comparação"
+            : "por mês, contra a frota informada",
+          {porque: "Diferença entre o custo da frota informada e o custo da "
+            + "frota que o plano exige, com as mesmas premissas de diesel, "
+            + "dias e manutenção."
+            + (duvidaDaComparacao()
+                ? " Atenção: " + esc((DADOS.planejar.coerencia || [])[0])
+                : "")})
+        : numeroCartao("Economia", "—",
+            "informe a frota atual para comparar"))
+      + '</div></section>'
+      + '<section class="secao"><header><h2>Hoje</h2>'
+      + selo(hoje.selo) + '</header><div class="grade n3">'
+      + numeroCartao("Eventos recebidos", num((hoje.eventos || {}).eventos),
+          "do aplicativo do motorista")
+      + numeroCartao("Faltas avisadas", num((hoje.faltas || {}).avisadas),
+          num((hoje.faltas || {}).desfeitas) + " avisos desfeitos")
+      + numeroCartao("Km poupados nas rodadas",
+          num(rod.km_economizados, 1) + " km",
+          num(rod.corridas_remanejadas) + " corridas trocaram de veículo")
+      + '</div></section>';
+  }
+
+  /* ------------------------------------------------------------ planejar */
+  var marcoAtivo = null;
+  function telaPlanejar() {
+    var pl = DADOS.planejar, imp = pl.importacao || {};
+    var marcos = [
+      {id: "dados", nome: "Dados",
+       estado: !pl.arquivo ? "espera" : (imp.erros ? "voce" : "pronto"),
+       resumo: pl.arquivo
+         ? num(imp.alunos_importados) + " importados · " + num(imp.erros)
+           + " erros"
+         : "base de demonstração, sem planilha"},
+      {id: "mapa", nome: "Mapa", estado: imp.precisam_ajuste_no_mapa
+         ? "voce" : "pronto",
+       resumo: pl.arquivo
+         ? num(imp.precisam_ajuste_no_mapa || 0) + " para ajustar"
+         : num((pl.agrupamento || {}).pontos
+             || Object.keys(DADOS.mapa.pontos || {}).length) + " pontos"},
+      {id: "rotas", nome: "Rotas", estado: "pronto",
+       resumo: num((pl.frota || {}).total_veiculos) + " veículos · "
+         + num((DADOS.resumo || {}).viagens) + " viagens"},
+      {id: "publicar", nome: "Publicar",
+       estado: (pl.nao_atendida || {}).alunos ? "voce" : "espera",
+       resumo: (pl.nao_atendida || {}).alunos
+         ? num(pl.nao_atendida.alunos) + " sem rota possível"
+         : "pronto para publicar"}
+    ];
+    /* Abre onde o trabalho está: o marco que precisa de você; sem nenhum,
+       o último já resolvido — nunca uma etapa vazia. */
+    if (!marcoAtivo) {
+      var pedindo = marcos.filter(function (m) { return m.estado === "voce"; });
+      var prontos = marcos.filter(function (m) { return m.estado === "pronto"; });
+      marcoAtivo = (pedindo[0] || prontos[prontos.length - 1] || marcos[0]).id;
+    }
+    var trilha = marcos.map(function (m) {
+      var rotulo = {pronto: "pronto", voce: "precisa de você",
+                    espera: "esperando"}[m.estado];
+      return '<button class="marco ' + m.estado + '" data-marco="' + m.id
+        + '" aria-selected="' + (marcoAtivo === m.id) + '">'
+        + '<span class="estado">' + rotulo + '</span><b>' + m.nome + '</b>'
+        + '<small>' + esc(m.resumo) + '</small></button>';
+    }).join("");
+
+    return '<h1>Planejar</h1>'
+      + '<p class="chamada">Quatro marcos, e dá para entrar por qualquer um. '
+      + 'O rascunho fica salvo: sair no meio é normal, não é erro.</p>'
+      + '<div class="trilha">' + trilha + '</div>'
+      + '<div id="conteudo-marco">' + conteudoMarco() + '</div>';
+  }
+
+  function conteudoMarco() {
+    var pl = DADOS.planejar;
+    if (marcoAtivo === "dados") { return marcoDados(pl); }
+    if (marcoAtivo === "mapa") { return marcoMapa(pl); }
+    if (marcoAtivo === "rotas") { return marcoRotas(pl); }
+    return marcoPublicar(pl);
+  }
+
+  function marcoDados(pl) {
+    var imp = pl.importacao || {};
+    if (!pl.arquivo) { return semPlanilha(pl); }
+    var tipos = {};
+    (pl.problemas || []).forEach(function (p) {
+      var chave = p.gravidade + "|" + p.problema + "|" + p.sugestao;
+      if (!tipos[chave]) { tipos[chave] = {linhas: [], p: p}; }
+      tipos[chave].linhas.push(p.linha);
+    });
+    var linhas = Object.keys(tipos).sort(function (a, b) {
+      return tipos[b].linhas.length - tipos[a].linhas.length;
+    }).slice(0, 8).map(function (chave) {
+      var t = tipos[chave];
+      return '<tr><td><span class="selo ' + (t.p.gravidade === "erro"
+          ? "simulado" : "planejado") + '">' + esc(t.p.gravidade) + '</span></td>'
+        + '<td>' + esc(t.p.problema) + '<div class="apoio" style="color:var(--tinta-2);font-size:13.5px">'
+        + esc(t.p.sugestao) + '</div></td>'
+        + '<td class="num">' + t.linhas.length + '</td>'
+        + '<td>' + esc(t.linhas.slice(0, 6).join(", "))
+        + (t.linhas.length > 6 ? "…" : "") + '</td></tr>';
+    }).join("");
+
+    return '<div class="grade n3" style="margin-bottom:16px">'
+      + numeroCartao("Importados", num(imp.alunos_importados),
+          esc(pl.arquivo || ""))
+      + numeroCartao("Erros", num(imp.erros), "a linha não entrou")
+      + numeroCartao("Avisos", num(imp.avisos), "entrou, mas confira")
+      + '</div>'
+      + (linhas ? '<div class="rolagem"><table><thead><tr><th></th>'
+          + '<th>O que aconteceu e o que fazer</th><th class="num">Linhas</th>'
+          + '<th>Onde</th></tr></thead><tbody>' + linhas + '</tbody></table></div>'
+        : '<div class="cartao vazio"><b>Nada a corrigir</b>A planilha entrou '
+          + 'inteira.</div>');
+  }
+
+  /* Plano que não veio de planilha: dizer isso, em vez de mostrar "0 erros"
+     — zero de nada parece qualidade e não é. */
+  function semPlanilha(pl) {
+    var d = pl.demanda || {};
+    var o = DADOS.operacao;
+    return '<div class="cartao vazio" style="margin-bottom:16px">'
+      + '<b>Este plano não veio de uma planilha</b>'
+      + 'Ele foi montado com a base de demonstração do projeto. Quando a '
+      + 'planilha da operação entra por aqui, esta etapa mostra cada linha '
+      + 'que deu problema e o que fazer com ela.</div>'
+      + '<div class="grade n3">'
+      + numeroCartao(maiuscula(o.passageiros), num(d.alunos || 0),
+          "na base de origem")
+      + numeroCartao("Pontos de embarque", num(d.pontos_embarque || 0),
+          "depois do agrupamento")
+      + numeroCartao("Cadeirantes", num(d.cadeirantes || 0),
+          "nunca agrupados com outro ponto")
+      + '</div>';
+  }
+
+  function maiuscula(t) {
+    return String(t || "").charAt(0).toUpperCase() + String(t || "").slice(1);
+  }
+
+  function marcoMapa(pl) {
+    var imp = pl.importacao || {};
+    var ag = pl.agrupamento || {};
+    var pontos = ag.pontos || Object.keys(DADOS.mapa.pontos || {}).length;
+    var cartoes = [];
+    if (pl.arquivo) {
+      cartoes.push(numeroCartao("No ponto do bairro",
+        num(imp.precisam_ajuste_no_mapa || 0),
+        "arraste cada um para a casa certa"));
+    }
+    cartoes.push(numeroCartao("Pontos de embarque", num(pontos),
+      ag.alunos_por_ponto ? num(ag.alunos_por_ponto, 2) + " por ponto" : "",
+      {porque: "Quem mora perto embarca junto: o raio de caminhada é de "
+        + num(ag.raio_urbano_m || 300) + " m no urbano e "
+        + num(ag.raio_rural_m || 800) + " m no rural. Cadeirante nunca é "
+        + "agrupado — o ponto dele é a casa dele."}));
+    cartoes.push(numeroCartao(maiuscula(DADOS.operacao.destinos),
+      num((DADOS.mapa.destinos || []).length), "no plano de hoje"));
+    if (ag.caminhada_media_m) {
+      cartoes.push(numeroCartao("Caminhada média",
+        num(ag.caminhada_media_m) + " m",
+        "máximo de " + num(ag.caminhada_maxima_m || 0) + " m"));
+    }
+    return '<div class="grade n' + Math.min(cartoes.length, 3)
+      + '" style="margin-bottom:16px">' + cartoes.join("") + '</div>'
+      + desenharMapa([]);
+  }
+
+  function marcoRotas(pl) {
+    var cenarios = pl.cenarios || [];
+    var base = cenarios.filter(function (c) { return c.selecionado; })[0]
+      || cenarios[0];
+    var opcoes = cenarios.map(function (c, i) {
+      return '<option value="' + i + '"' + (c === base ? " selected" : "") + '>'
+        + esc(c.rotulo || (reais(c.preco_diesel_l, 2) + "/l · " + c.dias_letivos_mes
+          + " dias")) + '</option>';
+    }).join("");
+    var turnos = (pl.por_turno || []).map(function (t) {
+      var pct = t.lugares_ofertados
+        ? Math.round(100 * t.alunos / t.lugares_ofertados) : 0;
+      return '<tr><td>' + esc(t.turno) + '</td>'
+        + '<td class="num">' + num(t.alunos) + '</td>'
+        + '<td class="num">' + num(t.viagens) + '</td>'
+        + '<td class="num">' + num(t.veiculos) + '</td>'
+        + '<td style="min-width:120px"><div class="barra"><i class="'
+        + (pct > 85 ? "cheio" : (pct < 60 ? "vazio" : ""))
+        + '" style="width:' + pct + '%"></i></div>'
+        + '<small style="color:var(--tinta-2)">' + pct + '% de ocupação</small>'
+        + '</td></tr>';
+    }).join("");
+
+    return '<div class="grade n2"><div class="cartao">'
+      + '<h3>Comparar antes de publicar</h3>'
+      + '<p class="chamada">Cada cenário foi resolvido pelo motor — o seletor '
+      + 'escolhe entre resultados prontos, não recalcula no navegador.</p>'
+      + '<div style="margin:14px 0"><label for="cenario">Cenário</label><br>'
+      + '<select id="cenario" style="padding:10px;border-radius:8px;'
+      + 'border:1px solid var(--linha);width:100%;max-width:340px">' + opcoes
+      + '</select></div><div id="saida-cenario"></div></div>'
+      + '<div class="cartao"><h3>Como os turnos ficaram</h3>'
+      + '<div class="rolagem"><table style="margin-top:10px"><thead><tr>'
+      + '<th>Turno</th>'
+      + '<th class="num">Pessoas</th><th class="num">Viagens</th>'
+      + '<th class="num">Veículos</th><th>Ocupação</th></tr></thead>'
+      + '<tbody>' + turnos + '</tbody></table></div></div></div>';
+  }
+
+  function pintarCenario(indice) {
+    var c = (DADOS.planejar.cenarios || [])[indice];
+    var no = document.getElementById("saida-cenario");
+    if (!c || !no) { return; }
+    no.innerHTML = '<div class="grade n2">'
+      + numeroCartao("Custo com o plano novo",
+          reaisCurto(c.custo_otimizado_mes), "por mês, com a frota do plano")
+      + numeroCartao("Diferença", reaisCurto(c.economia_mes),
+          "por mês, contra " + reaisCurto(c.custo_atual_mes)
+          + " de hoje ("
+          + num(c.reducao_custo_pct, 1) + "% a menos)")
+      + '</div>';
+  }
+
+  function marcoPublicar(pl) {
+    var nao = pl.nao_atendida || {};
+    var itens = (nao.pontos || []).slice(0, 6).map(function (p) {
+      return '<tr><td>' + esc(p.ponto) + '</td><td>' + esc(p.bairro) + '</td>'
+        + '<td>' + esc(p.escola) + '</td>'
+        + '<td class="num">' + num(p.minutos_minimos) + ' min</td>'
+        + '<td class="num">' + num(p.limite_min) + ' min</td></tr>';
+    }).join("");
+    var coerencia = (pl.coerencia || []).map(function (a) {
+      return '<div class="aviso">' + esc(a) + '</div>';
+    }).join("");
+
+    return '<div class="cartao"><h3>O que muda quando você publicar</h3>'
+      + '<p class="chamada">Publicar troca a rota que o motorista vê no '
+      + 'aplicativo. O plano anterior vai para o histórico, datado.</p>'
+      + '<div class="grade n3" style="margin-top:14px">'
+      + numeroCartao("Veículos", num((pl.frota || {}).total_veiculos), "na rua")
+      + numeroCartao("Viagens por dia", num((DADOS.resumo || {}).viagens), "")
+      + numeroCartao("Quilometragem", num((pl.frota || {}).km_dia, 1) + " km",
+          "por dia")
+      + '</div>'
+      + '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'
+      + '<button class="botao" data-acao="publicar">Publicar este plano</button>'
+      + '<button class="botao calmo" data-acao="proposta">Ver como proposta'
+      + '</button></div></div>'
+      + coerencia
+      + (itens ? '<div class="aviso risco" style="margin-top:16px">'
+          + '<b>' + num(nao.alunos) + ' pessoas não cabem em rota nenhuma '
+          + 'dentro do limite de tempo.</b> Isso é decisão da secretaria — o '
+          + 'sistema não afrouxa a regra nem deixa ninguém de fora em '
+          + 'silêncio.</div>'
+          + '<div class="rolagem"><table><thead><tr><th>Ponto</th>'
+          + '<th>Bairro</th><th>Destino</th><th class="num">Trajeto mínimo</th>'
+          + '<th class="num">Limite</th></tr></thead><tbody>' + itens
+          + '</tbody></table></div>' : "");
+  }
+
+  /* -------------------------------------------------------------- operar */
+  var rotaSelecionada = null;
+  var filtro = "";
+  function telaOperar() {
+    return '<h1>Operar</h1>'
+      + '<p class="chamada">O dia como ele está: as rotas no mapa, os avisos '
+      + 'que chegaram e quem está esperando decisão.</p>'
+      + '<div class="despacho" style="margin-top:18px">'
+      + '<div>' + listaDeRotas() + '</div>'
+      + '<div><div id="area-mapa">' + desenharMapa(mapaPadrao())
+      + '</div>' + resumoDoDia() + '</div></div>'
+      + secaoPessoas();
+  }
+
+  /* Mapa nunca abre vazio: sem rota escolhida, mostra as três primeiras —
+     um mapa só de pontinhos não diz nada a quem despacha. */
+  function mapaPadrao() {
+    if (rotaSelecionada) { return [rotaSelecionada]; }
+    return (DADOS.mapa.viagens || []).slice(0, 3);
+  }
+
+  function listaDeRotas() {
+    var viagens = (DADOS.mapa.viagens || []).filter(function (v) {
+      if (!filtro) { return true; }
+      var alvo = (v.id + " " + v.destino + " " + v.turno + " "
+        + (v.veiculo || "") + " " + (v.paradas || []).join(" ")).toLowerCase();
+      return alvo.indexOf(filtro.toLowerCase()) >= 0;
+    });
+    var itens = viagens.slice(0, 60).map(function (v) {
+      return '<button class="item" data-viagem="' + esc(v.id) + '" '
+        + 'aria-selected="' + (rotaSelecionada && rotaSelecionada.id === v.id)
+        + '"><div class="titulo">' + esc(v.id) + '</div>'
+        + '<div class="meta">' + esc(v.destino) + ' · ' + esc(v.turno) + ' · '
+        + num(v.passageiros) + ' pessoas · ' + num(v.km, 1) + ' km</div>'
+        + '</button>';
+    }).join("") || '<div class="vazio">Nenhuma rota com “' + esc(filtro)
+      + '”.</div>';
+
+    var total = (DADOS.mapa.viagens || []).length;
+    var conta = filtro
+      ? viagens.length + " de " + total + " rotas"
+      : total + " rotas hoje";
+    return '<div class="lista" style="margin-bottom:16px"><header>'
+      + '<input type="search" id="filtro-rotas" placeholder="Filtrar rotas" '
+      + 'value="' + esc(filtro) + '" aria-label="Filtrar rotas">'
+      + '<span class="conta">' + conta
+      + (viagens.length > 60 ? " · rolando as 60 primeiras" : "")
+      + '</span></header><div class="itens">' + itens + '</div></div>';
+  }
+
+  function resumoDoDia() {
+    var hoje = DADOS.hoje || {}, rod = hoje.rodadas || {}, pol = hoje.politica || {};
+    return '<div class="cartao"><h3>Reotimização contínua</h3>'
+      + '<p class="chamada">A cada ' + num(pol.intervalo_min || 5)
+      + ' minutos o plano do dia é revisto inteiro.</p>'
+      + '<ul class="linha-tempo" style="margin-top:14px">'
+      + '<li><b>' + num(rod.rodadas || 0) + ' rodadas</b><br>'
+      + '<small style="color:var(--tinta-2)">' + num(rod.rodadas_com_acao || 0)
+      + ' com alguma mudança</small></li>'
+      + '<li><b>' + num(rod.km_economizados || 0, 1) + ' km poupados</b><br>'
+      + '<small style="color:var(--tinta-2)">' + num(rod.corridas_remanejadas || 0)
+      + ' corridas trocaram de veículo</small></li>'
+      + '<li><b>' + num(rod.promessas_quebradas || 0) + ' horários quebrados</b>'
+      + '<br><small style="color:var(--tinta-2)">quem já foi avisado não é '
+      + 'remarcado</small></li></ul></div>';
+  }
+
+  function secaoPessoas() {
+    var el = (DADOS.operar || {}).elegibilidade || {};
+    var r = el.resumo || {};
+    var fila = (el.fila || []).slice(0, 6).map(function (s) {
+      return '<tr><td>' + esc(s.protocolo) + '</td>'
+        + '<td>' + esc(s.estado_em_portugues) + '</td>'
+        + '<td class="num">' + (s.dias_em_aberto || 0) + '</td>'
+        + '<td>' + esc(s.resumo_do_perfil || "—") + '</td></tr>';
+    }).join("");
+    if (!fila) { return ""; }
+    return '<section class="secao"><header><h2>Quem está esperando decisão</h2>'
+      + selo({rotulo: el.origem === "operacao_real" ? "medido" : "simulado",
+              explicacao: el.explicacao_selo || ""}) + '</header>'
+      + '<div class="grade n3" style="margin-bottom:14px">'
+      + numeroCartao("Em aberto", num(r.em_aberto), "de " + num(r.pedidos)
+          + " pedidos")
+      + numeroCartao("Fora do prazo", num(r.atrasados),
+          "prazo assumido: " + num(r.prazo_dias) + " dias")
+      + numeroCartao("Espera média", num(r.dias_em_aberto_media, 1) + " dias",
+          "do protocolo até hoje")
+      + '</div><div class="rolagem"><table><thead><tr><th>Protocolo</th>'
+      + '<th>Situação</th><th class="num">Dias</th><th>Perfil</th></tr></thead>'
+      + '<tbody>' + fila + '</tbody></table></div></section>';
+  }
+
+  /* -------------------------------------------------------------- vender */
+  function telaVender() {
+    var v = DADOS.vender;
+    if (!v) {
+      return '<h1>Vender</h1><div class="cartao vazio">'
+        + '<b>Este destino é para operação de empresa</b>'
+        + 'A precificação separa o custo do motorista e usa o contrato como '
+        + '"antes". Numa operação escolar, a prefeitura contrata veículo com '
+        + 'motorista, e a comparação é outra — está em Planejar.</div>';
+    }
+    var p = v.preco.preco, c = v.preco.custo;
+    var participacao = (v.preco.indicadores || {}).participacao_no_custo_pct || {};
+    var grupos = Object.keys(c.por_grupo).map(function (g) {
+      return numeroCartao(g, reaisCurto(c.por_grupo[g]),
+        num(participacao[g], 1) + "% do custo");
+    }).join("");
+    var cenarios = (v.cenarios || []).map(function (x) {
+      return '<tr><td>' + esc(x.cenario) + '</td>'
+        + '<td class="num">' + reais(x.preco_mes) + '</td>'
+        + '<td class="num">' + (x.diferenca_pct
+            ? num(x.diferenca_pct, 1) + "%" : "—") + '</td></tr>';
+    }).join("");
+    var achados = ((v.diagnostico || {}).achados || []).slice(0, 6)
+      .map(function (a) {
+        return '<div class="cartao" style="margin-bottom:10px">'
+          + '<b>' + esc(a.titulo) + '</b> — <b style="color:var(--ok)">'
+          + reais(a.economia_mes) + '/mês</b>'
+          + '<p class="chamada">' + esc(a.detalhe) + '</p>'
+          + '<p class="chamada" style="font-size:14px">Antes de aplicar: '
+          + esc(a.o_que_conferir) + '</p></div>';
+      }).join("");
+    var dr = (v.diagnostico || {}).resumo || {};
+
+    return '<h1>Vender</h1>'
+      + '<p class="chamada">Duas perguntas: por quanto propor um contrato novo '
+      + 'e o que dá para melhorar no que já roda.</p>'
+      + '<section class="secao"><header><h2>Preço da proposta</h2>'
+      + selo({rotulo: "planejado", explicacao: "custo calculado a partir do "
+          + "plano roteirizado e das premissas declaradas"}) + '</header>'
+      + '<div class="grade n2">'
+      + numeroCartao("Preço", reais(p.mes) + "/mês", reais(p.ano) + " por ano",
+          {porque: (v.preco.memoria || []).join(" ")})
+      + numeroCartao("Custo total", reais(c.total_mes),
+          "direto " + reaisCurto(c.direto) + " + indireto "
+          + reaisCurto(c.indireto))
+      + '</div><div class="grade n4" style="margin-top:14px">' + grupos
+      + '</div>'
+      + '<div class="rolagem" style="margin-top:16px"><table><thead><tr>'
+      + '<th>Cenário</th><th class="num">Preço/mês</th>'
+      + '<th class="num">Diferença</th></tr></thead><tbody>' + cenarios
+      + '</tbody></table></div></section>'
+      + (achados ? '<section class="secao"><header>'
+          + '<h2>O que dá para melhorar no que já roda</h2>'
+          + selo({rotulo: "informado", explicacao: "km e passageiros vieram da "
+              + "planilha da própria operação — não foram medidos aqui"})
+          + '</header>'
+          + '<div class="grade n3" style="margin-bottom:14px">'
+          + numeroCartao("Linhas analisadas", num(dr.linhas_analisadas),
+              "ocupação média de " + num(dr.ocupacao_media_hoje_pct, 1) + "%")
+          + numeroCartao("Ações imediatas",
+              reaisCurto(dr.economia_acoes_imediatas_mes),
+              "troca de veículo e fusão de linha")
+          + numeroCartao("Teto", reaisCurto(dr.economia_teto_mes),
+              "já contém as ações acima — não some")
+          + '</div>' + achados + '</section>' : "");
+  }
+
+  /* ------------------------------------------------------------- gaveta */
+  function abrirGaveta(viagem) {
+    var gaveta = document.getElementById("gaveta");
+    var paradas = (viagem.paradas || []).map(function (p, i) {
+      return '<li><b>' + (i + 1) + 'ª parada</b> — ' + esc(p) + '</li>';
+    }).join("");
+    gaveta.innerHTML = '<header><div><h2>' + esc(viagem.id) + '</h2>'
+      + '<p class="chamada">' + esc(viagem.destino) + ' · ' + esc(viagem.turno)
+      + '</p></div><button class="fechar" aria-label="Fechar">×</button></header>'
+      + '<div class="grade n2">'
+      + numeroCartao("Pessoas", num(viagem.passageiros),
+          viagem.ocupacao ? num(viagem.ocupacao) + "% de ocupação" : "")
+      + numeroCartao("Percurso", num(viagem.km, 1) + " km",
+          num(viagem.min) + " min")
+      + '</div>'
+      + '<h3 style="margin-top:18px">Ordem das paradas</h3>'
+      + '<ul class="linha-tempo">' + paradas + '</ul>'
+      + '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'
+      + '<button class="botao pequeno" data-acao="avisar">Avisar as famílias'
+      + '</button><button class="botao calmo pequeno" data-acao="imprimir">'
+      + 'Imprimir a rota</button></div>';
+    gaveta.hidden = false;
+    gaveta.querySelector(".fechar").addEventListener("click", function () {
+      gaveta.hidden = true;
+    });
+  }
+
+  /* --------------------------------------------------------------- rotas */
+  var TELAS = {inicio: telaInicio, planejar: telaPlanejar, operar: telaOperar,
+               vender: telaVender};
+
+  function pintar() {
+    var destino = (location.hash || "#inicio").slice(1);
+    if (!TELAS[destino]) { destino = "inicio"; }
+    document.querySelectorAll(".rail a").forEach(function (a) {
+      if (a.dataset.destino === destino) {
+        a.setAttribute("aria-current", "page");
+      } else {
+        a.removeAttribute("aria-current");
+      }
+    });
+    document.getElementById("tela").innerHTML = TELAS[destino]();
+    document.getElementById("gaveta").hidden = true;
+    window.scrollTo({top: 0, behavior: "instant"});
+    ligarEventos(destino);
+    pintarContexto();  /* o seletor de operação leva o destino atual junto */
+  }
+
+  function ligarEventos(destino) {
+    document.querySelectorAll("[data-explica]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var alvo = document.getElementById(b.dataset.explica);
+        alvo.hidden = !alvo.hidden;
+        b.textContent = alvo.hidden ? "por quê?" : "fechar";
+      });
+    });
+    if (destino === "planejar") {
+      document.querySelectorAll("[data-marco]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          marcoAtivo = b.dataset.marco;
+          pintar();
+        });
+      });
+      var seletor = document.getElementById("cenario");
+      if (seletor) {
+        seletor.addEventListener("change", function () {
+          pintarCenario(Number(seletor.value));
+        });
+        pintarCenario(Number(seletor.value));
+      }
+      document.querySelectorAll("[data-acao]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          alert(b.dataset.acao === "publicar"
+            ? "Nesta demonstração nada é publicado. No sistema, aqui a rota "
+              + "trocaria no aplicativo dos motoristas e o plano anterior iria "
+              + "para o histórico."
+            : "A proposta completa é a tela Vender e o arquivo proposta.html.");
+        });
+      });
+    }
+    if (destino === "operar") {
+      var filtroCampo = document.getElementById("filtro-rotas");
+      if (filtroCampo) {
+        filtroCampo.addEventListener("input", function () {
+          filtro = filtroCampo.value;
+          var lista = document.querySelector(".lista");
+          lista.outerHTML = listaDeRotas();
+          ligarEventos("operar");
+          var novo = document.getElementById("filtro-rotas");
+          novo.focus();
+          novo.setSelectionRange(novo.value.length, novo.value.length);
+        });
+      }
+      document.querySelectorAll("[data-viagem]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          rotaSelecionada = (DADOS.mapa.viagens || []).filter(function (v) {
+            return v.id === b.dataset.viagem;
+          })[0];
+          document.getElementById("area-mapa").innerHTML =
+            desenharMapa([rotaSelecionada]);
+          document.querySelectorAll("[data-viagem]").forEach(function (o) {
+            o.setAttribute("aria-selected", o === b);
+          });
+          abrirGaveta(rotaSelecionada);
+        });
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------- contexto */
+  function pintarContexto() {
+    var o = DADOS.operacao;
+    document.getElementById("contexto").innerHTML =
+      '<b>' + esc(o.nome) + '</b>'
+      + '<span>·</span><span>' + esc(o.vertical === "fretamento"
+          ? "fretamento corporativo" : "transporte escolar") + '</span>'
+      + '<span>·</span><span>plano de '
+      + esc(String(DADOS.gerado_em).slice(0, 5)) + '</span>';
+    document.getElementById("operacoes").innerHTML =
+      (DADOS.operacoes || []).map(function (op) {
+        return '<a href="' + esc(op.arquivo) + (location.hash || "#inicio") + '"'
+          + (op.atual ? ' aria-current="true"' : '') + '>'
+          + esc(op.rotulo) + '</a>';
+      }).join("");
+    document.getElementById("rodape-rail").innerHTML =
+      'Protótipo gerado a partir dos relatórios reais do projeto.';
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "/" && document.activeElement.tagName !== "INPUT") {
+      e.preventDefault();
+      document.getElementById("busca").focus();
+    }
+    if (e.key === "Escape") { document.getElementById("gaveta").hidden = true; }
+  });
+  document.getElementById("busca").addEventListener("input", function () {
+    filtro = this.value;
+    if ((location.hash || "") !== "#operar") { location.hash = "#operar"; }
+    else { pintar(); }
+  });
+
+  window.addEventListener("hashchange", pintar);
+  pintarContexto();
+  pintar();
+})();
+</script>
+</body>
+</html>

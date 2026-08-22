@@ -64,6 +64,7 @@ previu X, aconteceu Y, ajustou Z".
 | 8 | `planejamento/` + `motor/planejar.py` + `dados/agrupar.py` — planilha → pontos → rotas → publicar | ✅ pronto |
 | 9 | `dados/perfis.py` + `motor/jornada.py` — perfil de fretamento: turnos configuráveis e jornada do motorista (Lei 13.103) como restrição | ✅ pronto |
 | 10 | `comercial/` — precificação (custo → preço com margem por divisão) e diagnóstico da operação existente | ✅ pronto |
+| 11 | `ui/` — o sistema remodelado por momento de trabalho (Início · Planejar · Operar · Vender), descrito em `docs/ux-modelo.md` | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -108,6 +109,8 @@ mobgov/                          (raiz deste repositório)
   planejamento/servidor.py       a tela da roteirização: envia, confere, ajusta, publica
   planejamento/tela.html         os cinco passos numa página só
   planejamento/multipart.py      envio de arquivo sem dependência (o cgi saiu do 3.13)
+  ui/app.html                    o sistema remodelado: 4 destinos, mapa vivo, trilha
+  ui/gerar.py                    monta o payload real e escreve a tela autocontida
   painel/console.py              console: Hoje, Elegibilidade, Equipe, Assistente
   docs/demonstracao/gerar_telas_estaticas.py  todas as telas em HTML autocontido
   motor/rodadas.py               reotimização contínua: o dia inteiro em rodadas
@@ -155,6 +158,7 @@ python motor/planejar.py rh.csv --perfil fretamento --frota-atual "RODO46=9,EXEC
 python comercial/cli.py precificar --plano relatorios/plano-fretamento.json --margem 12
 python comercial/cli.py diagnosticar --plano ... --linhas linhas-atuais.csv
 python comercial/cli.py proposta --plano ... --linhas ... --cliente "Empresa X"
+python ui/gerar.py                     # o sistema remodelado (prefeitura + empresa)
 python -m painel.console               # gera relatorios/console.html
 python docs/demonstracao/gerar_telas_estaticas.py   # o sistema inteiro em HTML
 python -m operacao.servidor            # apps do motorista e do responsável (8080)
@@ -198,6 +202,17 @@ python -m unittest discover -s testes -v
   código, não são convenção.
 - **Previsão para a família tem origem declarada**: `medido` só quando houve
   embarque ou ping do veículo hoje; senão é `planejado`, e a tela diz isso.
+- **A tela começa pela pendência, não pelo painel.** Em `ui/`, o Início lista o
+  que precisa de decisão humana — cada item com quem decide, há quanto tempo
+  espera e o botão que resolve. KPI é contexto, vem depois. Pendência nova só
+  entra se tiver dono e ação; há teste que quebra sem isso.
+- **Relatório auxiliar só entra se for do mesmo plano.** `ui/gerar.py` confere
+  `origem.arquivo` antes de usar `importacao.json`: mostrar o erro de uma
+  planilha em cima dos números de outra é o pior tipo de bug, porque parece
+  certo. Pelo mesmo motivo, fila de porta a porta não aparece em operação de
+  fretamento.
+- **Número que o sistema duvida não aparece limpo.** Se `coerencia` traz aviso
+  sobre a base de comparação, o cartão de economia diz isso ao lado do número.
 - **Teste antes de commitar.** As fórmulas, a coerência dos indicadores e a meta
   de ≥20% de redução de frota são cobertas por testes; se a economia cair abaixo
   disso, a suíte quebra de propósito.

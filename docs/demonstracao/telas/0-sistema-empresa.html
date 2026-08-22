@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOBGOV — sistema</title>
+<style>
+/* =============================================================== tokens ===
+   Poucas variáveis, e todas com motivo. Contraste alto porque isto abre em
+   monitor de secretaria com brilho no talo; fonte grande porque quem opera
+   passa o dia aqui; alvo de toque de 44px porque o despachante usa com uma
+   mão só e o telefone na outra. */
+:root{
+  --fundo:#F6F8FA; --superficie:#FFFFFF; --superficie-2:#EEF3F7;
+  --tinta:#0F2231; --tinta-2:#4A6072; --linha:#D9E2EA;
+  --marca:#12508A; --marca-fraca:#E7F0F9;
+  --ok:#0B6B52; --ok-fraco:#DCEFE8;
+  --atencao:#8A5A00; --atencao-fraco:#FCF2DC;
+  --risco:#A63A17; --risco-fraco:#FAE7DF;
+  --sombra:0 1px 2px rgba(15,34,49,.06), 0 8px 24px rgba(15,34,49,.06);
+  --raio:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--fundo);color:var(--tinta);font-size:16.5px;line-height:1.5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--marca);outline-offset:2px;border-radius:6px}
+
+/* ================================================================ casca === */
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.rail{background:var(--superficie);border-right:1px solid var(--linha);
+  display:flex;flex-direction:column;padding:18px 14px;gap:6px;position:sticky;
+  top:0;height:100vh}
+.marca{display:flex;align-items:baseline;gap:8px;padding:6px 10px 18px}
+.marca b{font-size:19px;letter-spacing:.06em;color:var(--marca)}
+.marca span{font-size:12.5px;color:var(--tinta-2)}
+.rail a{display:flex;align-items:center;gap:11px;padding:12px 12px;border-radius:10px;
+  text-decoration:none;color:var(--tinta);font-weight:600;min-height:46px}
+.rail a:hover{background:var(--superficie-2)}
+.rail a[aria-current="page"]{background:var(--marca);color:#FFF}
+.rail a[aria-current="page"] .icone{opacity:1}
+.rail a .icone{width:20px;height:20px;flex:0 0 auto;opacity:.75}
+.rail a small{display:block;font-weight:400;font-size:12.5px;opacity:.75}
+.rail .rodape{margin-top:auto;font-size:12.5px;color:var(--tinta-2);padding:10px}
+.topo{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);
+  backdrop-filter:blur(6px);border-bottom:1px solid var(--linha);
+  padding:12px 26px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.contexto{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14.5px;
+  color:var(--tinta-2)}
+.contexto b{color:var(--tinta)}
+.operacoes{display:flex;gap:2px;background:var(--superficie-2);
+  border:1px solid var(--linha);border-radius:999px;padding:3px}
+.operacoes a{display:block;padding:5px 13px;border-radius:999px;font-size:13.5px;
+  color:var(--tinta-2);text-decoration:none;white-space:nowrap}
+.operacoes a:hover{color:var(--tinta)}
+.operacoes a[aria-current]{background:var(--superficie);color:var(--tinta);
+  font-weight:600;box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.busca{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--superficie-2);
+  border:1px solid var(--linha);border-radius:999px;padding:8px 14px;
+  flex:0 1 250px;min-width:150px}
+.busca input{border:0;background:transparent;width:100%;outline:none}
+.busca kbd{font-size:12px;background:var(--superficie);border:1px solid var(--linha);
+  border-radius:5px;padding:1px 6px;color:var(--tinta-2)}
+main{padding:26px}
+.folha{max-width:1180px;margin:0 auto}
+
+/* ============================================================ tipografia === */
+h1{font-size:27px;letter-spacing:-.01em}
+h2{font-size:19px;margin-bottom:4px}
+h3{font-size:16px}
+.chamada{color:var(--tinta-2);margin-top:6px;max-width:70ch}
+.secao{margin-top:32px}
+.secao > header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  margin-bottom:14px}
+.secao > header .chamada{margin-top:0}
+
+/* ================================================================ selo === */
+/* Todo número diz de onde veio. É componente, não rodapé. */
+.selo{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  letter-spacing:.03em;text-transform:uppercase;padding:3px 9px;border-radius:999px;
+  border:1px solid transparent;cursor:help}
+.selo.medido{background:var(--ok-fraco);color:var(--ok);border-color:#B7DDD0}
+.selo.planejado{background:var(--marca-fraca);color:var(--marca);border-color:#C3DAF0}
+.selo.simulado{background:var(--atencao-fraco);color:var(--atencao);border-color:#EBD9AE}
+.selo.informado{background:var(--superficie-2);color:var(--tinta-2)}
+
+/* =============================================================== cartões === */
+.cartao{background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:18px;box-shadow:var(--sombra)}
+.grade{display:grid;gap:14px}
+.grade.n2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.grade.n3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.grade.n4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+
+/* pendência: o item mais importante do sistema */
+.pendencia{display:flex;gap:14px;align-items:flex-start;background:var(--superficie);
+  border:1px solid var(--linha);border-left:5px solid var(--marca);
+  border-radius:var(--raio);padding:18px;box-shadow:var(--sombra)}
+.pendencia.alta{border-left-color:var(--risco)}
+.pendencia.media{border-left-color:var(--atencao)}
+.pendencia .corpo{flex:1;min-width:0}
+.pendencia h3{font-size:17.5px}
+.pendencia p{color:var(--tinta-2);margin-top:5px}
+.pendencia .quem{margin-top:9px;font-size:13.5px;color:var(--tinta-2)}
+.pendencia .quem b{color:var(--tinta)}
+.botao{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--marca);color:#FFF;border:0;border-radius:10px;padding:12px 18px;
+  font-weight:700;min-height:46px;cursor:pointer;text-decoration:none;
+  white-space:nowrap}
+.botao:hover{filter:brightness(1.08)}
+.botao.calmo{background:var(--superficie);color:var(--tinta);
+  border:1.5px solid var(--linha)}
+.botao.pequeno{padding:8px 12px;min-height:38px;font-size:14.5px}
+
+/* número com explicação sob demanda */
+.numero{background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:16px 18px}
+.numero .rotulo{font-size:13px;color:var(--tinta-2);display:flex;
+  align-items:center;justify-content:space-between;gap:8px}
+.numero .valor{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.numero .apoio{font-size:14px;color:var(--tinta-2);margin-top:3px}
+.porque{background:none;border:0;color:var(--marca);font-size:13px;font-weight:700;
+  cursor:pointer;padding:2px 4px}
+.explicacao{margin-top:10px;padding:10px 12px;background:var(--superficie-2);
+  border-radius:10px;font-size:14px;color:var(--tinta-2)}
+.explicacao[hidden]{display:none}
+
+/* ================================================= operação: mapa + lista === */
+.despacho{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start}
+@media (max-width:980px){.despacho{grid-template-columns:1fr}
+  .app{grid-template-columns:1fr}.rail{position:static;height:auto;
+  flex-direction:row;overflow-x:auto}.rail .marca,.rail .rodape{display:none}}
+.lista{background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);overflow:hidden;box-shadow:var(--sombra)}
+.lista header{padding:14px 16px;border-bottom:1px solid var(--linha);
+  display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.lista .conta{font-size:12.5px;color:var(--tinta-2);flex:0 0 100%}
+.lista input[type=search]{flex:1;border:1px solid var(--linha);border-radius:8px;
+  padding:9px 11px;background:var(--superficie-2)}
+.lista .itens{max-height:520px;overflow:auto}
+.lista button.item{display:block;width:100%;text-align:left;background:none;
+  border:0;border-bottom:1px solid var(--linha);padding:13px 16px;cursor:pointer}
+.lista button.item:hover{background:var(--superficie-2)}
+.lista button.item[aria-selected="true"]{background:var(--marca-fraca);
+  box-shadow:inset 3px 0 0 var(--marca)}
+.lista .titulo{font-weight:700}
+.lista .meta{font-size:13.5px;color:var(--tinta-2);margin-top:2px}
+.mapa-caixa{background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:14px;box-shadow:var(--sombra)}
+svg.mapa{width:100%;height:auto;background:#EAF0F5;border-radius:10px}
+.legenda{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--tinta-2);
+  margin-top:10px}
+.legenda i{width:11px;height:11px;border-radius:50%;display:inline-block;
+  margin-right:6px}
+
+/* ============================================================== trilha === */
+.trilha{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.marco{flex:1 1 200px;background:var(--superficie);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:15px;text-align:left;cursor:pointer;
+  box-shadow:var(--sombra)}
+.marco[aria-selected="true"]{border-color:var(--marca);box-shadow:0 0 0 3px var(--marca-fraca)}
+.marco .estado{font-size:12.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.04em}
+.marco.pronto .estado{color:var(--ok)}
+.marco.voce .estado{color:var(--risco)}
+.marco.espera .estado{color:var(--tinta-2)}
+.marco b{display:block;margin-top:5px;font-size:16.5px}
+.marco small{color:var(--tinta-2)}
+
+/* =============================================================== tabela === */
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--linha)}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--tinta-2)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.rolagem{max-height:420px;overflow:auto;border:1px solid var(--linha);
+  border-radius:12px;background:var(--superficie)}
+.barra{height:8px;background:var(--superficie-2);border-radius:999px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--marca)}
+.barra i.cheio{background:var(--ok)}
+.barra i.vazio{background:var(--atencao)}
+
+/* ============================================================== avisos === */
+.aviso{background:var(--atencao-fraco);border-left:4px solid var(--atencao);
+  border-radius:0 12px 12px 0;padding:14px 16px;margin:14px 0}
+.risco{background:var(--risco-fraco);border-left-color:var(--risco)}
+.vazio{text-align:center;color:var(--tinta-2);padding:42px 20px}
+.vazio b{display:block;color:var(--tinta);font-size:17px;margin-bottom:6px}
+
+/* ============================================================== gaveta === */
+.gaveta{position:fixed;top:0;right:0;bottom:0;width:min(460px,94vw);
+  background:var(--superficie);border-left:1px solid var(--linha);
+  box-shadow:-12px 0 40px rgba(15,34,49,.14);padding:22px;overflow:auto;z-index:40}
+.gaveta[hidden]{display:none}
+.gaveta header{display:flex;justify-content:space-between;align-items:flex-start;
+  gap:12px;margin-bottom:14px}
+.gaveta .fechar{background:none;border:0;font-size:24px;cursor:pointer;
+  color:var(--tinta-2);line-height:1;padding:4px 8px}
+.linha-tempo{margin-top:12px;border-left:2px solid var(--linha);padding-left:16px}
+.linha-tempo li{list-style:none;margin-bottom:14px;position:relative}
+.linha-tempo li::before{content:"";position:absolute;left:-22px;top:6px;width:10px;
+  height:10px;border-radius:50%;background:var(--marca)}
+.linha-tempo b{font-variant-numeric:tabular-nums}
+.faixa-demo{background:var(--atencao-fraco);color:var(--atencao);font-size:13.5px;
+  font-weight:700;text-align:center;padding:8px}
+</style>
+</head>
+<body>
+<div class="faixa-demo">Protótipo com dados reais dos relatórios do projeto —
+demonstração, nada aqui é publicado de verdade</div>
+<div class="app">
+  <nav class="rail" aria-label="Destinos">
+    <div class="marca"><b>MOBGOV</b><span>sistema</span></div>
+    <a href="#inicio" data-destino="inicio">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      <span>Início<small>o que precisa de você</small></span></a>
+    <a href="#planejar" data-destino="planejar">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><path d="M4 19V5m0 14h16"/><path d="M8 15l4-6 4 3 4-7"/></svg>
+      <span>Planejar<small>da planilha às rotas</small></span></a>
+    <a href="#operar" data-destino="operar">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      <span>Operar<small>o dia acontecendo</small></span></a>
+    <a href="#vender" data-destino="vender">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><path d="M4 20V8m5 12V4m5 16v-7m5 7V10"/></svg>
+      <span>Vender<small>quanto custa, por quanto</small></span></a>
+    <div class="rodape" id="rodape-rail"></div>
+  </nav>
+
+  <div>
+    <div class="topo">
+      <div class="contexto" id="contexto"></div>
+      <div class="operacoes" id="operacoes" role="group"
+        aria-label="Trocar de operação"></div>
+      <label class="busca">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/>
+          <path d="M20 20l-3.5-3.5"/></svg>
+        <input id="busca" type="search" placeholder="Buscar rota, ponto, veículo"
+          aria-label="Buscar">
+        <kbd>/</kbd>
+      </label>
+    </div>
+    <main><div class="folha" id="tela"></div></main>
+  </div>
+</div>
+
+<aside class="gaveta" id="gaveta" hidden aria-label="Detalhe"></aside>
+
+<script>
+var DADOS = {"gerado_em": "22/08/2026 22:30", "operacao": {"nome": "Empresa Modelo S.A.", "vertical": "fretamento", "passageiro": "colaborador", "passageiros": "colaboradores", "destino": "planta", "destinos": "plantas"}, "operacoes": [{"rotulo": "Prefeitura · escolar", "arquivo": "0-sistema.html", "atual": false}, {"rotulo": "Empresa · fretamento", "arquivo": "0-sistema-empresa.html", "atual": true}], "pendencias": [{"urgencia": "media", "destino": "planejar", "titulo": "A frota informada não bate com a demanda da planilha", "detalhe": "A frota declarada oferece 670 lugares por viagem, para um turno de 148 colaboradores (4.5× a demanda). Confira se a planilha cobre a empresa inteira — comparar a frota inteira com uma parte dos colaboradores produz uma economia que não existe.", "quem_decide": "quem enviou a base", "acao": "Conferir a base"}, {"urgencia": "baixa", "destino": "operar", "titulo": "1 escala fecha com hora extra", "detalhe": "São 16 min além da jornada normal, dentro do limite legal de 120 min por dia. Cabe na lei, mas custa — dá para redistribuir entre os turnos.", "quem_decide": "quem assina a escala", "acao": "Ver a escala do dia"}], "resumo": {"passageiros": 339, "veiculos": 7, "viagens": 21, "motoristas": 16, "economia_mes": 155908.85, "ocupacao_pct": 74.7, "selo": {"rotulo": "planejado", "explicacao": "calculado pelo motor de roteirização, ainda não medido"}}, "hoje": {"eventos": {"eventos": 2, "por_tipo": {"embarque": 1, "ping": 1}, "motoristas": 1, "atraso_medio_s": 46294.0, "atraso_maximo_s": 46324.0}, "faltas": {"avisadas": 0, "desfeitas": 0}, "rodadas": {"rodadas": 37, "rodadas_com_acao": 11, "km_economizados": 50.03, "km_de_demanda_nova": 15.42, "km_liberados_por_falta": 35.05, "km_do_remanejamento": 14.98, "faltas_absorvidas": 6, "pedidos_aceitos": 4, "pedidos_recusados": 4, "corridas_remanejadas": 3, "melhorias_descartadas": 35, "promessas_quebradas": 0, "tempo_max_s": 0.097, "tempo_medio_s": 0.048}, "politica": {"intervalo_min": 5, "horizonte_compromisso_min": 20, "janela_de_aviso_min": 60, "max_atraso_promessa_min": 5, "remocoes_por_rodada": 3, "ganho_minimo_km": 0.3, "limite_km_extra": 15.0}, "selo": {"rotulo": "medido", "explicacao": "veio do GPS do veículo ou do aplicativo de quem usa"}, "rota_exemplo": {"motorista": "VT01", "veiculo": "Ônibus rodoviário 46 lugares", "capacidade": 46, "turno": "1º turno (06h)", "jornada_prevista_min": 90, "jornada_limite_min": 120, "viagens": [{"viagem": "E2-t1-01", "escola": "Planta 1 — Fábrica", "turno": "1º turno (06h)", "alunos": 38, "cadeirantes": 0, "km": 47.4, "minutos": 90, "chegada_prevista": "07h06", "paradas": [{"ponto": "P110", "lat": -21.15031, "lon": -47.797347, "hora_prevista": "05h30"}, {"ponto": "P102", "lat": -21.154846, "lon": -47.799413, "hora_prevista": "05h34"}, {"ponto": "P092", "lat": -21.162135, "lon": -47.808163, "hora_prevista": "05h38"}, {"ponto": "P088", "lat": -21.165312, "lon": -47.810643, "hora_prevista": "05h42"}, {"ponto": "P083", "lat": -21.167242, "lon": -47.808176, "hora_prevista": "05h46"}, {"ponto": "P080", "lat": -21.172286, "lon": -47.810013, "hora_prevista": "05h50"}, {"ponto": "P072", "lat": -21.179993, "lon": -47.818881, "hora_prevista": "05h54"}, {"ponto": "P066", "lat": -21.196875, "lon": -47.840869, "hora_prevista": "05h58"}, {"ponto": "P064", "lat": -21.203762, "lon": -47.850727, "hora_prevista": "06h02"}, {"ponto": "P061", "lat": -21.2116, "lon": -47.840733, "hora_prevista": "06h06"}, {"ponto": "P056", "lat": -21.229994, "lon": -47.85779, "hora_prevista": "06h10"}, {"ponto": "P057", "lat": -21.228723, "lon": -47.873055, "hora_prevista": "06h14"}, {"ponto": "P060", "lat": -21.219429, "lon": -47.868671, "hora_prevista": "06h18"}, {"ponto": "P062", "lat": -21.212485, "lon": -47.875991, "hora_prevista": "06h22"}, {"ponto": "P063", "lat": -21.201401, "lon": -47.886307, "hora_prevista": "06h26"}, {"ponto": "P069", "lat": -21.187734, "lon": -47.883417, "hora_prevista": "06h30"}, {"ponto": "P065", "lat": -21.19602, "lon": -47.878047, "hora_prevista": "06h34"}, {"ponto": "P067", "lat": -21.191381, "lon": -47.850484, "hora_prevista": "06h38"}, {"ponto": "P078", "lat": -21.174666, "lon": -47.830766, "hora_prevista": "06h42"}, {"ponto": "P101", "lat": -21.155479, "lon": -47.823487, "hora_prevista": "06h46"}, {"ponto": "P098", "lat": -21.158403, "lon": -47.817344, "hora_prevista": "06h50"}, {"ponto": "P095", "lat": -21.162106, "lon": -47.813575, "hora_prevista": "06h54"}, {"ponto": "P109", "lat": -21.150188, "lon": -47.803207, "hora_prevista": "06h58"}, {"ponto": "P113", "lat": -21.146097, "lon": -47.803861, "hora_prevista": "07h02"}]}], "total_alunos": 38}}, "planejar": {"importacao": {"alunos_importados": 339, "erros": 101, "avisos": 79, "precisam_ajuste_no_mapa": 0, "colunas_detectadas": {"nome": 1, "endereco": 2, "bairro": 4, "escola": 5, "turno": 6, "cadeirante": 7, "latitude": 8, "longitude": 9}, "por_turno": {"t2": 87, "t1": 148, "adm": 73, "t3": 31}, "por_escola": {"Planta 1 — Fábrica": 132, "Planta 2 — Centro de distribuição": 134, "Escritório administrativo": 73}, "cadeirantes": 4, "acompanhantes": 0}, "problemas": [{"linha": 5, "campo": "coordenada", "valor": "-47.820919, -21.165104", "problema": "Latitude e longitude estavam trocadas.", "sugestao": "Corrigi automaticamente — confira no mapa.", "gravidade": "aviso"}, {"linha": 7, "campo": "endereco", "valor": "Rodovia SP-330 km 12", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 19, "campo": "endereco", "valor": "Av. dos Trabalhadores", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 25, "campo": "endereco", "valor": "Travessa da Fábrica", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 29, "campo": "endereco", "valor": "Rua das Palmeiras", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 33, "campo": "endereco", "valor": "Rodovia SP-330 km 12", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 41, "campo": "turno", "valor": "2º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 55, "campo": "turno", "valor": "3º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 56, "campo": "turno", "valor": "2º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 61, "campo": "cadeirante", "valor": "-", "problema": "Não entendi se o colaborador usa cadeira de rodas.", "sugestao": "Use sim/não, S/N ou X. Assumi que NÃO — confira, porque isso muda o tipo de veículo da rota.", "gravidade": "erro"}, {"linha": 61, "campo": "endereco", "valor": "Rodovia SP-330 km 12", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 62, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 63, "campo": "endereco", "valor": "Rua Projetada B", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 70, "campo": "turno", "valor": "3º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 72, "campo": "endereco", "valor": "Rua Dom Pedro", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 75, "campo": "turno", "valor": "2º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 78, "campo": "turno", "valor": "3º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 78, "campo": "coordenada", "valor": "-47.871528, -21.223026", "problema": "Latitude e longitude estavam trocadas.", "sugestao": "Corrigi automaticamente — confira no mapa.", "gravidade": "aviso"}, {"linha": 85, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 86, "campo": "endereco", "valor": "Rua das Palmeiras", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 91, "campo": "endereco", "valor": "Rua Dom Pedro", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 92, "campo": "endereco", "valor": "Rua Projetada B", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 98, "campo": "endereco", "valor": "Av. dos Trabalhadores", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 99, "campo": "endereco", "valor": "Estrada do Contorno", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 103, "campo": "duplicado", "valor": "Rua Projetada B", "problema": "Colaborador repetido (já aparece na linha 102).", "sugestao": "Mantive só a primeira ocorrência. Se forem pessoas diferentes com o mesmo nome, acrescente algo que as distinga (data de nascimento ou matrícula).", "gravidade": "aviso"}, {"linha": 115, "campo": "cadeirante", "valor": "?", "problema": "Não entendi se o colaborador usa cadeira de rodas.", "sugestao": "Use sim/não, S/N ou X. Assumi que NÃO — confira, porque isso muda o tipo de veículo da rota.", "gravidade": "erro"}, {"linha": 116, "campo": "endereco", "valor": "Rua 7 de Setembro", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 117, "campo": "duplicado", "valor": "Rodovia SP-330 km 12", "problema": "Colaborador repetido (já aparece na linha 56).", "sugestao": "Mantive só a primeira ocorrência. Se forem pessoas diferentes com o mesmo nome, acrescente algo que as distinga (data de nascimento ou matrícula).", "gravidade": "aviso"}, {"linha": 119, "campo": "endereco", "valor": "Estrada do Contorno", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 121, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 122, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 124, "campo": "turno", "valor": "3º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 131, "campo": "endereco", "valor": "Estrada do Contorno", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 132, "campo": "turno", "valor": "2º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 139, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 139, "campo": "endereco", "valor": "Av. dos Trabalhadores", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 140, "campo": "turno", "valor": "2º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 141, "campo": "cadeirante", "valor": "-", "problema": "Não entendi se o colaborador usa cadeira de rodas.", "sugestao": "Use sim/não, S/N ou X. Assumi que NÃO — confira, porque isso muda o tipo de veículo da rota.", "gravidade": "erro"}, {"linha": 144, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 146, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 146, "campo": "endereco", "valor": "Estrada do Contorno", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 150, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 151, "campo": "turno", "valor": "2º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 151, "campo": "endereco", "valor": "Rua 7 de Setembro", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 152, "campo": "coordenada", "valor": "-47.794571, -21.137341", "problema": "Latitude e longitude estavam trocadas.", "sugestao": "Corrigi automaticamente — confira no mapa.", "gravidade": "aviso"}, {"linha": 153, "campo": "turno", "valor": "1º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 155, "campo": "turno", "valor": "3º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 158, "campo": "endereco", "valor": "Travessa da Fábrica", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 159, "campo": "endereco", "valor": "Av. dos Trabalhadores", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 167, "campo": "turno", "valor": "3º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 170, "campo": "endereco", "valor": "Rua Projetada B", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 173, "campo": "endereco", "valor": "Rua Dom Pedro", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 179, "campo": "turno", "valor": "2º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 182, "campo": "turno", "valor": "3º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}, {"linha": 182, "campo": "endereco", "valor": "Av. dos Trabalhadores", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 184, "campo": "cadeirante", "valor": "?", "problema": "Não entendi se o colaborador usa cadeira de rodas.", "sugestao": "Use sim/não, S/N ou X. Assumi que NÃO — confira, porque isso muda o tipo de veículo da rota.", "gravidade": "erro"}, {"linha": 185, "campo": "endereco", "valor": "Rua Projetada B", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 186, "campo": "endereco", "valor": "Rodovia SP-330 km 12", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 189, "campo": "endereco", "valor": "Av. Industrial", "problema": "Endereço sem coordenada e bairro desconhecido.", "sugestao": "Preencha latitude/longitude, ou informe um bairro que já tenha ponto de referência cadastrado.", "gravidade": "erro"}, {"linha": 190, "campo": "turno", "valor": "3º turno", "problema": "Turno não reconhecido.", "sugestao": "Turnos desta operação: t1, adm, t2, t3. Assumi “t1” para não perder a pessoa — confira.", "gravidade": "aviso"}], "agrupamento": {"alunos": 339, "pontos": 220, "alunos_por_ponto": 1.54, "caminhada_media_m": 109, "caminhada_maxima_m": 573, "pontos_exclusivos_de_cadeirante": 4, "raio_urbano_m": 300, "raio_rural_m": 800, "escolas": 3, "escolas_com_coordenada_estimada": 0, "avisos": []}, "nao_atendida": {"pontos": [], "alunos": 0, "por_turno": {"t1": 0, "adm": 0, "t2": 0, "t3": 0}}, "coerencia": ["A frota declarada oferece 670 lugares por viagem, para um turno de 148 colaboradores (4.5× a demanda). Confira se a planilha cobre a empresa inteira — comparar a frota inteira com uma parte dos colaboradores produz uma economia que não existe."], "frota": {"rotulo": "Frota necessária", "composicao": [{"tipo": "EXEC28", "nome": "Micro-ônibus executivo 28 lugares", "qtd": 3, "capacidade": 28, "assentos": 84, "posicoes_cadeirante": 0, "km_dia": 556.4, "custo_km": 2.6, "custo_fixo_mes": 21600.0, "custo_variavel_mes": 31826.08, "custo_mes": 53426.08, "litros_dia": 132.5}, {"tipo": "VAN16", "nome": "Van executiva 16 lugares", "qtd": 2, "capacidade": 16, "assentos": 32, "posicoes_cadeirante": 0, "km_dia": 505.4, "custo_km": 1.8, "custo_fixo_mes": 9800.0, "custo_variavel_mes": 20013.84, "custo_mes": 29813.84, "litros_dia": 59.5}, {"tipo": "RODO46", "nome": "Ônibus rodoviário 46 lugares", "qtd": 1, "capacidade": 46, "assentos": 46, "posicoes_cadeirante": 0, "km_dia": 187.6, "custo_km": 3.4, "custo_fixo_mes": 9800.0, "custo_variavel_mes": 14032.48, "custo_mes": 23832.48, "litros_dia": 64.7}, {"tipo": "VANPCD", "nome": "Van acessível 12 lugares", "qtd": 1, "capacidade": 12, "assentos": 12, "posicoes_cadeirante": 2, "km_dia": 290.8, "custo_km": 1.95, "custo_fixo_mes": 5600.0, "custo_variavel_mes": 12475.32, "custo_mes": 18075.32, "litros_dia": 37.3}], "total_veiculos": 7, "assentos": 174, "posicoes_cadeirante": 2, "km_dia": 1540.2, "km_mes": 33884.4, "custo_fixo_mes": 46800.0, "custo_variavel_mes": 78347.72, "custo_mes": 125147.72, "custo_ano": 1501772.64, "litros_dia": 294.0, "litros_ano": 77616.0, "tco2_ano": 208.0}, "frota_atual": {"rotulo": "Frota atual", "composicao": [{"tipo": "RODO46", "nome": "Ônibus rodoviário 46 lugares", "qtd": 9, "capacidade": 46, "assentos": 414, "posicoes_cadeirante": 0, "km_dia": 848.6, "custo_km": 3.4, "custo_fixo_mes": 88200.0, "custo_variavel_mes": 63473.14, "custo_mes": 151673.14, "litros_dia": 292.6}, {"tipo": "EXEC28", "nome": "Micro-ônibus executivo 28 lugares", "qtd": 6, "capacidade": 28, "assentos": 168, "posicoes_cadeirante": 0, "km_dia": 565.7, "custo_km": 2.6, "custo_fixo_mes": 43200.0, "custo_variavel_mes": 32358.86, "custo_mes": 75558.86, "litros_dia": 134.7}, {"tipo": "VAN16", "nome": "Van executiva 16 lugares", "qtd": 4, "capacidade": 16, "assentos": 64, "posicoes_cadeirante": 0, "km_dia": 377.1, "custo_km": 1.8, "custo_fixo_mes": 19600.0, "custo_variavel_mes": 14934.86, "custo_mes": 34534.86, "litros_dia": 44.4}, {"tipo": "VANPCD", "nome": "Van acessível 12 lugares", "qtd": 2, "capacidade": 12, "assentos": 24, "posicoes_cadeirante": 4, "km_dia": 188.6, "custo_km": 1.95, "custo_fixo_mes": 11200.0, "custo_variavel_mes": 8089.71, "custo_mes": 19289.71, "litros_dia": 24.2}], "total_veiculos": 21, "assentos": 670, "posicoes_cadeirante": 4, "km_dia": 1980.0, "km_mes": 43560.0, "custo_fixo_mes": 162200.0, "custo_variavel_mes": 118856.57, "custo_mes": 281056.57, "custo_ano": 3372678.84, "litros_dia": 495.9, "litros_ano": 130917.6, "tco2_ano": 350.9}, "economia": {"veiculos": 14, "reducao_frota_pct": 66.7, "custo_mes": 155908.85, "custo_ano": 1870906.2, "reducao_custo_pct": 55.5, "km_dia": 439.8, "reducao_km_pct": 22.2, "litros_dia": 201.9, "litros_ano": 53301.6, "tco2_ano": 142.9}, "memoria": [{"passo": "1. Custo por km de cada tipo de veículo", "formula": "custo_km = manutenção_km + preço_diesel ÷ consumo (km/l)", "valores": "preço do diesel R$ 6.10/l → Ônibus rodoviário 46 lugares: R$ 3.40/km, Micro-ônibus executivo 28 lugares: R$ 2.60/km, Van executiva 16 lugares: R$ 1.80/km, Van acessível 12 lugares: R$ 1.95/km"}, {"passo": "2. Custo fixo mensal", "formula": "Σ (custo_fixo_mês do tipo × quantidade de veículos)", "valores": "frota atual R$ 162,200/mês · frota necessária R$ 46,800/mês"}, {"passo": "3. Custo variável mensal", "formula": "km/dia × dias letivos no mês × custo_km", "valores": "1,980 km/dia × 22 dias → R$ 118,857/mês (atual) · 1,540 km/dia × 22 dias → R$ 78,348/mês (necessária)"}, {"passo": "4. Consumo de combustível", "formula": "litros/dia = Σ (km/dia do tipo ÷ consumo km/l do tipo)", "valores": "495.9 l/dia (atual) · 294.0 l/dia (necessária)"}, {"passo": "5. Emissões evitadas", "formula": "tCO₂/ano = litros/dia × dias letivos × 12 meses × 2.68 kg CO₂/l ÷ 1.000", "valores": "350.9 t/ano (atual) · 208.0 t/ano (necessária)"}, {"passo": "6. Economia", "formula": "economia = indicador da frota atual − indicador da frota necessária", "valores": "os valores da faixa superior desta página saem exatamente destes passos, sem arredondamento intermediário"}], "por_turno": [{"turno": "1º turno (06h)", "alunos": 148, "viagens": 7, "veiculos": 6, "viagens_por_veiculo": 1.17, "lugares_ofertados": 174, "lugares_folga": 26, "jornada_limite_min": 120, "jornada_media_min": 85.3, "jornada_max_min": 119}, {"turno": "Administrativo (08h)", "alunos": 73, "viagens": 5, "veiculos": 4, "viagens_por_veiculo": 1.25, "lugares_ofertados": 112, "lugares_folga": 39, "jornada_limite_min": 120, "jornada_media_min": 74.0, "jornada_max_min": 99}, {"turno": "2º turno (14h20)", "alunos": 87, "viagens": 5, "veiculos": 5, "viagens_por_veiculo": 1.0, "lugares_ofertados": 118, "lugares_folga": 31, "jornada_limite_min": 120, "jornada_media_min": 78.6, "jornada_max_min": 90}, {"turno": "3º turno (22h)", "alunos": 31, "viagens": 4, "veiculos": 3, "viagens_por_veiculo": 1.33, "lugares_ofertados": 56, "lugares_folga": 25, "jornada_limite_min": 120, "jornada_media_min": 84.0, "jornada_max_min": 97}], "arquivo": "planilha-fretamento-demo.csv", "origem": {"tipo": "planilha_importada", "arquivo": "planilha-fretamento-demo.csv", "importado_em": "2026-08-22 21:53", "alunos_na_planilha": 339, "erros_na_importacao": 101, "avisos_na_importacao": 79}, "demanda": {"alunos": 339, "alunos_por_turno": {"t1": 148, "adm": 73, "t2": 87, "t3": 31}, "cadeirantes": 4, "cadeirantes_por_turno": {"t1": 1, "adm": 1, "t2": 1, "t3": 1}, "pontos_embarque": 220, "escolas": 3, "turnos": [{"id": "t1", "nome": "1º turno (06h)", "jornada_max_min": 120}, {"id": "adm", "nome": "Administrativo (08h)", "jornada_max_min": 120}, {"id": "t2", "nome": "2º turno (14h20)", "jornada_max_min": 120}, {"id": "t3", "nome": "3º turno (22h)", "jornada_max_min": 120}]}, "cenarios": [{"preco_diesel_l": 6.1, "dias_letivos_mes": 20, "padrao": false, "custo_atual_mes": 270251.43, "custo_otimizado_mes": 118025.2, "economia_mes": 152226.23, "economia_ano": 1826714.76, "reducao_custo_pct": 56.3}, {"preco_diesel_l": 6.1, "dias_letivos_mes": 22, "padrao": true, "custo_atual_mes": 281056.57, "custo_otimizado_mes": 125147.72, "economia_mes": 155908.85, "economia_ano": 1870906.2, "reducao_custo_pct": 55.5}, {"preco_diesel_l": 6.1, "dias_letivos_mes": 24, "padrao": false, "custo_atual_mes": 291861.71, "custo_otimizado_mes": 132270.24, "economia_mes": 159591.47, "economia_ano": 1915097.64, "reducao_custo_pct": 54.7}, {"preco_diesel_l": 7.01, "dias_letivos_mes": 20, "padrao": false, "custo_atual_mes": 279275.9, "custo_otimizado_mes": 123374.3, "economia_mes": 155901.6, "economia_ano": 1870819.2, "reducao_custo_pct": 55.8}, {"preco_diesel_l": 7.01, "dias_letivos_mes": 22, "padrao": false, "custo_atual_mes": 290983.49, "custo_otimizado_mes": 131031.74, "economia_mes": 159951.75, "economia_ano": 1919421.0, "reducao_custo_pct": 55.0}, {"preco_diesel_l": 7.01, "dias_letivos_mes": 24, "padrao": false, "custo_atual_mes": 302691.09, "custo_otimizado_mes": 138689.16, "economia_mes": 164001.93, "economia_ano": 1968023.16, "reducao_custo_pct": 54.2}, {"preco_diesel_l": 7.93, "dias_letivos_mes": 20, "padrao": false, "custo_atual_mes": 288399.55, "custo_otimizado_mes": 128782.18, "economia_mes": 159617.37, "economia_ano": 1915408.44, "reducao_custo_pct": 55.3}, {"preco_diesel_l": 7.93, "dias_letivos_mes": 22, "padrao": false, "custo_atual_mes": 301019.5, "custo_otimizado_mes": 136980.41, "economia_mes": 164039.09, "economia_ano": 1968469.08, "reducao_custo_pct": 54.5}, {"preco_diesel_l": 7.93, "dias_letivos_mes": 24, "padrao": false, "custo_atual_mes": 313639.47, "custo_otimizado_mes": 145178.62, "economia_mes": 168460.85, "economia_ano": 2021530.2, "reducao_custo_pct": 53.7}], "premissas": {"preco_diesel_l": 6.1, "dias_letivos_mes": 22, "viagens_por_rota": 2, "fator_co2_kg_l": 2.68, "tempo_max_trajeto_min": 90, "tempo_virada_min": 5, "preco_diesel_base_l": 6.1, "fonte_tempos": "OSRM/haversine com fator rural 1.35 + tempo de embarque por parada (corrigidos depois pelo aprendizado com GPS real)"}}, "mapa": {"destinos": [{"id": "E1", "nome": "Escritório administrativo", "lat": -21.158, "lon": -47.802, "alunos": 73, "origem_da_coordenada": "informada pelo município"}, {"id": "E2", "nome": "Planta 1 — Fábrica", "lat": -21.14, "lon": -47.79, "alunos": 132, "origem_da_coordenada": "informada pelo município"}, {"id": "E3", "nome": "Planta 2 — Centro de distribuição", "lat": -21.205, "lon": -47.845, "alunos": 134, "origem_da_coordenada": "informada pelo município"}], "pontos": {"P001": [-21.226378, -47.859082], "P002": [-21.219981, -47.869723], "P003": [-21.207786, -47.889454], "P004": [-21.206376, -47.847108], "P005": [-21.205347, -47.871705], "P006": [-21.197632, -47.883575], "P007": [-21.189041, -47.848612], "P008": [-21.1847, -47.858192], "P009": [-21.178907, -47.821591], "P010": [-21.17625, -47.861537], "P011": [-21.174868, -47.799111], "P012": [-21.174772, -47.821218], "P013": [-21.168726, -47.802374], "P014": [-21.167801, -47.834738], "P015": [-21.16491, -47.812537], "P016": [-21.163644, -47.808401], "P017": [-21.163342, -47.798624], "P018": [-21.161759, -47.811788], "P019": [-21.160609, -47.793846], "P020": [-21.160209, -47.815958], "P021": [-21.159595, -47.822238], "P022": [-21.158908, -47.783316], "P023": [-21.158816, -47.796068], "P024": [-21.15875, -47.811148], "P025": [-21.158261, -47.789254], "P026": [-21.158084, -47.830757], "P027": [-21.156257, -47.802796], "P028": [-21.156573, -47.776317], "P029": [-21.155405, -47.79347], "P030": [-21.154489, -47.808567], "P031": [-21.153748, -47.79744], "P032": [-21.153568, -47.805448], "P033": [-21.152134, -47.774956], "P034": [-21.150909, -47.808282], "P035": [-21.150849, -47.797569], "P036": [-21.150085, -47.804918], "P037": [-21.149441, -47.785935], "P038": [-21.147296, -47.795869], "P039": [-21.147369, -47.80464], "P040": [-21.146523, -47.800391], "P041": [-21.143651, -47.778568], "P042": [-21.14183, -47.801611], "P043": [-21.14089, -47.781977], "P044": [-21.138464, -47.792812], "P045": [-21.129261, -47.752921], "P046": [-21.116615, -47.77763], "P047": [-21.09773, -47.721736], "P048": [-21.095511, -47.730149], "P049": [-21.088207, -47.753464], "P050": [-21.081452, -47.780946], "P051": [-21.078929, -47.790057], "P052": [-21.071302, -47.732956], "P053": [-21.06428, -47.740699], "P054": [-21.064489, -47.767138], "P055": [-21.060635, -47.757088], "P056": [-21.229994, -47.85779], "P057": [-21.228723, -47.873055], "P058": [-21.228273, -47.84856], "P059": [-21.223464, -47.862561], "P060": [-21.219429, -47.868671], "P061": [-21.2116, -47.840733], "P062": [-21.212485, -47.875991], "P063": [-21.201401, -47.886307], "P064": [-21.203762, -47.850727], "P065": [-21.19602, -47.878047], "P066": [-21.196875, -47.840869], "P067": [-21.191381, -47.850484], "P068": [-21.190709, -47.863612], "P069": [-21.187734, -47.883417], "P070": [-21.186636, -47.80723], "P071": [-21.182814, -47.87199], "P072": [-21.179993, -47.818881], "P073": [-21.17956, -47.815134], "P074": [-21.179257, -47.830125], "P075": [-21.179091, -47.798906], "P076": [-21.17865, -47.822764], "P077": [-21.175536, -47.810171], "P078": [-21.174666, -47.830766], "P079": [-21.174361, -47.803389], "P080": [-21.172286, -47.810013], "P081": [-21.172143, -47.799798], "P082": [-21.169928, -47.80407], "P083": [-21.167242, -47.808176], "P084": [-21.167205, -47.795774], "P085": [-21.166091, -47.803366], "P086": [-21.166748, -47.799502], "P087": [-21.165407, -47.786319], "P088": [-21.165312, -47.810643], "P089": [-21.165121, -47.829473], "P090": [-21.165104, -47.820919], "P091": [-21.163861, -47.805323], "P092": [-21.162135, -47.808163], "P093": [-21.162699, -47.792877], "P094": [-21.16214, -47.78499], "P095": [-21.162106, -47.813575], "P096": [-21.161018, -47.796647], "P097": [-21.160851, -47.77973], "P098": [-21.158403, -47.817344], "P099": [-21.156213, -47.811662], "P100": [-21.155792, -47.796049], "P101": [-21.155479, -47.823487], "P102": [-21.154846, -47.799413], "P103": [-21.154907, -47.787803], "P104": [-21.155283, -47.779824], "P105": [-21.153999, -47.806867], "P106": [-21.154551, -47.780426], "P107": [-21.153804, -47.793749], "P108": [-21.153394, -47.783986], "P109": [-21.150188, -47.803207], "P110": [-21.15031, -47.797347], "P111": [-21.149734, -47.809738], "P112": [-21.146761, -47.788122], "P113": [-21.146097, -47.803861], "P114": [-21.145661, -47.780148], "P115": [-21.140223, -47.778675], "P116": [-21.140029, -47.798158], "P117": [-21.137341, -47.794571], "P118": [-21.133477, -47.787441], "P119": [-21.128221, -47.741186], "P120": [-21.128106, -47.725768], "P121": [-21.126042, -47.767284], "P122": [-21.124303, -47.748472], "P123": [-21.123302, -47.731907], "P124": [-21.114102, -47.776975], "P125": [-21.114085, -47.752418], "P126": [-21.103808, -47.774204], "P127": [-21.100396, -47.786378], "P128": [-21.099138, -47.733831], "P129": [-21.092961, -47.722886], "P130": [-21.083967, -47.732145], "P131": [-21.082638, -47.768849], "P132": [-21.078731, -47.763366], "P133": [-21.0721, -47.732823], "P134": [-21.071149, -47.780603], "P135": [-21.070327, -47.771508], "P136": [-21.067589, -47.763367], "P137": [-21.234923, -47.861257], "P138": [-21.230762, -47.875134], "P139": [-21.229759, -47.852661], "P140": [-21.221229, -47.876328], "P141": [-21.222411, -47.863122], "P142": [-21.2141, -47.838435], "P143": [-21.212211, -47.871702], "P144": [-21.204447, -47.835987], "P145": [-21.202838, -47.846788], "P146": [-21.198596, -47.873855], "P147": [-21.188087, -47.852373], "P148": [-21.188567, -47.840114], "P149": [-21.187649, -47.81946], "P150": [-21.185876, -47.822088], "P151": [-21.185639, -47.862672], "P152": [-21.184355, -47.817297], "P153": [-21.182112, -47.824297], "P154": [-21.181941, -47.799492], "P155": [-21.181336, -47.827119], "P156": [-21.180316, -47.871483], "P157": [-21.180235, -47.830058], "P158": [-21.177236, -47.830134], "P159": [-21.176109, -47.796266], "P160": [-21.175088, -47.818427], "P161": [-21.174616, -47.799639], "P162": [-21.174572, -47.821898], "P163": [-21.173739, -47.807779], "P164": [-21.171294, -47.830092], "P165": [-21.171834, -47.819608], "P166": [-21.16961, -47.826491], "P167": [-21.169349, -47.800903], "P168": [-21.168258, -47.80655], "P169": [-21.168135, -47.798183], "P170": [-21.164998, -47.808685], "P171": [-21.164563, -47.801938], "P172": [-21.163809, -47.805806], "P173": [-21.163628, -47.812091], "P174": [-21.161817, -47.799384], "P175": [-21.162691, -47.787138], "P176": [-21.162661, -47.781483], "P177": [-21.161861, -47.795917], "P178": [-21.160543, -47.813316], "P179": [-21.160127, -47.779873], "P180": [-21.158394, -47.810688], "P181": [-21.158894, -47.797924], "P182": [-21.156965, -47.807755], "P183": [-21.157267, -47.784796], "P184": [-21.156705, -47.829466], "P185": [-21.155384, -47.804518], "P186": [-21.155131, -47.793237], "P187": [-21.155135, -47.790209], "P188": [-21.154945, -47.814976], "P189": [-21.154913, -47.812058], "P190": [-21.154482, -47.778565], "P191": [-21.150666, -47.794527], "P192": [-21.152115, -47.797675], "P193": [-21.151456, -47.816392], "P194": [-21.151372, -47.805177], "P195": [-21.150495, -47.776535], "P196": [-21.14868, -47.785494], "P197": [-21.147448, -47.803639], "P198": [-21.146079, -47.775654], "P199": [-21.14466, -47.793126], "P200": [-21.144401, -47.764958], "P201": [-21.143444, -47.800872], "P202": [-21.142462, -47.784056], "P203": [-21.139643, -47.780405], "P204": [-21.136621, -47.740217], "P205": [-21.136524, -47.787076], "P206": [-21.131435, -47.768117], "P207": [-21.129652, -47.793767], "P208": [-21.127307, -47.744021], "P209": [-21.122325, -47.730858], "P210": [-21.11492, -47.753079], "P211": [-21.114977, -47.725375], "P212": [-21.097708, -47.723744], "P213": [-21.093529, -47.783834], "P214": [-21.088878, -47.744046], "P215": [-21.085268, -47.730602], "P216": [-21.077998, -47.762687], "P217": [-21.073268, -47.75837], "P218": [-21.075775, -47.780193], "P219": [-21.072512, -47.729925], "P220": [-21.061528, -47.767224]}, "viagens": [{"id": "E2-t1-01", "destino": "Planta 1 — Fábrica", "destino_id": "E2", "turno": "1º turno (06h)", "veiculo": "VT01", "paradas": ["P110", "P102", "P092", "P088", "P083", "P080", "P072", "P066", "P064", "P061", "P056", "P057", "P060", "P062", "P063", "P069", "P065", "P067", "P078", "P101", "P098", "P095", "P109", "P113"], "passageiros": 38, "ocupacao": 83, "km": 47.4, "min": 90}, {"id": "E2-t1-02", "destino": "Planta 1 — Fábrica", "destino_id": "E2", "turno": "1º turno (06h)", "veiculo": "VT04", "paradas": ["P114", "P115", "P122", "P120", "P128", "P129", "P130", "P133", "P136", "P135", "P134", "P131", "P127", "P126", "P124"], "passageiros": 21, "ocupacao": 75, "km": 41.0, "min": 74}, {"id": "E2-t1-03", "destino": "Planta 1 — Fábrica", "destino_id": "E2", "turno": "1º turno (06h)", "veiculo": "VT05", "paradas": ["P112", "P103", "P106", "P097", "P094", "P087", "P075", "P070", "P077", "P079", "P082", "P091", "P096", "P107"], "passageiros": 15, "ocupacao": 94, "km": 18.7, "min": 39}, {"id": "E3-t1-01", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "1º turno (06h)", "veiculo": "VT02", "paradas": ["P177", "P183", "P190", "P195", "P198", "P200", "P204", "P209", "P211", "P212", "P219", "P210", "P191", "P185", "P180", "P178"], "passageiros": 21, "ocupacao": 75, "km": 55.1, "min": 90}, {"id": "E3-t1-02", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "1º turno (06h)", "veiculo": "VT03", "paradas": ["P152", "P161", "P169", "P175", "P187", "P196", "P203", "P217", "P220", "P205", "P199", "P192", "P181", "P174", "P171", "P172", "P163"], "passageiros": 25, "ocupacao": 89, "km": 52.6, "min": 90}, {"id": "E3-t1-03", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "1º turno (06h)", "veiculo": "VT05", "paradas": ["P148", "P157", "P158", "P164", "P166", "P184", "P193", "P197", "P194", "P173", "P165", "P160", "P162", "P155"], "passageiros": 16, "ocupacao": 100, "km": 23.1, "min": 49}, {"id": "E3-t1-04", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "1º turno (06h)", "veiculo": "VT06", "paradas": ["P144", "P149", "P153", "P147", "P151", "P156", "P140", "P141", "P145"], "passageiros": 12, "ocupacao": 100, "km": 24.9, "min": 49}, {"id": "E1-adm-01", "destino": "Escritório administrativo", "destino_id": "E1", "turno": "Administrativo (08h)", "veiculo": "VA01", "paradas": ["P018", "P015", "P012", "P009", "P007", "P004", "P001", "P002", "P005", "P003", "P006", "P008", "P010", "P014", "P026", "P021", "P020", "P024"], "passageiros": 25, "ocupacao": 89, "km": 37.9, "min": 89}, {"id": "E1-adm-02", "destino": "Escritório administrativo", "destino_id": "E1", "turno": "Administrativo (08h)", "veiculo": "VA02", "paradas": ["P031", "P043", "P051", "P050", "P054", "P055", "P053", "P052", "P048", "P047", "P045", "P041", "P037", "P029"], "passageiros": 19, "ocupacao": 68, "km": 42.6, "min": 89}, {"id": "E1-adm-03", "destino": "Escritório administrativo", "destino_id": "E1", "turno": "Administrativo (08h)", "veiculo": "VA04", "paradas": ["P017", "P011", "P013", "P016", "P030", "P034", "P036", "P040", "P038", "P035"], "passageiros": 15, "ocupacao": 94, "km": 10.5, "min": 36}, {"id": "E1-adm-04", "destino": "Escritório administrativo", "destino_id": "E1", "turno": "Administrativo (08h)", "veiculo": "VA01", "paradas": ["P027"], "passageiros": 2, "ocupacao": 7, "km": 0.6, "min": 5}, {"id": "E1-adm-05", "destino": "Escritório administrativo", "destino_id": "E1", "turno": "Administrativo (08h)", "veiculo": "VA03", "paradas": ["P032", "P039", "P042", "P044", "P046", "P049", "P033", "P028", "P022", "P025", "P019", "P023"], "passageiros": 12, "ocupacao": 100, "km": 28.0, "min": 72}, {"id": "E2-t2-01", "destino": "Planta 1 — Fábrica", "destino_id": "E2", "turno": "2º turno (14h20)", "veiculo": "VT01", "paradas": ["P117", "P116", "P111", "P099", "P090", "P089", "P074", "P067", "P071", "P063", "P062", "P056", "P061", "P073", "P084", "P093", "P086", "P085", "P091", "P092", "P105", "P109"], "passageiros": 30, "ocupacao": 65, "km": 46.4, "min": 90}, {"id": "E2-t2-02", "destino": "Planta 1 — Fábrica", "destino_id": "E2", "turno": "2º turno (14h20)", "veiculo": "VT04", "paradas": ["P118", "P127", "P132", "P125", "P123", "P119", "P121", "P114", "P108", "P103", "P096", "P100"], "passageiros": 12, "ocupacao": 100, "km": 34.6, "min": 65}, {"id": "E3-t2-01", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "2º turno (14h20)", "veiculo": "VT02", "paradas": ["P155", "P180", "P182", "P185", "P194", "P197", "P201", "P207", "P213", "P216", "P217", "P205", "P196", "P186", "P174", "P150", "P144"], "passageiros": 24, "ocupacao": 86, "km": 48.4, "min": 90}, {"id": "E3-t2-02", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "2º turno (14h20)", "veiculo": "VT03", "paradas": ["P154", "P176", "P195", "P204", "P208", "P215", "P219", "P214", "P206", "P202", "P192", "P170", "P153"], "passageiros": 13, "ocupacao": 81, "km": 54.4, "min": 90}, {"id": "E3-t2-03", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "2º turno (14h20)", "veiculo": "VT05", "paradas": ["P139", "P137", "P141", "P140", "P146", "P188", "P189", "P148"], "passageiros": 8, "ocupacao": 50, "km": 32.4, "min": 58}, {"id": "E2-t3-01", "destino": "Planta 1 — Fábrica", "destino_id": "E2", "turno": "3º turno (22h)", "veiculo": "VT02", "paradas": ["P105", "P089", "P068", "P059", "P056", "P058", "P061", "P076", "P083", "P082", "P081", "P085"], "passageiros": 12, "ocupacao": 75, "km": 38.0, "min": 67}, {"id": "E2-t3-02", "destino": "Planta 1 — Fábrica", "destino_id": "E2", "turno": "3º turno (22h)", "veiculo": "VT03", "paradas": ["P104", "P123", "P115", "P118"], "passageiros": 4, "ocupacao": 33, "km": 20.6, "min": 35}, {"id": "E3-t3-01", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "3º turno (22h)", "veiculo": "VT03", "paradas": ["P142", "P138", "P143", "P146", "P147"], "passageiros": 5, "ocupacao": 42, "km": 18.4, "min": 31}, {"id": "E3-t3-02", "destino": "Planta 2 — Centro de distribuição", "destino_id": "E3", "turno": "3º turno (22h)", "veiculo": "VT01", "paradas": ["P159", "P179", "P204", "P220", "P218", "P197", "P186", "P167", "P168", "P153"], "passageiros": 10, "ocupacao": 62, "km": 56.7, "min": 88}], "pings": [{"lat": -21.15, "lon": -47.8, "veiculo": "VM01", "em": "2026-08-22T06:13:00"}]}, "operar": {"veiculos": [{"id": "VT01", "tipo": "Ônibus rodoviário 46 lugares", "turno": "1º turno (06h)", "viagens": 1, "passageiros": 38, "ocupacao": 83, "jornada": 90}, {"id": "VT02", "tipo": "Micro-ônibus executivo 28 lugares", "turno": "1º turno (06h)", "viagens": 1, "passageiros": 21, "ocupacao": 75, "jornada": 90}, {"id": "VT03", "tipo": "Micro-ônibus executivo 28 lugares", "turno": "1º turno (06h)", "viagens": 1, "passageiros": 25, "ocupacao": 89, "jornada": 90}, {"id": "VT04", "tipo": "Micro-ônibus executivo 28 lugares", "turno": "1º turno (06h)", "viagens": 1, "passageiros": 21, "ocupacao": 75, "jornada": 74}, {"id": "VT05", "tipo": "Van executiva 16 lugares", "turno": "1º turno (06h)", "viagens": 2, "passageiros": 31, "ocupacao": 97, "jornada": 119}, {"id": "VT06", "tipo": "Van acessível 12 lugares", "turno": "1º turno (06h)", "viagens": 1, "passageiros": 12, "ocupacao": 100, "jornada": 49}, {"id": "VA01", "tipo": "Micro-ônibus executivo 28 lugares", "turno": "Administrativo (08h)", "viagens": 2, "passageiros": 27, "ocupacao": 48, "jornada": 99}, {"id": "VA02", "tipo": "Micro-ônibus executivo 28 lugares", "turno": "Administrativo (08h)", "viagens": 1, "passageiros": 19, "ocupacao": 68, "jornada": 89}, {"id": "VA03", "tipo": "Van acessível 12 lugares", "turno": "Administrativo (08h)", "viagens": 1, "passageiros": 12, "ocupacao": 100, "jornada": 72}, {"id": "VA04", "tipo": "Van executiva 16 lugares", "turno": "Administrativo (08h)", "viagens": 1, "passageiros": 15, "ocupacao": 94, "jornada": 36}, {"id": "VT01", "tipo": "Ônibus rodoviário 46 lugares", "turno": "2º turno (14h20)", "viagens": 1, "passageiros": 30, "ocupacao": 65, "jornada": 90}, {"id": "VT02", "tipo": "Micro-ônibus executivo 28 lugares", "turno": "2º turno (14h20)", "viagens": 1, "passageiros": 24, "ocupacao": 86, "jornada": 90}, {"id": "VT03", "tipo": "Van executiva 16 lugares", "turno": "2º turno (14h20)", "viagens": 1, "passageiros": 13, "ocupacao": 81, "jornada": 90}, {"id": "VT04", "tipo": "Van acessível 12 lugares", "turno": "2º turno (14h20)", "viagens": 1, "passageiros": 12, "ocupacao": 100, "jornada": 65}, {"id": "VT05", "tipo": "Van executiva 16 lugares", "turno": "2º turno (14h20)", "viagens": 1, "passageiros": 8, "ocupacao": 50, "jornada": 58}, {"id": "VT01", "tipo": "Van executiva 16 lugares", "turno": "3º turno (22h)", "viagens": 1, "passageiros": 10, "ocupacao": 62, "jornada": 88}, {"id": "VT02", "tipo": "Van executiva 16 lugares", "turno": "3º turno (22h)", "viagens": 1, "passageiros": 12, "ocupacao": 75, "jornada": 67}, {"id": "VT03", "tipo": "Van acessível 12 lugares", "turno": "3º turno (22h)", "viagens": 2, "passageiros": 9, "ocupacao": 38, "jornada": 97}], "equipe": {"resumo": {"motoristas": 16, "blocos": 36, "jornada_media_min": 249.1, "jornada_maxima_min": 496, "com_hora_extra": 1, "hora_extra_total_min": 16, "com_dupla_pegada": 11, "escalas_com_problema": 0, "por_turno": {"adm": 8, "t1": 8, "t2": 8, "t3": 6}, "ocupacao_da_jornada_pct": 51.9}, "regras": {"jornada_normal_min": 480, "hora_extra_max_min": 120, "direcao_continua_max_min": 330, "parada_obrigatoria_min": 30, "intervalo_refeicao_min": 60, "interjornada_min": 660, "amplitude_max_min": 840, "permite_dupla_pegada": true, "tempo_troca_veiculo_min": 15}, "custo_motorista_mes": 7800.0, "custo_equipe_mes": 124800, "motoristas": [{"id": "M01", "turnos": ["adm", "t1"], "veiculos": ["VA03", "VT05"], "inicio": "03h31", "fim": "16h29", "jornada_min": 400, "amplitude_min": 778, "dupla_pegada": true, "hora_extra_min": 0, "km": 149.4, "problemas": []}, {"id": "M02", "turnos": ["adm", "t1"], "veiculos": ["VA04", "VT01"], "inicio": "04h00", "fim": "16h00", "jornada_min": 306, "amplitude_min": 720, "dupla_pegada": true, "hora_extra_min": 0, "km": 105.3, "problemas": []}, {"id": "M03", "turnos": ["t1"], "veiculos": ["VT02"], "inicio": "04h00", "fim": "16h00", "jornada_min": 240, "amplitude_min": 720, "dupla_pegada": true, "hora_extra_min": 0, "km": 110.2, "problemas": []}, {"id": "M04", "turnos": ["t1"], "veiculos": ["VT03"], "inicio": "04h00", "fim": "16h00", "jornada_min": 240, "amplitude_min": 720, "dupla_pegada": true, "hora_extra_min": 0, "km": 105.2, "problemas": []}, {"id": "M05", "turnos": ["t1"], "veiculos": ["VT04"], "inicio": "04h16", "fim": "06h00", "jornada_min": 104, "amplitude_min": 104, "dupla_pegada": false, "hora_extra_min": 0, "km": 41.0, "problemas": []}, {"id": "M06", "turnos": ["t1"], "veiculos": ["VT06"], "inicio": "04h41", "fim": "06h00", "jornada_min": 79, "amplitude_min": 79, "dupla_pegada": false, "hora_extra_min": 0, "km": 24.9, "problemas": []}, {"id": "M07", "turnos": ["adm", "t2"], "veiculos": ["VA01", "VT02"], "inicio": "05h51", "fim": "14h20", "jornada_min": 249, "amplitude_min": 509, "dupla_pegada": true, "hora_extra_min": 0, "km": 86.9, "problemas": []}, {"id": "M08", "turnos": ["adm", "t2", "t3"], "veiculos": ["VA02", "VT03"], "inicio": "06h00", "fim": "18h59", "jornada_min": 366, "amplitude_min": 779, "dupla_pegada": true, "hora_extra_min": 0, "km": 154.9, "problemas": []}, {"id": "M09", "turnos": ["t1", "t3"], "veiculos": ["VT01", "VT06"], "inicio": "06h00", "fim": "15h19", "jornada_min": 197, "amplitude_min": 559, "dupla_pegada": true, "hora_extra_min": 0, "km": 81.6, "problemas": []}, {"id": "M10", "turnos": ["t3"], "veiculos": ["VT02"], "inicio": "06h00", "fim": "07h37", "jornada_min": 97, "amplitude_min": 97, "dupla_pegada": false, "hora_extra_min": 0, "km": 38.0, "problemas": []}, {"id": "M11", "turnos": ["adm", "t2"], "veiculos": ["VA02", "VT05"], "inicio": "06h01", "fim": "14h20", "jornada_min": 207, "amplitude_min": 499, "dupla_pegada": true, "hora_extra_min": 0, "km": 75.0, "problemas": []}, {"id": "M12", "turnos": ["adm", "t2", "t3"], "veiculos": ["VA01", "VT01", "VT03"], "inicio": "12h20", "fim": "00h20", "jornada_min": 496, "amplitude_min": 720, "dupla_pegada": true, "hora_extra_min": 16, "km": 189.2, "problemas": []}, {"id": "M13", "turnos": ["adm", "t2", "t3"], "veiculos": ["VA04", "VT02", "VT03", "VT04"], "inicio": "12h45", "fim": "00h20", "jornada_min": 378, "amplitude_min": 695, "dupla_pegada": true, "hora_extra_min": 0, "km": 137.5, "problemas": []}, {"id": "M14", "turnos": ["adm", "t1", "t2", "t3"], "veiculos": ["VA03", "VT01", "VT02", "VT04"], "inicio": "14h00", "fim": "00h20", "jornada_min": 444, "amplitude_min": 620, "dupla_pegada": true, "hora_extra_min": 0, "km": 174.1, "problemas": []}, {"id": "M15", "turnos": ["t2"], "veiculos": ["VT04"], "inicio": "22h20", "fim": "23h55", "jornada_min": 95, "amplitude_min": 95, "dupla_pegada": false, "hora_extra_min": 0, "km": 34.6, "problemas": []}, {"id": "M16", "turnos": ["t2"], "veiculos": ["VT05"], "inicio": "22h20", "fim": "23h48", "jornada_min": 88, "amplitude_min": 88, "dupla_pegada": false, "hora_extra_min": 0, "km": 32.4, "problemas": []}], "escalas": [{"motorista": "M01", "blocos": [{"veiculo": "VT05", "turno": "1º turno (06h)", "inicio": 211, "fim": 360}, {"veiculo": "VA03", "turno": "Administrativo (08h)", "inicio": 378, "fim": 480}, {"veiculo": "VT05", "turno": "1º turno (06h) (volta)", "inicio": 840, "fim": 989}]}, {"motorista": "M02", "blocos": [{"veiculo": "VT01", "turno": "1º turno (06h)", "inicio": 240, "fim": 360}, {"veiculo": "VA04", "turno": "Administrativo (08h)", "inicio": 414, "fim": 480}, {"veiculo": "VT01", "turno": "1º turno (06h) (volta)", "inicio": 840, "fim": 960}]}, {"motorista": "M03", "blocos": [{"veiculo": "VT02", "turno": "1º turno (06h)", "inicio": 240, "fim": 360}, {"veiculo": "VT02", "turno": "1º turno (06h) (volta)", "inicio": 840, "fim": 960}]}, {"motorista": "M04", "blocos": [{"veiculo": "VT03", "turno": "1º turno (06h)", "inicio": 240, "fim": 360}, {"veiculo": "VT03", "turno": "1º turno (06h) (volta)", "inicio": 840, "fim": 960}]}, {"motorista": "M05", "blocos": [{"veiculo": "VT04", "turno": "1º turno (06h)", "inicio": 256, "fim": 360}]}, {"motorista": "M06", "blocos": [{"veiculo": "VT06", "turno": "1º turno (06h)", "inicio": 281, "fim": 360}]}, {"motorista": "M07", "blocos": [{"veiculo": "VA01", "turno": "Administrativo (08h)", "inicio": 351, "fim": 480}, {"veiculo": "VT02", "turno": "2º turno (14h20)", "inicio": 740, "fim": 860}]}, {"motorista": "M08", "blocos": [{"veiculo": "VT03", "turno": "3º turno (22h) (volta)", "inicio": 360, "fim": 487}, {"veiculo": "VT03", "turno": "2º turno (14h20)", "inicio": 740, "fim": 860}, {"veiculo": "VA02", "turno": "Administrativo (08h) (volta)", "inicio": 1020, "fim": 1139}]}, {"motorista": "M09", "blocos": [{"veiculo": "VT01", "turno": "3º turno (22h) (volta)", "inicio": 360, "fim": 478}, {"veiculo": "VT06", "turno": "1º turno (06h) (volta)", "inicio": 840, "fim": 919}]}, {"motorista": "M10", "blocos": [{"veiculo": "VT02", "turno": "3º turno (22h) (volta)", "inicio": 360, "fim": 457}]}, {"motorista": "M11", "blocos": [{"veiculo": "VA02", "turno": "Administrativo (08h)", "inicio": 361, "fim": 480}, {"veiculo": "VT05", "turno": "2º turno (14h20)", "inicio": 772, "fim": 860}]}, {"motorista": "M12", "blocos": [{"veiculo": "VT01", "turno": "2º turno (14h20)", "inicio": 740, "fim": 860}, {"veiculo": "VA01", "turno": "Administrativo (08h) (volta)", "inicio": 1020, "fim": 1149}, {"veiculo": "VT03", "turno": "3º turno (22h)", "inicio": 1193, "fim": 1320}, {"veiculo": "VT01", "turno": "2º turno (14h20) (volta)", "inicio": 1340, "fim": 1460}]}, {"motorista": "M13", "blocos": [{"veiculo": "VT04", "turno": "2º turno (14h20)", "inicio": 765, "fim": 860}, {"veiculo": "VA04", "turno": "Administrativo (08h) (volta)", "inicio": 1020, "fim": 1086}, {"veiculo": "VT02", "turno": "3º turno (22h)", "inicio": 1223, "fim": 1320}, {"veiculo": "VT03", "turno": "2º turno (14h20) (volta)", "inicio": 1340, "fim": 1460}]}, {"motorista": "M14", "blocos": [{"veiculo": "VT04", "turno": "1º turno (06h) (volta)", "inicio": 840, "fim": 944}, {"veiculo": "VA03", "turno": "Administrativo (08h) (volta)", "inicio": 1020, "fim": 1122}, {"veiculo": "VT01", "turno": "3º turno (22h)", "inicio": 1202, "fim": 1320}, {"veiculo": "VT02", "turno": "2º turno (14h20) (volta)", "inicio": 1340, "fim": 1460}]}, {"motorista": "M15", "blocos": [{"veiculo": "VT04", "turno": "2º turno (14h20) (volta)", "inicio": 1340, "fim": 1435}]}, {"motorista": "M16", "blocos": [{"veiculo": "VT05", "turno": "2º turno (14h20) (volta)", "inicio": 1340, "fim": 1428}]}], "explicacao": ["M01: 03h31–16h29 (6h40 de jornada) · turnos adm, t1 · veículos VA03, VT05 · dupla pegada", "M02: 04h00–16h00 (5h06 de jornada) · turnos adm, t1 · veículos VA04, VT01 · dupla pegada", "M03: 04h00–16h00 (4h00 de jornada) · turnos t1 · veículos VT02 · dupla pegada", "M04: 04h00–16h00 (4h00 de jornada) · turnos t1 · veículos VT03 · dupla pegada", "M05: 04h16–06h00 (1h44 de jornada) · turnos t1 · veículos VT04"]}, "elegibilidade": null, "aprendizado": {"erro_inicial": 5.88, "erro_atual": 2.03, "origem": "simulacao"}}, "vender": {"preco": {"custo": {"direto": 349211.72, "indireto": 62539.64, "total_mes": 411751.36, "por_grupo": {"Veículo": 46800.0, "Rodagem": 78347.72, "Equipe": 224064.0, "Indiretos": 62539.64}, "linhas": [{"grupo": "Veículo", "item": "3× Micro-ônibus executivo 28 lugares", "valor_mes": 21600.0, "memoria": "3 × R$ 7.200,00/mês (posse do veículo)"}, {"grupo": "Veículo", "item": "1× Ônibus rodoviário 46 lugares", "valor_mes": 9800.0, "memoria": "1 × R$ 9.800,00/mês (posse do veículo)"}, {"grupo": "Veículo", "item": "2× Van executiva 16 lugares", "valor_mes": 9800.0, "memoria": "2 × R$ 4.900,00/mês (posse do veículo)"}, {"grupo": "Veículo", "item": "1× Van acessível 12 lugares", "valor_mes": 5600.0, "memoria": "1 × R$ 5.600,00/mês (posse do veículo)"}, {"grupo": "Rodagem", "item": "Combustível — Micro-ônibus executivo 28 lugares", "valor_mes": 17778.3, "memoria": "12.241 km/mês ÷ 4.2 km/l × R$ 6,10/l = 2.914 litros"}, {"grupo": "Rodagem", "item": "Manutenção e pneus — Micro-ônibus executivo 28 lugares", "valor_mes": 14047.78, "memoria": "12.241 km/mês × R$ 1,15/km"}, {"grupo": "Rodagem", "item": "Combustível — Ônibus rodoviário 46 lugares", "valor_mes": 8681.35, "memoria": "4.127 km/mês ÷ 2.9 km/l × R$ 6,10/l = 1.423 litros"}, {"grupo": "Rodagem", "item": "Manutenção e pneus — Ônibus rodoviário 46 lugares", "valor_mes": 5351.13, "memoria": "4.127 km/mês × R$ 1,30/km"}, {"grupo": "Rodagem", "item": "Combustível — Van executiva 16 lugares", "valor_mes": 7979.37, "memoria": "11.119 km/mês ÷ 8.5 km/l × R$ 6,10/l = 1.308 litros"}, {"grupo": "Rodagem", "item": "Manutenção e pneus — Van executiva 16 lugares", "valor_mes": 12034.47, "memoria": "11.119 km/mês × R$ 1,08/km"}, {"grupo": "Rodagem", "item": "Combustível — Van acessível 12 lugares", "valor_mes": 5003.25, "memoria": "6.398 km/mês ÷ 7.8 km/l × R$ 6,10/l = 820 litros"}, {"grupo": "Rodagem", "item": "Manutenção e pneus — Van acessível 12 lugares", "valor_mes": 7472.07, "memoria": "6.398 km/mês × R$ 1,17/km"}, {"grupo": "Equipe", "item": "16 motoristas — salário", "valor_mes": 124800.0, "memoria": "16 × R$ 7.800,00/mês (escala calculada pela jornada, não pelo número de veículos)"}, {"grupo": "Equipe", "item": "Encargos sobre a folha", "valor_mes": 84864.0, "memoria": "68% sobre R$ 124.800,00"}, {"grupo": "Equipe", "item": "Benefícios (VT, VR, saúde, uniforme)", "valor_mes": 14400.0, "memoria": "16 × R$ 900,00"}, {"grupo": "Indiretos", "item": "Garagem e pátio", "valor_mes": 5950.0, "memoria": "7 veículos × R$ 850,00/mês"}, {"grupo": "Indiretos", "item": "Rastreamento e telemetria", "valor_mes": 840.0, "memoria": "7 veículos × R$ 120,00/mês"}, {"grupo": "Indiretos", "item": "Seguro de responsabilidade civil", "valor_mes": 2660.0, "memoria": "7 veículos × R$ 380,00/mês"}, {"grupo": "Indiretos", "item": "Supervisão e despacho", "valor_mes": 4200.0, "memoria": "7 veículos × R$ 600,00/mês"}, {"grupo": "Indiretos", "item": "Administrativo e estrutura", "valor_mes": 20952.7, "memoria": "6% sobre o custo direto (R$ 349.211,72)"}, {"grupo": "Indiretos", "item": "Reserva técnica (frota reserva e imprevistos)", "valor_mes": 27936.94, "memoria": "8% sobre o custo direto — veículo quebra, motorista falta, e a operação não pode parar"}]}, "preco": {"mes": 563502.61, "ano": 6762031.37, "dia": 25613.76, "por_veiculo_mes": 80500.37, "por_passageiro_mes": 1662.25, "por_km": 16.63, "impostos_mes": 84130.94, "lucro_mes": 67620.31, "margem_alvo_pct": 12.0, "carga_tributaria_pct": 14.93, "regime": "Lucro Presumido", "observacao_tributaria": "PIS/COFINS cumulativos, ISS conforme o município (usado 5%) e IRPJ/CSLL sobre presunção de 32%."}, "premissas": {"regime": "presumido", "margem_alvo": 0.12, "encargos_sobre_salario": 0.68, "beneficios_motorista_mes": 900.0, "monitores": 0, "salario_monitor_mes": 1800.0, "custo_garagem_por_veiculo_mes": 850.0, "custo_rastreamento_por_veiculo_mes": 120.0, "custo_seguro_rc_por_veiculo_mes": 380.0, "supervisao_por_veiculo_mes": 600.0, "administrativo_pct": 0.06, "reserva_tecnica_pct": 0.08, "dias_operacao_mes": 22, "preco_diesel_l": 6.1, "veiculos": 7, "motoristas": 16, "km_dia": 1540.2, "passageiros": 339}, "indicadores": {"participacao_no_custo_pct": {"Veículo": 11.4, "Rodagem": 19.0, "Equipe": 54.4, "Indiretos": 15.2}, "passageiros_por_veiculo": 48.4, "passageiros_por_motorista": 21.2, "km_por_passageiro_dia": 4.54, "ocupacao_media_das_viagens_pct": 77.0}, "memoria": ["Custo direto: R$ 349.211,72/mês (veículo, rodagem e equipe).", "Custo indireto: R$ 62.539,64/mês (garagem, supervisão, rastreamento, seguro, administrativo e reserva técnica).", "Preço = custo ÷ (1 − 14.93% de impostos − 12.00% de margem) = R$ 563.502,61/mês.", "Pelo caminho errado (custo × 1 + margem = R$ 461.161,52), a margem real seria -4.22%: o imposto incide sobre a receita, não sobre o custo."]}, "cenarios": [{"cenario": "Proposta base", "preco_mes": 563502.61, "custo_mes": 411751.36, "diferenca_mes": 0.0, "diferenca_pct": 0.0}, {"cenario": "Diesel +10% (R$ 6.71/l)", "preco_mes": 569656.19, "custo_mes": 416247.78, "diferenca_mes": 6153.58, "diferenca_pct": 1.09}, {"cenario": "Diesel +25% (R$ 7.62/l)", "preco_mes": 578836.12, "custo_mes": 422955.55, "diferenca_mes": 15333.51, "diferenca_pct": 2.72}, {"cenario": "Margem de 8% em vez de 12%", "preco_mes": 534256.34, "custo_mes": 411751.36, "diferenca_mes": -29246.27, "diferenca_pct": -5.19}, {"cenario": "Margem de 18%", "preco_mes": 613912.87, "custo_mes": 411751.36, "diferenca_mes": 50410.26, "diferenca_pct": 8.95}, {"cenario": "Regime Simples Nacional", "preco_mes": 560205.93, "custo_mes": 411751.36, "diferenca_mes": -3296.68, "diferenca_pct": -0.59}], "diagnostico": {"achados": [{"tipo": "veiculo_grande_demais", "titulo": "L01: trocar Micro-ônibus executivo 28 lugares por Van executiva 16 lugares", "linhas": ["L01"], "economia_mes": 3343.68, "detalhe": "A linha transporta 12 passageiros num veículo de 28 lugares (43% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L03: trocar Ônibus rodoviário 46 lugares por Micro-ônibus executivo 28 lugares", "linhas": ["L03"], "economia_mes": 4002.72, "detalhe": "A linha transporta 27 passageiros num veículo de 46 lugares (59% de ocupação). Um Micro-ônibus executivo 28 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L04: trocar Ônibus rodoviário 46 lugares por Van executiva 16 lugares", "linhas": ["L04"], "economia_mes": 8180.64, "detalhe": "A linha transporta 13 passageiros num veículo de 46 lugares (28% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L05: trocar Micro-ônibus executivo 28 lugares por Van executiva 16 lugares", "linhas": ["L05"], "economia_mes": 3817.12, "detalhe": "A linha transporta 7 passageiros num veículo de 28 lugares (25% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L06: trocar Ônibus rodoviário 46 lugares por Van executiva 16 lugares", "linhas": ["L06"], "economia_mes": 6786.72, "detalhe": "A linha transporta 13 passageiros num veículo de 46 lugares (28% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L08: trocar Ônibus rodoviário 46 lugares por Van executiva 16 lugares", "linhas": ["L08"], "economia_mes": 7230.24, "detalhe": "A linha transporta 15 passageiros num veículo de 46 lugares (33% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L13: trocar Micro-ônibus executivo 28 lugares por Van executiva 16 lugares", "linhas": ["L13"], "economia_mes": 3289.12, "detalhe": "A linha transporta 9 passageiros num veículo de 28 lugares (32% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L15: trocar Ônibus rodoviário 46 lugares por Van executiva 16 lugares", "linhas": ["L15"], "economia_mes": 8430.56, "detalhe": "A linha transporta 16 passageiros num veículo de 46 lugares (35% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L17: trocar Micro-ônibus executivo 28 lugares por Van executiva 16 lugares", "linhas": ["L17"], "economia_mes": 3197.6, "detalhe": "A linha transporta 16 passageiros num veículo de 28 lugares (57% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L18: trocar Ônibus rodoviário 46 lugares por Van executiva 16 lugares", "linhas": ["L18"], "economia_mes": 7173.92, "detalhe": "A linha transporta 13 passageiros num veículo de 46 lugares (28% de ocupação). Um Van executiva 16 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L20: trocar Ônibus rodoviário 46 lugares por Micro-ônibus executivo 28 lugares", "linhas": ["L20"], "economia_mes": 4370.56, "detalhe": "A linha transporta 20 passageiros num veículo de 46 lugares (43% de ocupação). Um Micro-ônibus executivo 28 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "veiculo_grande_demais", "titulo": "L21: trocar Ônibus rodoviário 46 lugares por Micro-ônibus executivo 28 lugares", "linhas": ["L21"], "economia_mes": 3893.6, "detalhe": "A linha transporta 25 passageiros num veículo de 46 lugares (54% de ocupação). Um Micro-ônibus executivo 28 lugares atende a mesma gente.", "o_que_conferir": "Confira se o itinerário tem trecho que exige o veículo maior (rampa, bagageiro, acesso) e se o contrato especifica o tipo."}, {"tipo": "linhas_que_se_fundem", "titulo": "L20 + L08: uma linha em vez de duas", "linhas": ["L20", "L08"], "economia_mes": 20095.33, "detalhe": "As duas atendem Escritório administrativo no 1º turno com 43% e 33% de ocupação. Juntas são 35 passageiros, que cabem num Ônibus rodoviário 46 lugares.", "o_que_conferir": "A fusão alonga o trajeto de quem embarca primeiro: confira se o tempo a bordo continua dentro do combinado com o cliente antes de propor."}, {"tipo": "linhas_que_se_fundem", "titulo": "L01 + L13: uma linha em vez de duas", "linhas": ["L01", "L13"], "economia_mes": 16321.32, "detalhe": "As duas atendem Planta 2 — Centro de distribuição no 2º turno com 43% e 32% de ocupação. Juntas são 21 passageiros, que cabem num Micro-ônibus executivo 28 lugares.", "o_que_conferir": "A fusão alonga o trajeto de quem embarca primeiro: confira se o tempo a bordo continua dentro do combinado com o cliente antes de propor."}, {"tipo": "linhas_que_se_fundem", "titulo": "L18 + L06: uma linha em vez de duas", "linhas": ["L18", "L06"], "economia_mes": 23632.53, "detalhe": "As duas atendem Planta 1 — Fábrica no 3º turno com 28% e 28% de ocupação. Juntas são 26 passageiros, que cabem num Micro-ônibus executivo 28 lugares.", "o_que_conferir": "A fusão alonga o trajeto de quem embarca primeiro: confira se o tempo a bordo continua dentro do combinado com o cliente antes de propor."}, {"tipo": "linhas_que_se_fundem", "titulo": "L15 + L07: uma linha em vez de duas", "linhas": ["L15", "L07"], "economia_mes": 18559.22, "detalhe": "As duas atendem Escritório administrativo no ADM com 35% e 50% de ocupação. Juntas são 22 passageiros, que cabem num Micro-ônibus executivo 28 lugares.", "o_que_conferir": "A fusão alonga o trajeto de quem embarca primeiro: confira se o tempo a bordo continua dentro do combinado com o cliente antes de propor."}, {"tipo": "km_excedente", "titulo": "148 km/dia a mais que o percurso otimizado", "linhas": ["L01", "L02", "L03", "L04", "L05", "L06", "L07", "L08", "L09", "L10", "L11", "L12", "L13", "L14", "L15", "L16", "L17", "L18", "L19", "L20", "L21"], "economia_mes": 9143.19, "detalhe": "A operação de hoje roda 1,688 km/dia; o mesmo atendimento, roteirizado, fecha em 1,540 km/dia (9% a menos).", "o_que_conferir": "O percurso otimizado pressupõe os mesmos pontos de embarque. Se algum ponto for imposto pelo cliente, refaça com ele fixo."}, {"tipo": "frota_ociosa", "titulo": "14 veículo(s) a menos para o mesmo atendimento", "linhas": [], "economia_mes": 290943.75, "detalhe": "A operação usa 21 veículos; o plano fecha com 7. A diferença é o efeito somado das trocas, fusões e do percurso menor — não é um corte à parte.", "o_que_conferir": "Não some esta economia com as anteriores: ela já as contém. Use-a como teto do que dá para capturar."}], "resumo": {"linhas_analisadas": 21, "linhas_ignoradas": 0, "veiculos_hoje": 21, "veiculos_no_plano": 7, "motoristas_no_plano": 16, "km_dia_hoje": 1688.0, "km_dia_no_plano": 1540.2, "custo_mes_hoje": 436415.62, "ocupacao_media_hoje_pct": 49.8, "economia_teto_mes": 290943.75, "economia_acoes_imediatas_mes": 142324.87}, "linhas_ignoradas": []}}};
+</script>
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------ utilidades */
+  function esc(t) {
+    return String(t === undefined || t === null ? "" : t)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function num(v, casas) {
+    if (v === undefined || v === null || isNaN(v)) { return "—"; }
+    return Number(v).toLocaleString("pt-BR", {
+      minimumFractionDigits: casas || 0, maximumFractionDigits: casas || 0});
+  }
+  function reais(v, casas) {
+    if (v === undefined || v === null) { return "—"; }
+    return "R$ " + num(v, casas === undefined ? 0 : casas);
+  }
+  function reaisCurto(v) {
+    if (v === undefined || v === null) { return "—"; }
+    var a = Math.abs(v);
+    if (a >= 1e6) { return "R$ " + num(v / 1e6, 2) + " mi"; }
+    if (a >= 1000) { return "R$ " + num(v / 1000) + " mil"; }
+    return reais(v);
+  }
+  function horas(min) {
+    if (!min && min !== 0) { return "—"; }
+    var m = Math.round(min);
+    return Math.floor(m / 60) + "h" + String(m % 60).padStart(2, "0");
+  }
+  function selo(s) {
+    if (!s || !s.rotulo) { return ""; }
+    return '<span class="selo ' + esc(s.rotulo) + '" title="' + esc(s.explicacao)
+      + '">' + esc(s.rotulo) + '</span>';
+  }
+  var contador = 0;
+  function numeroCartao(rotulo, valor, apoio, opcoes) {
+    opcoes = opcoes || {};
+    var id = "exp" + (++contador);
+    return '<div class="numero"><div class="rotulo"><span>' + esc(rotulo)
+      + '</span>' + (opcoes.selo ? selo(opcoes.selo) : "")
+      + (opcoes.porque ? '<button class="porque" data-explica="' + id
+          + '">por quê?</button>' : "")
+      + '</div><div class="valor">' + esc(valor) + '</div>'
+      + (apoio ? '<div class="apoio">' + esc(apoio) + '</div>' : "")
+      + (opcoes.porque ? '<div class="explicacao" id="' + id + '" hidden>'
+          + esc(opcoes.porque) + '</div>' : "")
+      + '</div>';
+  }
+
+  /* ---------------------------------------------------------------- mapa */
+  function desenharMapa(viagensDestacadas) {
+    var pontos = DADOS.mapa.pontos || {};
+    var ids = Object.keys(pontos);
+    if (!ids.length) { return '<div class="vazio">Sem mapa neste plano.</div>'; }
+    var lats = ids.map(function (i) { return pontos[i][0]; });
+    var lons = ids.map(function (i) { return pontos[i][1]; });
+    (DADOS.mapa.destinos || []).forEach(function (d) {
+      lats.push(d.lat); lons.push(d.lon);
+    });
+    var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+    var minLon = Math.min.apply(null, lons), maxLon = Math.max.apply(null, lons);
+    var mx = (maxLon - minLon) * 0.06 || 0.01, my = (maxLat - minLat) * 0.06 || 0.01;
+    minLat -= my; maxLat += my; minLon -= mx; maxLon += mx;
+    var L = 900, A = 520;
+    function x(lon) { return ((lon - minLon) / (maxLon - minLon) * L).toFixed(1); }
+    function y(lat) { return (A - (lat - minLat) / (maxLat - minLat) * A).toFixed(1); }
+
+    var camadas = ids.map(function (i) {
+      return '<circle cx="' + x(pontos[i][1]) + '" cy="' + y(pontos[i][0])
+        + '" r="3" fill="#8FA9BC" fill-opacity=".8"/>';
+    }).join("");
+
+    (viagensDestacadas || []).forEach(function (v, indice) {
+      var cores = ["#12508A", "#0B6B52", "#A63A17", "#6B3FA0"];
+      var cor = cores[indice % cores.length];
+      var destino = (DADOS.mapa.destinos || []).filter(function (d) {
+        return d.id === v.destino_id || d.nome === v.destino;
+      })[0];
+      var caminho = (v.paradas || []).filter(function (p) { return pontos[p]; })
+        .map(function (p) { return x(pontos[p][1]) + "," + y(pontos[p][0]); });
+      if (destino) { caminho.push(x(destino.lon) + "," + y(destino.lat)); }
+      if (caminho.length > 1) {
+        camadas += '<polyline points="' + caminho.join(" ") + '" fill="none" '
+          + 'stroke="' + cor + '" stroke-width="2.5" stroke-linejoin="round" '
+          + 'stroke-opacity=".9"/>';
+      }
+      (v.paradas || []).forEach(function (p) {
+        if (!pontos[p]) { return; }
+        camadas += '<circle cx="' + x(pontos[p][1]) + '" cy="' + y(pontos[p][0])
+          + '" r="5" fill="' + cor + '"><title>' + esc(p) + '</title></circle>';
+      });
+    });
+
+    (DADOS.mapa.destinos || []).forEach(function (d) {
+      camadas += '<rect x="' + (x(d.lon) - 7) + '" y="' + (y(d.lat) - 7)
+        + '" width="14" height="14" rx="3" fill="#0F2231"><title>'
+        + esc(d.nome) + '</title></rect>';
+    });
+    (DADOS.mapa.pings || []).forEach(function (p) {
+      camadas += '<circle cx="' + x(p.lon) + '" cy="' + y(p.lat)
+        + '" r="7" fill="#0B6B52" stroke="#FFF" stroke-width="2"><title>'
+        + esc(p.veiculo || "veículo") + '</title></circle>';
+    });
+
+    return '<div class="mapa-caixa"><svg class="mapa" viewBox="0 0 ' + L + ' '
+      + A + '" role="img" aria-label="Mapa das rotas">' + camadas + '</svg>'
+      + '<div class="legenda">'
+      + '<span><i style="background:#8FA9BC"></i>pontos de embarque</span>'
+      + '<span><i style="background:#0F2231;border-radius:2px"></i>'
+      + esc(DADOS.operacao.destinos) + '</span>'
+      + '<span><i style="background:#12508A"></i>rota em destaque</span>'
+      + '<span><i style="background:#0B6B52"></i>veículo com GPS ligado</span>'
+      + '</div></div>';
+  }
+
+  /* -------------------------------------------------------------- início */
+  function telaInicio() {
+    var r = DADOS.resumo, p = DADOS.pendencias || [];
+    var hora = new Date().getHours();
+    var saudacao = hora < 12 ? "Bom dia" : (hora < 18 ? "Boa tarde" : "Boa noite");
+    var cabeca = p.length
+      ? '<h1>' + saudacao + '. ' + p.length + (p.length === 1
+          ? " coisa precisa de você." : " coisas precisam de você.") + '</h1>'
+        + '<p class="chamada">Estão em ordem de quem não pode esperar. '
+        + 'Resolvidas essas, o resto do sistema segue sozinho.</p>'
+      : '<h1>' + saudacao + '. Nada parado esperando decisão.</h1>'
+        + '<p class="chamada">Quando aparecer alguma pendência, ela aparece '
+        + 'aqui — com quem decide e o botão que resolve.</p>';
+
+    var cartoes = p.map(function (item) {
+      return '<div class="pendencia ' + esc(item.urgencia) + '">'
+        + '<div class="corpo"><h3>' + esc(item.titulo) + '</h3>'
+        + '<p>' + esc(item.detalhe) + '</p>'
+        + '<div class="quem">Quem decide: <b>' + esc(item.quem_decide)
+        + '</b></div></div>'
+        + '<a class="botao" href="#' + esc(item.destino) + '">'
+        + esc(item.acao) + '</a></div>';
+    }).join("") || '<div class="cartao vazio"><b>Tudo em dia</b>'
+      + 'Nenhuma decisão pendente neste momento.</div>';
+
+    var hoje = DADOS.hoje || {};
+    var rod = hoje.rodadas || {};
+
+    /* Número que o próprio sistema duvida não aparece limpo: se a base de
+       comparação tem aviso, a economia diz isso ao lado. */
+    function duvidaDaComparacao() {
+      return ((DADOS.planejar || {}).coerencia || []).length > 0;
+    }
+
+    return cabeca
+      + '<div class="grade" style="margin-top:20px">' + cartoes + '</div>'
+      + '<section class="secao"><header><h2>A operação em um olhar</h2>'
+      + selo(r.selo) + '</header>'
+      + '<div class="grade n4">'
+      + numeroCartao(DADOS.operacao.passageiros.charAt(0).toUpperCase()
+          + DADOS.operacao.passageiros.slice(1) + " por dia", num(r.passageiros),
+          num(r.viagens) + " viagens")
+      + numeroCartao("Veículos", num(r.veiculos),
+          r.motoristas ? num(r.motoristas) + " motoristas na escala"
+            : "o mesmo veículo atende mais de um turno",
+          {porque: "A frota é o pior turno, não a soma dos turnos: o mesmo "
+            + "veículo atende manhã e tarde."})
+      + numeroCartao("Ocupação média", num(r.ocupacao_pct, 1) + "%",
+          "dos lugares ofertados")
+      + (r.economia_mes ? numeroCartao("Economia", reaisCurto(r.economia_mes),
+          duvidaDaComparacao()
+            ? "por mês — mas há um aviso sobre a base de comparação"
+            : "por mês, contra a frota informada",
+          {porque: "Diferença entre o custo da frota informada e o custo da "
+            + "frota que o plano exige, com as mesmas premissas de diesel, "
+            + "dias e manutenção."
+            + (duvidaDaComparacao()
+                ? " Atenção: " + esc((DADOS.planejar.coerencia || [])[0])
+                : "")})
+        : numeroCartao("Economia", "—",
+            "informe a frota atual para comparar"))
+      + '</div></section>'
+      + '<section class="secao"><header><h2>Hoje</h2>'
+      + selo(hoje.selo) + '</header><div class="grade n3">'
+      + numeroCartao("Eventos recebidos", num((hoje.eventos || {}).eventos),
+          "do aplicativo do motorista")
+      + numeroCartao("Faltas avisadas", num((hoje.faltas || {}).avisadas),
+          num((hoje.faltas || {}).desfeitas) + " avisos desfeitos")
+      + numeroCartao("Km poupados nas rodadas",
+          num(rod.km_economizados, 1) + " km",
+          num(rod.corridas_remanejadas) + " corridas trocaram de veículo")
+      + '</div></section>';
+  }
+
+  /* ------------------------------------------------------------ planejar */
+  var marcoAtivo = null;
+  function telaPlanejar() {
+    var pl = DADOS.planejar, imp = pl.importacao || {};
+    var marcos = [
+      {id: "dados", nome: "Dados",
+       estado: !pl.arquivo ? "espera" : (imp.erros ? "voce" : "pronto"),
+       resumo: pl.arquivo
+         ? num(imp.alunos_importados) + " importados · " + num(imp.erros)
+           + " erros"
+         : "base de demonstração, sem planilha"},
+      {id: "mapa", nome: "Mapa", estado: imp.precisam_ajuste_no_mapa
+         ? "voce" : "pronto",
+       resumo: pl.arquivo
+         ? num(imp.precisam_ajuste_no_mapa || 0) + " para ajustar"
+         : num((pl.agrupamento || {}).pontos
+             || Object.keys(DADOS.mapa.pontos || {}).length) + " pontos"},
+      {id: "rotas", nome: "Rotas", estado: "pronto",
+       resumo: num((pl.frota || {}).total_veiculos) + " veículos · "
+         + num((DADOS.resumo || {}).viagens) + " viagens"},
+      {id: "publicar", nome: "Publicar",
+       estado: (pl.nao_atendida || {}).alunos ? "voce" : "espera",
+       resumo: (pl.nao_atendida || {}).alunos
+         ? num(pl.nao_atendida.alunos) + " sem rota possível"
+         : "pronto para publicar"}
+    ];
+    /* Abre onde o trabalho está: o marco que precisa de você; sem nenhum,
+       o último já resolvido — nunca uma etapa vazia. */
+    if (!marcoAtivo) {
+      var pedindo = marcos.filter(function (m) { return m.estado === "voce"; });
+      var prontos = marcos.filter(function (m) { return m.estado === "pronto"; });
+      marcoAtivo = (pedindo[0] || prontos[prontos.length - 1] || marcos[0]).id;
+    }
+    var trilha = marcos.map(function (m) {
+      var rotulo = {pronto: "pronto", voce: "precisa de você",
+                    espera: "esperando"}[m.estado];
+      return '<button class="marco ' + m.estado + '" data-marco="' + m.id
+        + '" aria-selected="' + (marcoAtivo === m.id) + '">'
+        + '<span class="estado">' + rotulo + '</span><b>' + m.nome + '</b>'
+        + '<small>' + esc(m.resumo) + '</small></button>';
+    }).join("");
+
+    return '<h1>Planejar</h1>'
+      + '<p class="chamada">Quatro marcos, e dá para entrar por qualquer um. '
+      + 'O rascunho fica salvo: sair no meio é normal, não é erro.</p>'
+      + '<div class="trilha">' + trilha + '</div>'
+      + '<div id="conteudo-marco">' + conteudoMarco() + '</div>';
+  }
+
+  function conteudoMarco() {
+    var pl = DADOS.planejar;
+    if (marcoAtivo === "dados") { return marcoDados(pl); }
+    if (marcoAtivo === "mapa") { return marcoMapa(pl); }
+    if (marcoAtivo === "rotas") { return marcoRotas(pl); }
+    return marcoPublicar(pl);
+  }
+
+  function marcoDados(pl) {
+    var imp = pl.importacao || {};
+    if (!pl.arquivo) { return semPlanilha(pl); }
+    var tipos = {};
+    (pl.problemas || []).forEach(function (p) {
+      var chave = p.gravidade + "|" + p.problema + "|" + p.sugestao;
+      if (!tipos[chave]) { tipos[chave] = {linhas: [], p: p}; }
+      tipos[chave].linhas.push(p.linha);
+    });
+    var linhas = Object.keys(tipos).sort(function (a, b) {
+      return tipos[b].linhas.length - tipos[a].linhas.length;
+    }).slice(0, 8).map(function (chave) {
+      var t = tipos[chave];
+      return '<tr><td><span class="selo ' + (t.p.gravidade === "erro"
+          ? "simulado" : "planejado") + '">' + esc(t.p.gravidade) + '</span></td>'
+        + '<td>' + esc(t.p.problema) + '<div class="apoio" style="color:var(--tinta-2);font-size:13.5px">'
+        + esc(t.p.sugestao) + '</div></td>'
+        + '<td class="num">' + t.linhas.length + '</td>'
+        + '<td>' + esc(t.linhas.slice(0, 6).join(", "))
+        + (t.linhas.length > 6 ? "…" : "") + '</td></tr>';
+    }).join("");
+
+    return '<div class="grade n3" style="margin-bottom:16px">'
+      + numeroCartao("Importados", num(imp.alunos_importados),
+          esc(pl.arquivo || ""))
+      + numeroCartao("Erros", num(imp.erros), "a linha não entrou")
+      + numeroCartao("Avisos", num(imp.avisos), "entrou, mas confira")
+      + '</div>'
+      + (linhas ? '<div class="rolagem"><table><thead><tr><th></th>'
+          + '<th>O que aconteceu e o que fazer</th><th class="num">Linhas</th>'
+          + '<th>Onde</th></tr></thead><tbody>' + linhas + '</tbody></table></div>'
+        : '<div class="cartao vazio"><b>Nada a corrigir</b>A planilha entrou '
+          + 'inteira.</div>');
+  }
+
+  /* Plano que não veio de planilha: dizer isso, em vez de mostrar "0 erros"
+     — zero de nada parece qualidade e não é. */
+  function semPlanilha(pl) {
+    var d = pl.demanda || {};
+    var o = DADOS.operacao;
+    return '<div class="cartao vazio" style="margin-bottom:16px">'
+      + '<b>Este plano não veio de uma planilha</b>'
+      + 'Ele foi montado com a base de demonstração do projeto. Quando a '
+      + 'planilha da operação entra por aqui, esta etapa mostra cada linha '
+      + 'que deu problema e o que fazer com ela.</div>'
+      + '<div class="grade n3">'
+      + numeroCartao(maiuscula(o.passageiros), num(d.alunos || 0),
+          "na base de origem")
+      + numeroCartao("Pontos de embarque", num(d.pontos_embarque || 0),
+          "depois do agrupamento")
+      + numeroCartao("Cadeirantes", num(d.cadeirantes || 0),
+          "nunca agrupados com outro ponto")
+      + '</div>';
+  }
+
+  function maiuscula(t) {
+    return String(t || "").charAt(0).toUpperCase() + String(t || "").slice(1);
+  }
+
+  function marcoMapa(pl) {
+    var imp = pl.importacao || {};
+    var ag = pl.agrupamento || {};
+    var pontos = ag.pontos || Object.keys(DADOS.mapa.pontos || {}).length;
+    var cartoes = [];
+    if (pl.arquivo) {
+      cartoes.push(numeroCartao("No ponto do bairro",
+        num(imp.precisam_ajuste_no_mapa || 0),
+        "arraste cada um para a casa certa"));
+    }
+    cartoes.push(numeroCartao("Pontos de embarque", num(pontos),
+      ag.alunos_por_ponto ? num(ag.alunos_por_ponto, 2) + " por ponto" : "",
+      {porque: "Quem mora perto embarca junto: o raio de caminhada é de "
+        + num(ag.raio_urbano_m || 300) + " m no urbano e "
+        + num(ag.raio_rural_m || 800) + " m no rural. Cadeirante nunca é "
+        + "agrupado — o ponto dele é a casa dele."}));
+    cartoes.push(numeroCartao(maiuscula(DADOS.operacao.destinos),
+      num((DADOS.mapa.destinos || []).length), "no plano de hoje"));
+    if (ag.caminhada_media_m) {
+      cartoes.push(numeroCartao("Caminhada média",
+        num(ag.caminhada_media_m) + " m",
+        "máximo de " + num(ag.caminhada_maxima_m || 0) + " m"));
+    }
+    return '<div class="grade n' + Math.min(cartoes.length, 3)
+      + '" style="margin-bottom:16px">' + cartoes.join("") + '</div>'
+      + desenharMapa([]);
+  }
+
+  function marcoRotas(pl) {
+    var cenarios = pl.cenarios || [];
+    var base = cenarios.filter(function (c) { return c.selecionado; })[0]
+      || cenarios[0];
+    var opcoes = cenarios.map(function (c, i) {
+      return '<option value="' + i + '"' + (c === base ? " selected" : "") + '>'
+        + esc(c.rotulo || (reais(c.preco_diesel_l, 2) + "/l · " + c.dias_letivos_mes
+          + " dias")) + '</option>';
+    }).join("");
+    var turnos = (pl.por_turno || []).map(function (t) {
+      var pct = t.lugares_ofertados
+        ? Math.round(100 * t.alunos / t.lugares_ofertados) : 0;
+      return '<tr><td>' + esc(t.turno) + '</td>'
+        + '<td class="num">' + num(t.alunos) + '</td>'
+        + '<td class="num">' + num(t.viagens) + '</td>'
+        + '<td class="num">' + num(t.veiculos) + '</td>'
+        + '<td style="min-width:120px"><div class="barra"><i class="'
+        + (pct > 85 ? "cheio" : (pct < 60 ? "vazio" : ""))
+        + '" style="width:' + pct + '%"></i></div>'
+        + '<small style="color:var(--tinta-2)">' + pct + '% de ocupação</small>'
+        + '</td></tr>';
+    }).join("");
+
+    return '<div class="grade n2"><div class="cartao">'
+      + '<h3>Comparar antes de publicar</h3>'
+      + '<p class="chamada">Cada cenário foi resolvido pelo motor — o seletor '
+      + 'escolhe entre resultados prontos, não recalcula no navegador.</p>'
+      + '<div style="margin:14px 0"><label for="cenario">Cenário</label><br>'
+      + '<select id="cenario" style="padding:10px;border-radius:8px;'
+      + 'border:1px solid var(--linha);width:100%;max-width:340px">' + opcoes
+      + '</select></div><div id="saida-cenario"></div></div>'
+      + '<div class="cartao"><h3>Como os turnos ficaram</h3>'
+      + '<div class="rolagem"><table style="margin-top:10px"><thead><tr>'
+      + '<th>Turno</th>'
+      + '<th class="num">Pessoas</th><th class="num">Viagens</th>'
+      + '<th class="num">Veículos</th><th>Ocupação</th></tr></thead>'
+      + '<tbody>' + turnos + '</tbody></table></div></div></div>';
+  }
+
+  function pintarCenario(indice) {
+    var c = (DADOS.planejar.cenarios || [])[indice];
+    var no = document.getElementById("saida-cenario");
+    if (!c || !no) { return; }
+    no.innerHTML = '<div class="grade n2">'
+      + numeroCartao("Custo com o plano novo",
+          reaisCurto(c.custo_otimizado_mes), "por mês, com a frota do plano")
+      + numeroCartao("Diferença", reaisCurto(c.economia_mes),
+          "por mês, contra " + reaisCurto(c.custo_atual_mes)
+          + " de hoje ("
+          + num(c.reducao_custo_pct, 1) + "% a menos)")
+      + '</div>';
+  }
+
+  function marcoPublicar(pl) {
+    var nao = pl.nao_atendida || {};
+    var itens = (nao.pontos || []).slice(0, 6).map(function (p) {
+      return '<tr><td>' + esc(p.ponto) + '</td><td>' + esc(p.bairro) + '</td>'
+        + '<td>' + esc(p.escola) + '</td>'
+        + '<td class="num">' + num(p.minutos_minimos) + ' min</td>'
+        + '<td class="num">' + num(p.limite_min) + ' min</td></tr>';
+    }).join("");
+    var coerencia = (pl.coerencia || []).map(function (a) {
+      return '<div class="aviso">' + esc(a) + '</div>';
+    }).join("");
+
+    return '<div class="cartao"><h3>O que muda quando você publicar</h3>'
+      + '<p class="chamada">Publicar troca a rota que o motorista vê no '
+      + 'aplicativo. O plano anterior vai para o histórico, datado.</p>'
+      + '<div class="grade n3" style="margin-top:14px">'
+      + numeroCartao("Veículos", num((pl.frota || {}).total_veiculos), "na rua")
+      + numeroCartao("Viagens por dia", num((DADOS.resumo || {}).viagens), "")
+      + numeroCartao("Quilometragem", num((pl.frota || {}).km_dia, 1) + " km",
+          "por dia")
+      + '</div>'
+      + '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'
+      + '<button class="botao" data-acao="publicar">Publicar este plano</button>'
+      + '<button class="botao calmo" data-acao="proposta">Ver como proposta'
+      + '</button></div></div>'
+      + coerencia
+      + (itens ? '<div class="aviso risco" style="margin-top:16px">'
+          + '<b>' + num(nao.alunos) + ' pessoas não cabem em rota nenhuma '
+          + 'dentro do limite de tempo.</b> Isso é decisão da secretaria — o '
+          + 'sistema não afrouxa a regra nem deixa ninguém de fora em '
+          + 'silêncio.</div>'
+          + '<div class="rolagem"><table><thead><tr><th>Ponto</th>'
+          + '<th>Bairro</th><th>Destino</th><th class="num">Trajeto mínimo</th>'
+          + '<th class="num">Limite</th></tr></thead><tbody>' + itens
+          + '</tbody></table></div>' : "");
+  }
+
+  /* -------------------------------------------------------------- operar */
+  var rotaSelecionada = null;
+  var filtro = "";
+  function telaOperar() {
+    return '<h1>Operar</h1>'
+      + '<p class="chamada">O dia como ele está: as rotas no mapa, os avisos '
+      + 'que chegaram e quem está esperando decisão.</p>'
+      + '<div class="despacho" style="margin-top:18px">'
+      + '<div>' + listaDeRotas() + '</div>'
+      + '<div><div id="area-mapa">' + desenharMapa(mapaPadrao())
+      + '</div>' + resumoDoDia() + '</div></div>'
+      + secaoPessoas();
+  }
+
+  /* Mapa nunca abre vazio: sem rota escolhida, mostra as três primeiras —
+     um mapa só de pontinhos não diz nada a quem despacha. */
+  function mapaPadrao() {
+    if (rotaSelecionada) { return [rotaSelecionada]; }
+    return (DADOS.mapa.viagens || []).slice(0, 3);
+  }
+
+  function listaDeRotas() {
+    var viagens = (DADOS.mapa.viagens || []).filter(function (v) {
+      if (!filtro) { return true; }
+      var alvo = (v.id + " " + v.destino + " " + v.turno + " "
+        + (v.veiculo || "") + " " + (v.paradas || []).join(" ")).toLowerCase();
+      return alvo.indexOf(filtro.toLowerCase()) >= 0;
+    });
+    var itens = viagens.slice(0, 60).map(function (v) {
+      return '<button class="item" data-viagem="' + esc(v.id) + '" '
+        + 'aria-selected="' + (rotaSelecionada && rotaSelecionada.id === v.id)
+        + '"><div class="titulo">' + esc(v.id) + '</div>'
+        + '<div class="meta">' + esc(v.destino) + ' · ' + esc(v.turno) + ' · '
+        + num(v.passageiros) + ' pessoas · ' + num(v.km, 1) + ' km</div>'
+        + '</button>';
+    }).join("") || '<div class="vazio">Nenhuma rota com “' + esc(filtro)
+      + '”.</div>';
+
+    var total = (DADOS.mapa.viagens || []).length;
+    var conta = filtro
+      ? viagens.length + " de " + total + " rotas"
+      : total + " rotas hoje";
+    return '<div class="lista" style="margin-bottom:16px"><header>'
+      + '<input type="search" id="filtro-rotas" placeholder="Filtrar rotas" '
+      + 'value="' + esc(filtro) + '" aria-label="Filtrar rotas">'
+      + '<span class="conta">' + conta
+      + (viagens.length > 60 ? " · rolando as 60 primeiras" : "")
+      + '</span></header><div class="itens">' + itens + '</div></div>';
+  }
+
+  function resumoDoDia() {
+    var hoje = DADOS.hoje || {}, rod = hoje.rodadas || {}, pol = hoje.politica || {};
+    return '<div class="cartao"><h3>Reotimização contínua</h3>'
+      + '<p class="chamada">A cada ' + num(pol.intervalo_min || 5)
+      + ' minutos o plano do dia é revisto inteiro.</p>'
+      + '<ul class="linha-tempo" style="margin-top:14px">'
+      + '<li><b>' + num(rod.rodadas || 0) + ' rodadas</b><br>'
+      + '<small style="color:var(--tinta-2)">' + num(rod.rodadas_com_acao || 0)
+      + ' com alguma mudança</small></li>'
+      + '<li><b>' + num(rod.km_economizados || 0, 1) + ' km poupados</b><br>'
+      + '<small style="color:var(--tinta-2)">' + num(rod.corridas_remanejadas || 0)
+      + ' corridas trocaram de veículo</small></li>'
+      + '<li><b>' + num(rod.promessas_quebradas || 0) + ' horários quebrados</b>'
+      + '<br><small style="color:var(--tinta-2)">quem já foi avisado não é '
+      + 'remarcado</small></li></ul></div>';
+  }
+
+  function secaoPessoas() {
+    var el = (DADOS.operar || {}).elegibilidade || {};
+    var r = el.resumo || {};
+    var fila = (el.fila || []).slice(0, 6).map(function (s) {
+      return '<tr><td>' + esc(s.protocolo) + '</td>'
+        + '<td>' + esc(s.estado_em_portugues) + '</td>'
+        + '<td class="num">' + (s.dias_em_aberto || 0) + '</td>'
+        + '<td>' + esc(s.resumo_do_perfil || "—") + '</td></tr>';
+    }).join("");
+    if (!fila) { return ""; }
+    return '<section class="secao"><header><h2>Quem está esperando decisão</h2>'
+      + selo({rotulo: el.origem === "operacao_real" ? "medido" : "simulado",
+              explicacao: el.explicacao_selo || ""}) + '</header>'
+      + '<div class="grade n3" style="margin-bottom:14px">'
+      + numeroCartao("Em aberto", num(r.em_aberto), "de " + num(r.pedidos)
+          + " pedidos")
+      + numeroCartao("Fora do prazo", num(r.atrasados),
+          "prazo assumido: " + num(r.prazo_dias) + " dias")
+      + numeroCartao("Espera média", num(r.dias_em_aberto_media, 1) + " dias",
+          "do protocolo até hoje")
+      + '</div><div class="rolagem"><table><thead><tr><th>Protocolo</th>'
+      + '<th>Situação</th><th class="num">Dias</th><th>Perfil</th></tr></thead>'
+      + '<tbody>' + fila + '</tbody></table></div></section>';
+  }
+
+  /* -------------------------------------------------------------- vender */
+  function telaVender() {
+    var v = DADOS.vender;
+    if (!v) {
+      return '<h1>Vender</h1><div class="cartao vazio">'
+        + '<b>Este destino é para operação de empresa</b>'
+        + 'A precificação separa o custo do motorista e usa o contrato como '
+        + '"antes". Numa operação escolar, a prefeitura contrata veículo com '
+        + 'motorista, e a comparação é outra — está em Planejar.</div>';
+    }
+    var p = v.preco.preco, c = v.preco.custo;
+    var participacao = (v.preco.indicadores || {}).participacao_no_custo_pct || {};
+    var grupos = Object.keys(c.por_grupo).map(function (g) {
+      return numeroCartao(g, reaisCurto(c.por_grupo[g]),
+        num(participacao[g], 1) + "% do custo");
+    }).join("");
+    var cenarios = (v.cenarios || []).map(function (x) {
+      return '<tr><td>' + esc(x.cenario) + '</td>'
+        + '<td class="num">' + reais(x.preco_mes) + '</td>'
+        + '<td class="num">' + (x.diferenca_pct
+            ? num(x.diferenca_pct, 1) + "%" : "—") + '</td></tr>';
+    }).join("");
+    var achados = ((v.diagnostico || {}).achados || []).slice(0, 6)
+      .map(function (a) {
+        return '<div class="cartao" style="margin-bottom:10px">'
+          + '<b>' + esc(a.titulo) + '</b> — <b style="color:var(--ok)">'
+          + reais(a.economia_mes) + '/mês</b>'
+          + '<p class="chamada">' + esc(a.detalhe) + '</p>'
+          + '<p class="chamada" style="font-size:14px">Antes de aplicar: '
+          + esc(a.o_que_conferir) + '</p></div>';
+      }).join("");
+    var dr = (v.diagnostico || {}).resumo || {};
+
+    return '<h1>Vender</h1>'
+      + '<p class="chamada">Duas perguntas: por quanto propor um contrato novo '
+      + 'e o que dá para melhorar no que já roda.</p>'
+      + '<section class="secao"><header><h2>Preço da proposta</h2>'
+      + selo({rotulo: "planejado", explicacao: "custo calculado a partir do "
+          + "plano roteirizado e das premissas declaradas"}) + '</header>'
+      + '<div class="grade n2">'
+      + numeroCartao("Preço", reais(p.mes) + "/mês", reais(p.ano) + " por ano",
+          {porque: (v.preco.memoria || []).join(" ")})
+      + numeroCartao("Custo total", reais(c.total_mes),
+          "direto " + reaisCurto(c.direto) + " + indireto "
+          + reaisCurto(c.indireto))
+      + '</div><div class="grade n4" style="margin-top:14px">' + grupos
+      + '</div>'
+      + '<div class="rolagem" style="margin-top:16px"><table><thead><tr>'
+      + '<th>Cenário</th><th class="num">Preço/mês</th>'
+      + '<th class="num">Diferença</th></tr></thead><tbody>' + cenarios
+      + '</tbody></table></div></section>'
+      + (achados ? '<section class="secao"><header>'
+          + '<h2>O que dá para melhorar no que já roda</h2>'
+          + selo({rotulo: "informado", explicacao: "km e passageiros vieram da "
+              + "planilha da própria operação — não foram medidos aqui"})
+          + '</header>'
+          + '<div class="grade n3" style="margin-bottom:14px">'
+          + numeroCartao("Linhas analisadas", num(dr.linhas_analisadas),
+              "ocupação média de " + num(dr.ocupacao_media_hoje_pct, 1) + "%")
+          + numeroCartao("Ações imediatas",
+              reaisCurto(dr.economia_acoes_imediatas_mes),
+              "troca de veículo e fusão de linha")
+          + numeroCartao("Teto", reaisCurto(dr.economia_teto_mes),
+              "já contém as ações acima — não some")
+          + '</div>' + achados + '</section>' : "");
+  }
+
+  /* ------------------------------------------------------------- gaveta */
+  function abrirGaveta(viagem) {
+    var gaveta = document.getElementById("gaveta");
+    var paradas = (viagem.paradas || []).map(function (p, i) {
+      return '<li><b>' + (i + 1) + 'ª parada</b> — ' + esc(p) + '</li>';
+    }).join("");
+    gaveta.innerHTML = '<header><div><h2>' + esc(viagem.id) + '</h2>'
+      + '<p class="chamada">' + esc(viagem.destino) + ' · ' + esc(viagem.turno)
+      + '</p></div><button class="fechar" aria-label="Fechar">×</button></header>'
+      + '<div class="grade n2">'
+      + numeroCartao("Pessoas", num(viagem.passageiros),
+          viagem.ocupacao ? num(viagem.ocupacao) + "% de ocupação" : "")
+      + numeroCartao("Percurso", num(viagem.km, 1) + " km",
+          num(viagem.min) + " min")
+      + '</div>'
+      + '<h3 style="margin-top:18px">Ordem das paradas</h3>'
+      + '<ul class="linha-tempo">' + paradas + '</ul>'
+      + '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'
+      + '<button class="botao pequeno" data-acao="avisar">Avisar as famílias'
+      + '</button><button class="botao calmo pequeno" data-acao="imprimir">'
+      + 'Imprimir a rota</button></div>';
+    gaveta.hidden = false;
+    gaveta.querySelector(".fechar").addEventListener("click", function () {
+      gaveta.hidden = true;
+    });
+  }
+
+  /* --------------------------------------------------------------- rotas */
+  var TELAS = {inicio: telaInicio, planejar: telaPlanejar, operar: telaOperar,
+               vender: telaVender};
+
+  function pintar() {
+    var destino = (location.hash || "#inicio").slice(1);
+    if (!TELAS[destino]) { destino = "inicio"; }
+    document.querySelectorAll(".rail a").forEach(function (a) {
+      if (a.dataset.destino === destino) {
+        a.setAttribute("aria-current", "page");
+      } else {
+        a.removeAttribute("aria-current");
+      }
+    });
+    document.getElementById("tela").innerHTML = TELAS[destino]();
+    document.getElementById("gaveta").hidden = true;
+    window.scrollTo({top: 0, behavior: "instant"});
+    ligarEventos(destino);
+    pintarContexto();  /* o seletor de operação leva o destino atual junto */
+  }
+
+  function ligarEventos(destino) {
+    document.querySelectorAll("[data-explica]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var alvo = document.getElementById(b.dataset.explica);
+        alvo.hidden = !alvo.hidden;
+        b.textContent = alvo.hidden ? "por quê?" : "fechar";
+      });
+    });
+    if (destino === "planejar") {
+      document.querySelectorAll("[data-marco]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          marcoAtivo = b.dataset.marco;
+          pintar();
+        });
+      });
+      var seletor = document.getElementById("cenario");
+      if (seletor) {
+        seletor.addEventListener("change", function () {
+          pintarCenario(Number(seletor.value));
+        });
+        pintarCenario(Number(seletor.value));
+      }
+      document.querySelectorAll("[data-acao]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          alert(b.dataset.acao === "publicar"
+            ? "Nesta demonstração nada é publicado. No sistema, aqui a rota "
+              + "trocaria no aplicativo dos motoristas e o plano anterior iria "
+              + "para o histórico."
+            : "A proposta completa é a tela Vender e o arquivo proposta.html.");
+        });
+      });
+    }
+    if (destino === "operar") {
+      var filtroCampo = document.getElementById("filtro-rotas");
+      if (filtroCampo) {
+        filtroCampo.addEventListener("input", function () {
+          filtro = filtroCampo.value;
+          var lista = document.querySelector(".lista");
+          lista.outerHTML = listaDeRotas();
+          ligarEventos("operar");
+          var novo = document.getElementById("filtro-rotas");
+          novo.focus();
+          novo.setSelectionRange(novo.value.length, novo.value.length);
+        });
+      }
+      document.querySelectorAll("[data-viagem]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          rotaSelecionada = (DADOS.mapa.viagens || []).filter(function (v) {
+            return v.id === b.dataset.viagem;
+          })[0];
+          document.getElementById("area-mapa").innerHTML =
+            desenharMapa([rotaSelecionada]);
+          document.querySelectorAll("[data-viagem]").forEach(function (o) {
+            o.setAttribute("aria-selected", o === b);
+          });
+          abrirGaveta(rotaSelecionada);
+        });
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------- contexto */
+  function pintarContexto() {
+    var o = DADOS.operacao;
+    document.getElementById("contexto").innerHTML =
+      '<b>' + esc(o.nome) + '</b>'
+      + '<span>·</span><span>' + esc(o.vertical === "fretamento"
+          ? "fretamento corporativo" : "transporte escolar") + '</span>'
+      + '<span>·</span><span>plano de '
+      + esc(String(DADOS.gerado_em).slice(0, 5)) + '</span>';
+    document.getElementById("operacoes").innerHTML =
+      (DADOS.operacoes || []).map(function (op) {
+        return '<a href="' + esc(op.arquivo) + (location.hash || "#inicio") + '"'
+          + (op.atual ? ' aria-current="true"' : '') + '>'
+          + esc(op.rotulo) + '</a>';
+      }).join("");
+    document.getElementById("rodape-rail").innerHTML =
+      'Protótipo gerado a partir dos relatórios reais do projeto.';
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "/" && document.activeElement.tagName !== "INPUT") {
+      e.preventDefault();
+      document.getElementById("busca").focus();
+    }
+    if (e.key === "Escape") { document.getElementById("gaveta").hidden = true; }
+  });
+  document.getElementById("busca").addEventListener("input", function () {
+    filtro = this.value;
+    if ((location.hash || "") !== "#operar") { location.hash = "#operar"; }
+    else { pintar(); }
+  });
+
+  window.addEventListener("hashchange", pintar);
+  pintarContexto();
+  pintar();
+})();
+</script>
+</body>
+</html>
