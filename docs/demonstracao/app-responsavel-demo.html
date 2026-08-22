@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MOBGOV — Transporte do meu filho</title>
+<style>
+/* App do responsável. Quem usa: mãe, pai, avó — muitas vezes com celular
+   antigo, plano de dados contado e pouca familiaridade com aplicativo. Daí:
+   uma tela só, letra grande, um botão que importa, e nada que precise de
+   aprendizado. Nenhuma biblioteca, nenhuma fonte externa. */
+:root{
+  --fundo:#0F1A22; --cartao:#172836; --linha:#25404F;
+  --texto:#F3F8FB; --fraco:#9FB6C4;
+  --ok:#2BB394; --alerta:#E8A24E; --erro:#E2683F; --acento:#4FA3E3;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--fundo);color:var(--texto);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:17px;line-height:1.5;padding-bottom:32px;overflow-x:hidden}
+header{background:var(--cartao);border-bottom:1px solid var(--linha);
+  padding:16px}
+h1{font-size:19px}
+.sub{font-size:14px;color:var(--fraco);margin-top:3px}
+main{padding:16px;max-width:640px;margin:0 auto}
+.cartao{background:var(--cartao);border:1px solid var(--linha);
+  border-radius:16px;padding:18px;margin-bottom:16px}
+.previsao{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;line-height:1.1}
+.estado{display:inline-flex;align-items:center;gap:8px;font-size:14px;
+  color:var(--fraco);margin-top:8px;flex-wrap:wrap}
+.bolinha{width:11px;height:11px;border-radius:50%;background:var(--fraco);
+  flex:0 0 auto}
+.bolinha.a_caminho{background:var(--ok)}
+.bolinha.aguardando{background:var(--alerta)}
+.bolinha.falta_avisada{background:var(--erro)}
+.bolinha.embarcou{background:var(--acento)}
+.mensagem{margin-top:12px;font-size:16px}
+/* O selo de origem é obrigatório na tela: previsão medida e horário de
+   plano NÃO podem parecer a mesma coisa. */
+.selo{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;padding:3px 8px;border-radius:999px;
+  border:1px solid var(--linha);color:var(--fraco)}
+.selo.medido{color:#0C1A12;background:var(--ok);border-color:var(--ok)}
+.linha{display:flex;justify-content:space-between;gap:12px;padding:10px 0;
+  border-top:1px solid var(--linha);font-size:15px;flex-wrap:wrap}
+.linha:first-child{border-top:0}
+.linha b{font-variant-numeric:tabular-nums}
+button{font:inherit;border:0;border-radius:14px;padding:16px;font-weight:700;
+  width:100%;min-height:56px;background:var(--acento);color:#04121C}
+button.perigo{background:var(--erro);color:#FFF}
+button.secundaria{background:transparent;color:var(--texto);
+  border:1.5px solid var(--linha)}
+button:active{transform:scale(.99)}
+button[disabled]{opacity:.5}
+.paradas{margin-top:6px}
+.parada{display:flex;gap:12px;align-items:baseline;padding:7px 0;font-size:15px;
+  color:var(--fraco)}
+.parada b{color:var(--texto)}
+.parada.sua{color:var(--texto);font-weight:700}
+.aviso{background:#3A2A16;border-left:4px solid var(--alerta);border-radius:12px;
+  padding:14px;font-size:15px;margin-bottom:16px}
+.rodape{color:var(--fraco);font-size:13px;padding:0 16px;max-width:640px;
+  margin:0 auto}
+</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:99;background:#E8A24E;color:#1A1206;
+  font:700 13px/1.35 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,
+  sans-serif;padding:9px 14px;text-align:center;letter-spacing:.02em">
+  DEMONSTRAÇÃO — dados embutidos neste arquivo, sem servidor e sem internet
+</div>
+
+<script>
+/* Casca de demonstração: responde às chamadas de API com dados embutidos.
+   O app abaixo não sabe que ela existe — é o mesmo código que fala com
+   operacao/servidor.py numa operação de verdade. */
+(function () {
+  "use strict";
+  var DADOS = {"situacao": {"aluno": "AP074", "ponto": "P074", "viagem": "E1-manha-01", "escola": "EMEF Centro", "turno": "Manhã", "motorista": "VM17", "veiculo": "Ônibus escolar 31 lugares", "chegada_na_escola": "05h55", "hora_planejada": "05h40", "previsao": "05h43", "origem_da_previsao": "medido", "atraso_min": 3, "sinal_inconsistente": false, "estado": "a_caminho", "mensagem": "O veículo está a caminho. Previsão de passar no seu ponto: 05h43 (3 min atrasado).", "paradas_antes_de_voce": 2, "posicao_do_veiculo": null, "aviso_de_falta": false, "pode_avisar_falta": true, "paradas": [{"ponto": "P062", "hora_prevista": "05h30", "lat": -21.136194, "lon": -47.795108, "e_o_seu": false}, {"ponto": "P013", "hora_prevista": "05h35", "lat": -21.136892, "lon": -47.793234, "e_o_seu": false}, {"ponto": "P074", "hora_prevista": "05h40", "lat": -21.135548, "lon": -47.792777, "e_o_seu": true}, {"ponto": "P042", "hora_prevista": "05h45", "lat": -21.135516, "lon": -47.79204, "e_o_seu": false}, {"ponto": "P002", "hora_prevista": "05h50", "lat": -21.137504, "lon": -47.78994, "e_o_seu": false}]}, "situacao_com_falta": {"aluno": "AP074", "ponto": "P074", "viagem": "E1-manha-01", "escola": "EMEF Centro", "turno": "Manhã", "motorista": "VM17", "veiculo": "Ônibus escolar 31 lugares", "chegada_na_escola": "05h55", "hora_planejada": "05h40", "previsao": "05h43", "origem_da_previsao": "medido", "atraso_min": 3, "sinal_inconsistente": false, "estado": "falta_avisada", "mensagem": "Você avisou que hoje ele(a) não vai. O motorista já recebeu — o veículo não vai parar no seu ponto.", "paradas_antes_de_voce": 2, "posicao_do_veiculo": null, "aviso_de_falta": true, "pode_avisar_falta": false, "paradas": [{"ponto": "P062", "hora_prevista": "05h30", "lat": -21.136194, "lon": -47.795108, "e_o_seu": false}, {"ponto": "P013", "hora_prevista": "05h35", "lat": -21.136892, "lon": -47.793234, "e_o_seu": false}, {"ponto": "P074", "hora_prevista": "05h40", "lat": -21.135548, "lon": -47.792777, "e_o_seu": true}, {"ponto": "P042", "hora_prevista": "05h45", "lat": -21.135516, "lon": -47.79204, "e_o_seu": false}, {"ponto": "P002", "hora_prevista": "05h50", "lat": -21.137504, "lon": -47.78994, "e_o_seu": false}]}};
+  var estado = {falta: false};
+
+  function resposta(corpo) {
+    return Promise.resolve({
+      ok: true, status: 200,
+      json: function () { return Promise.resolve(corpo); }
+    });
+  }
+
+  var original = window.fetch;
+  window.fetch = function (url, opcoes) {
+    var caminho = String(url).split("?")[0];
+    if (caminho === "/api/rota-do-dia") { return resposta(DADOS.rota); }
+    if (caminho === "/api/situacao") {
+      return resposta(estado.falta ? DADOS.situacao_com_falta : DADOS.situacao);
+    }
+    if (caminho === "/api/falta") {
+      estado.falta = true;
+      return resposta({registrado: "falta"});
+    }
+    if (caminho === "/api/desfazer-falta") {
+      estado.falta = false;
+      return resposta({registrado: "volta_atras"});
+    }
+    if (caminho === "/api/eventos") {
+      var corpo = {};
+      try { corpo = JSON.parse((opcoes || {}).body || "{}"); } catch (e) {}
+      return resposta({aceitos: (corpo.eventos || []).length, recusados: []});
+    }
+    return original ? original.apply(window, arguments)
+                    : Promise.reject(new Error("sem rede"));
+  };
+})();
+</script>
+
+<header>
+  <h1 id="titulo">Transporte escolar</h1>
+  <div class="sub" id="subtitulo">carregando…</div>
+</header>
+
+<main>
+  <div id="conteudo">
+    <div class="cartao">Buscando informação do dia…</div>
+  </div>
+</main>
+<p class="rodape" id="rodape"></p>
+
+<script>
+/* Três coisas, e só três: ver a previsão, avisar que não vai, desfazer o
+   aviso. O aviso de falta é o dado que o sistema mais precisa — é dele que
+   sai a taxa de ausência real, hoje ainda estimada — e é também o que a
+   família mais quer poder fazer sem ligar para a secretaria. */
+(function () {
+  "use strict";
+  var params = new URLSearchParams(location.search);
+  var aluno = params.get("aluno") || "";
+  var ponto = params.get("ponto") || "";
+  var turno = params.get("turno") || "";
+  var token = params.get("token") || "";
+  var CHAVE = "mobgov.responsavel." + aluno;
+  var ultima = null;
+
+  function guardar(valor) {
+    try { localStorage.setItem(CHAVE, JSON.stringify(valor)); } catch (e) {}
+  }
+  function recuperar() {
+    try {
+      var bruto = localStorage.getItem(CHAVE);
+      return bruto ? JSON.parse(bruto) : null;
+    } catch (e) { return null; }
+  }
+
+  function consulta() {
+    return "?aluno=" + encodeURIComponent(aluno)
+      + "&ponto=" + encodeURIComponent(ponto)
+      + "&turno=" + encodeURIComponent(turno)
+      + "&token=" + encodeURIComponent(token);
+  }
+
+  function buscar() {
+    return fetch("/api/situacao" + consulta())
+      .then(function (r) { return r.json(); })
+      .then(function (dados) {
+        if (dados && dados.estado) { ultima = dados; guardar(dados); }
+        return ultima;
+      })
+      .catch(function () { return ultima; });
+  }
+
+  function enviar(caminho, corpo) {
+    return fetch(caminho + consulta(), {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(corpo || {})
+    }).then(function (r) {
+      if (!r.ok) { throw new Error("recusado"); }
+      return r.json();
+    });
+  }
+
+  function texto(no, valor) {
+    var el = document.getElementById(no);
+    if (el) { el.textContent = valor; }
+  }
+
+  function pintar(d) {
+    var conteudo = document.getElementById("conteudo");
+    if (!d) {
+      conteudo.innerHTML = '<div class="cartao">Sem conexão e sem nada '
+        + 'guardado ainda. Assim que houver sinal, a informação aparece '
+        + 'aqui.</div>';
+      return;
+    }
+    if (d.estado === "sem_rota") {
+      conteudo.innerHTML = '<div class="cartao">' + d.mensagem + '</div>';
+      return;
+    }
+    texto("titulo", d.escola || "Transporte escolar");
+    texto("subtitulo", "Ponto " + d.ponto + " · " + (d.turno || ""));
+
+    var selo = d.origem_da_previsao === "medido"
+      ? '<span class="selo medido">previsão medida</span>'
+      : '<span class="selo">horário do plano</span>';
+
+    var html = '<div class="cartao">'
+      + '<div class="previsao">' + (d.previsao || "—") + '</div>'
+      + '<div class="estado"><span class="bolinha ' + d.estado + '"></span>'
+      + selo + '</div>'
+      + '<div class="mensagem">' + d.mensagem + '</div></div>';
+
+    html += '<div class="cartao">'
+      + '<div class="linha"><span>Horário planejado</span><b>'
+      + (d.hora_planejada || "—") + '</b></div>'
+      + '<div class="linha"><span>Paradas antes da sua</span><b>'
+      + d.paradas_antes_de_voce + '</b></div>'
+      + '<div class="linha"><span>Chegada na escola</span><b>'
+      + (d.chegada_na_escola || "—") + '</b></div>'
+      + '<div class="linha"><span>Veículo</span><b>'
+      + (d.veiculo || "—") + '</b></div></div>';
+
+    if (d.aviso_de_falta) {
+      html += '<div class="cartao"><button class="secundaria" id="botao-volta">'
+        + 'Na verdade ele(a) vai hoje</button></div>';
+    } else if (d.pode_avisar_falta) {
+      html += '<div class="cartao"><button class="perigo" id="botao-falta">'
+        + 'Hoje ele(a) não vai</button>'
+        + '<p class="sub" style="margin-top:10px">O motorista é avisado na '
+        + 'hora e o veículo não para no seu ponto. Dá para desfazer enquanto '
+        + 'ele não passar.</p></div>';
+    }
+
+    var paradas = (d.paradas || []).map(function (p) {
+      return '<div class="parada' + (p.e_o_seu ? ' sua' : '') + '">'
+        + '<b>' + p.hora_prevista + '</b><span>' + p.ponto
+        + (p.e_o_seu ? ' — seu ponto' : '') + '</span></div>';
+    }).join("");
+    html += '<div class="cartao"><div class="sub">Ordem das paradas desta '
+      + 'viagem</div><div class="paradas">' + paradas + '</div></div>';
+
+    conteudo.innerHTML = html;
+
+    var falta = document.getElementById("botao-falta");
+    if (falta) {
+      falta.addEventListener("click", function () {
+        if (!confirm("Avisar que hoje ele(a) não vai?")) { return; }
+        falta.disabled = true;
+        enviar("/api/falta", {}).then(atualizar).catch(function () {
+          falta.disabled = false;
+          alert("Não consegui avisar agora. Tente de novo quando houver sinal.");
+        });
+      });
+    }
+    var volta = document.getElementById("botao-volta");
+    if (volta) {
+      volta.addEventListener("click", function () {
+        volta.disabled = true;
+        enviar("/api/desfazer-falta", {}).then(atualizar).catch(function () {
+          volta.disabled = false;
+          alert("Não consegui desfazer agora. Tente de novo com sinal.");
+        });
+      });
+    }
+    texto("rodape", "Atualiza sozinho a cada minuto. Nenhum dado de "
+      + "localização da sua família é coletado — o que aparece aqui é a "
+      + "posição do veículo.");
+  }
+
+  function atualizar() { return buscar().then(pintar); }
+
+  ultima = recuperar();
+  pintar(ultima);
+  atualizar();
+  setInterval(atualizar, 60000);
+})();
+</script>
+</body>
+</html>
