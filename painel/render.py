@@ -1,0 +1,384 @@
+# -*- coding: utf-8 -*-
+"""
+MOBGOV — Sprint 2 · agent-painel
+Renderiza o PAINEL DE ECONOMIA como uma página HTML autocontida.
+
+Por que HTML gerado no servidor, e não uma SPA:
+- abre num notebook de prefeitura sem internet (CSS, JS e gráficos embutidos,
+  zero requisição externa);
+- imprime em PDF pelo próprio navegador, com quebra de página tratada, o que
+  já resolve a exigência de "exportável para prestação de contas";
+- carrega instantaneamente em projetor 1024x768.
+
+Uso:
+    python -m painel.render                       # gera relatorios/painel-economia.html
+    python -m painel.render --diesel 7.20 --dias 20
+    python -m painel.render --saida /tmp/demo.html
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+
+try:
+    from .formato import esc, numero, pct, reais, reais_curto
+    from . import economia as economia_mod
+    from . import aprendizado as aprendizado_mod
+    from . import graficos
+except ImportError:  # execução direta: python painel/render.py
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from painel.formato import esc, numero, pct, reais, reais_curto
+    from painel import economia as economia_mod
+    from painel import aprendizado as aprendizado_mod
+    from painel import graficos
+
+DIR_PAINEL = os.path.dirname(os.path.abspath(__file__))
+DIR_BASE = os.path.dirname(DIR_PAINEL)
+SAIDA_PADRAO = os.path.join(DIR_BASE, "relatorios", "painel-economia.html")
+
+
+def _ativo(nome: str) -> str:
+    with open(os.path.join(DIR_PAINEL, "assets", nome), "r", encoding="utf-8") as f:
+        return f.read()
+
+
+# ------------------------------------------------------------------ blocos ---
+def _kpi(rotulo, valor, detalhe, destaque=False):
+    return (f'<div class="kpi{" destaque" if destaque else ""}">'
+            f'<div class="rotulo">{esc(rotulo)}</div>'
+            f'<div class="valor">{esc(valor)}</div>'
+            f'<div class="detalhe">{esc(detalhe)}</div></div>')
+
+
+def bloco_kpis(p: dict) -> str:
+    e, atual, otim = p["economia"], p["atual"], p["otimizada"]
+    return '<div class="kpis">' + "".join([
+        _kpi("Veículos a menos", f'−{e["veiculos"]}',
+             f'de {atual["total_veiculos"]} para {otim["total_veiculos"]} '
+             f'({pct(e["reducao_frota_pct"])} de redução)', destaque=True),
+        _kpi("Economia por mês", reais_curto(e["custo_mes"]),
+             f'{reais(atual["custo_mes"])} → {reais(otim["custo_mes"])} '
+             f'({pct(e["reducao_custo_pct"])})', destaque=True),
+        _kpi("Economia por ano", reais_curto(e["custo_ano"]),
+             f'{reais(e["custo_mes"])} × 12 meses'),
+        _kpi("Quilômetros por dia", f'−{numero(e["km_dia"])} km',
+             f'de {numero(atual["km_dia"])} para {numero(otim["km_dia"])} km/dia '
+             f'({pct(e["reducao_km_pct"])})'),
+        _kpi("Diesel por dia", f'−{numero(e["litros_dia"])} l',
+             f'{numero(e["litros_ano"])} litros por ano'),
+        _kpi("Emissões evitadas", f'−{numero(e["tco2_ano"], 1)} t',
+             'toneladas de CO₂ por ano'),
+    ]) + "</div>"
+
+
+def _tabela_frota(frota: dict, classe_marcador: str) -> str:
+    linhas = "".join(
+        f'<tr><td>{esc(l["nome"])}</td>'
+        f'<td class="num">{l["qtd"]}</td>'
+        f'<td class="num">{numero(l["km_dia"])}</td>'
+        f'<td class="num">{reais(l["custo_fixo_mes"])}</td>'
+        f'<td class="num">{reais(l["custo_variavel_mes"])}</td>'
+        f'<td class="num">{reais(l["custo_mes"])}</td></tr>'
+        for l in frota["composicao"]
+    )
+    return (
+        f'<div class="rolagem"><table>'
+        f'<caption><span class="marcador {classe_marcador}">{esc(frota["rotulo"])}</span> '
+        f'· {frota["total_veiculos"]} veículos · {numero(frota["assentos"])} assentos '
+        f'· {numero(frota["km_dia"])} km/dia</caption>'
+        f'<thead><tr><th>Tipo de veículo</th><th class="num">Qtd</th>'
+        f'<th class="num">km/dia</th><th class="num">Custo fixo/mês</th>'
+        f'<th class="num">Custo variável/mês</th><th class="num">Total/mês</th></tr></thead>'
+        f'<tbody>{linhas}</tbody>'
+        f'<tfoot><tr><td>Total</td><td class="num">{frota["total_veiculos"]}</td>'
+        f'<td class="num">{numero(frota["km_dia"])}</td>'
+        f'<td class="num">{reais(frota["custo_fixo_mes"])}</td>'
+        f'<td class="num">{reais(frota["custo_variavel_mes"])}</td>'
+        f'<td class="num">{reais(frota["custo_mes"])}</td></tr></tfoot>'
+        f'</table></div>'
+    )
+
+
+def bloco_antes_depois(p: dict) -> str:
+    return (
+        '<section><h2>Antes e depois — custo mensal da operação</h2>'
+        '<p class="chamada">O custo fixo é o que se paga por ter o veículo '
+        '(motorista, depreciação, seguro); o variável é o que se paga por rodá-lo. '
+        'A otimização mexe nos dois: tira veículo da conta e encurta o percurso.</p>'
+        + graficos.barras_custo(p["atual"], p["otimizada"])
+        + '<div style="margin-top:22px">'
+        + _tabela_frota(p["atual"], "atual")
+        + '</div><div style="margin-top:20px">'
+        + _tabela_frota(p["otimizada"], "otim")
+        + '</div></section>'
+    )
+
+
+def bloco_frota(p: dict) -> str:
+    otim, atual = p["otimizada"], p["atual"]
+    detalhe = " + ".join(f'{l["qtd"]} {l["nome"].lower()}' for l in otim["composicao"])
+    return (
+        '<section><h2>Dimensionamento da frota</h2>'
+        f'<p class="chamada">Sua frota atual: <b>{atual["total_veiculos"]} veículos</b>. '
+        f'Necessário para atender a mesma demanda: <b>{otim["total_veiculos"]} veículos</b> '
+        f'({esc(detalhe)}). Cada veículo da frota necessária existe porque há uma rota '
+        f'que não cabe nos demais dentro do limite de '
+        f'{p["premissas"]["tempo_max_trajeto_min"]} minutos por aluno.</p>'
+        + graficos.barras_frota(atual, otim)
+        + '</section>'
+    )
+
+
+def bloco_qualidade(p: dict, rotas: list) -> str:
+    q = p["qualidade"]
+    d = p["demanda"]
+    atende = ("atendidos" if q["atende_cadeirantes"]
+              else "ATENÇÃO: posições insuficientes")
+    return (
+        '<section><h2>A frota menor continua atendendo todo mundo</h2>'
+        f'<p class="chamada">Cortar veículo só vale se o serviço não piorar. '
+        f'As {q["rotas"]} rotas propostas transportam os {numero(d["alunos"])} alunos '
+        f'em {numero(d["pontos_embarque"])} pontos de embarque, com '
+        f'{numero(q["assentos_folga"])} assentos de folga e nenhuma rota acima do '
+        f'limite de {p["premissas"]["tempo_max_trajeto_min"]} minutos.</p>'
+        + graficos.barras_ocupacao(rotas)
+        + '<ul class="lista">'
+        f'<li>Ocupação média de {pct(q["ocupacao_media_pct"])} '
+        f'(menor rota {q["ocupacao_min_pct"]}%, maior rota {q["ocupacao_max_pct"]}%) — '
+        f'sem veículo rodando vazio nem aluno em pé.</li>'
+        f'<li>Tempo dentro do veículo: {numero(q["tempo_medio_rota_min"], 1)} min em média, '
+        f'máximo de {q["tempo_max_rota_min"]} min — o limite da secretaria é '
+        f'{p["premissas"]["tempo_max_trajeto_min"]} min.</li>'
+        f'<li>Alunos cadeirantes: {d["cadeirantes"]} · posições em veículo acessível na '
+        f'frota proposta: {q["posicoes_cadeirante"]} — {esc(atende)}.</li>'
+        '</ul></section>'
+    )
+
+
+def bloco_cenarios(p: dict) -> str:
+    cenarios = p.get("cenarios") or []
+    base = next((c for c in cenarios if c["padrao"]), None) or {}
+    # "</" escapado para o JSON nunca fechar a tag <script> antes da hora
+    dados = json.dumps(cenarios, ensure_ascii=False).replace("</", "<\\/")
+    return (
+        '<section><h2>E se o diesel subir? — simulador de cenários</h2>'
+        '<p class="chamada">Os cenários abaixo já foram calculados pelo motor de '
+        'dimensionamento com as mesmas fórmulas do relatório. Os controles apenas '
+        'escolhem qual deles mostrar: nenhum número é estimado na tela.</p>'
+        '<div class="controles" hidden>'
+        '<div class="controle"><label for="controle-diesel">Preço do diesel</label>'
+        '<input type="range" id="controle-diesel" min="0" max="1" step="1">'
+        f'<div class="leitura" id="leitura-diesel">'
+        f'{esc(reais(p["premissas"]["preco_diesel_l"], 2))}/l</div></div>'
+        '<div class="controle"><label for="controle-dias">Dias letivos no mês</label>'
+        '<input type="range" id="controle-dias" min="0" max="1" step="1">'
+        f'<div class="leitura" id="leitura-dias">'
+        f'{p["premissas"]["dias_letivos_mes"]} dias letivos/mês</div></div>'
+        '</div>'
+        '<div class="resultado-cenario">'
+        '<div><div class="rotulo">Economia por mês</div>'
+        f'<div class="valor" id="cen-economia-mes">{esc(reais(base.get("economia_mes", 0)))}</div></div>'
+        '<div><div class="rotulo">Economia por ano</div>'
+        f'<div class="valor" id="cen-economia-ano">{esc(reais(base.get("economia_ano", 0)))}</div></div>'
+        '<div><div class="rotulo">Custo da frota atual</div>'
+        f'<div class="valor" id="cen-custo-atual">{esc(reais(base.get("custo_atual_mes", 0)))}</div></div>'
+        '<div><div class="rotulo">Custo da frota necessária</div>'
+        f'<div class="valor" id="cen-custo-otim">{esc(reais(base.get("custo_otimizado_mes", 0)))}</div></div>'
+        '<div><div class="rotulo">Redução de custo</div>'
+        f'<div class="valor" id="cen-reducao">{esc(pct(base.get("reducao_custo_pct", 0)))}</div></div>'
+        '</div>'
+        '<p class="chamada" style="margin:14px 0 0" id="cen-situacao">'
+        'Cenário base do relatório.</p>'
+        '<p class="sem-js">Simulação interativa indisponível sem JavaScript — '
+        'os valores acima são os do cenário base do relatório.</p>'
+        f'<script type="application/json" id="dados-cenarios">{dados}</script>'
+        '</section>'
+    )
+
+
+def bloco_aprendizado(serie: dict) -> str:
+    exemplos = "".join(f'<li>{esc(x)}</li>' for x in serie.get("exemplos", []))
+    classe_selo = "selo" if serie["e_demonstracao"] else "selo medido"
+    if serie.get("semanas"):
+        resumo = (
+            f'<p class="chamada">Erro médio do tempo estimado caiu de '
+            f'{numero(serie["erro_inicial_min"], 1)} min para '
+            f'{numero(serie["erro_atual_min"], 1)} min em '
+            f'{len(serie["semanas"])} semanas ({pct(serie["queda_erro_pct"])} de queda), '
+            f'com {numero(serie["viagens_observadas"])} viagens observadas. '
+            f'A previsão de ausência de alunos ganhou '
+            f'{numero(serie["ganho_ausencia_pp"], 1)} pontos percentuais de acurácia.</p>')
+    else:
+        resumo = '<p class="chamada">Série ainda sem semanas registradas.</p>'
+    aviso = ('<div class="aviso"><b>Leia com atenção:</b> esta série é ilustrativa. '
+             'O aprendizado com GPS real entra na Sprint 5, quando o app do motorista '
+             'for ao ar; os números de economia das seções anteriores NÃO dependem '
+             'desta série.</div>') if serie["e_demonstracao"] else ""
+    return (
+        '<section><h2>O que o sistema aprendeu '
+        f'<span class="{classe_selo}">{esc(serie["selo"])}</span></h2>'
+        + resumo
+        + graficos.linha_erro(serie.get("semanas", []))
+        + (f'<ul class="lista">{exemplos}</ul>' if exemplos else "")
+        + aviso
+        + '</section>'
+    )
+
+
+def bloco_premissas(p: dict) -> str:
+    pr = p["premissas"]
+    passos = "".join(
+        f'<tr><td>{esc(m["passo"])}</td><td>{esc(m["formula"])}</td>'
+        f'<td>{esc(m["valores"])}</td></tr>'
+        for m in p["memoria_calculo"]
+    )
+    return (
+        '<section><h2>Premissas e memória de cálculo</h2>'
+        '<p class="chamada">Tudo o que entra na conta está aqui. Trocar qualquer '
+        'premissa muda o resultado — e é para isso que ela está declarada.</p>'
+        '<div class="colunas">'
+        '<div><div class="rolagem"><table><caption>Premissas adotadas</caption>'
+        '<tbody>'
+        f'<tr><td>Preço do diesel</td><td class="num">{esc(reais(pr["preco_diesel_l"], 2))}/litro</td></tr>'
+        f'<tr><td>Dias letivos no mês</td><td class="num">{pr["dias_letivos_mes"]}</td></tr>'
+        f'<tr><td>Viagens por dia (ida e volta)</td><td class="num">{pr["viagens_por_dia"]}</td></tr>'
+        f'<tr><td>Tempo máximo do aluno no veículo</td><td class="num">{pr["tempo_max_trajeto_min"]} min</td></tr>'
+        f'<tr><td>Fator de emissão do diesel</td><td class="num">{numero(pr["fator_co2_kg_l"], 2)} kg CO₂/litro</td></tr>'
+        f'<tr><td>Origem dos tempos de percurso</td><td>{esc(pr["fonte_tempos"])}</td></tr>'
+        '</tbody></table></div></div>'
+        '<div><div class="rolagem"><table><caption>Limitações declaradas desta versão</caption>'
+        '<tbody>'
+        '<tr><td>Demanda usada é sintética (município fictício gerado para a demonstração); '
+        'com a planilha real da prefeitura os números mudam.</td></tr>'
+        '<tr><td>Cada veículo faz uma rota por turno. Municípios que encadeiam duas ou três '
+        'viagens por veículo precisam do modelo multiviagem (backlog do motor de rotas).</td></tr>'
+        '<tr><td>Tempos de percurso vêm de distância em linha reta com fator de sinuosidade '
+        'rural, ainda não de malha viária real nem de GPS.</td></tr>'
+        '<tr><td>Custo por km da frota atual é rateado pelo número de veículos, porque a '
+        'prefeitura declara apenas o km/dia total.</td></tr>'
+        '</tbody></table></div></div>'
+        '</div>'
+        '<div class="rolagem" style="margin-top:22px"><table>'
+        '<caption>Memória de cálculo — passo a passo</caption>'
+        '<thead><tr><th>Passo</th><th>Fórmula</th><th>Valores</th></tr></thead>'
+        f'<tbody>{passos}</tbody></table></div>'
+        '</section>'
+    )
+
+
+# ------------------------------------------------------------------ página ---
+def renderizar(p: dict, serie: dict, rotas: list, origem: str) -> str:
+    css, js = _ativo("painel.css"), _ativo("painel.js")
+    d = p["demanda"]
+    titulo = f'Painel de Economia · {p["municipio"]}'
+    return f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOBGOV — {esc(titulo)}</title>
+<meta name="description" content="Relatório antes e depois do dimensionamento de frota do transporte escolar, com premissas auditáveis.">
+<style>{css}</style>
+</head>
+<body>
+<header class="topo"><div class="folha">
+  <div class="marca"><span class="produto">MOBGOV</span>
+    <span class="modulo">Painel de economia · transporte escolar</span></div>
+  <h1>Dimensionamento de frota: {esc(p["municipio"])}</h1>
+  <p class="subtitulo">Quantos veículos a rede realmente precisa para transportar
+  a mesma demanda, quanto isso economiza por mês e por quê — com todas as
+  premissas abertas para auditoria.</p>
+  <div class="identificacao">
+    <span>Demanda atendida: <b>{numero(d["alunos"])} alunos</b></span>
+    <span>Pontos de embarque: <b>{numero(d["pontos_embarque"])}</b></span>
+    <span>Escolas: <b>{d["escolas"]}</b></span>
+    <span>Relatório gerado em: <b>{esc(p["gerado_em"])}</b></span>
+  </div>
+</div></header>
+
+<div class="folha">
+  <div class="acoes">
+    <button class="acao" id="botao-pdf" hidden>Salvar em PDF / imprimir</button>
+  </div>
+
+  {bloco_kpis(p)}
+  {bloco_antes_depois(p)}
+  {bloco_frota(p)}
+  {bloco_qualidade(p, rotas)}
+  {bloco_cenarios(p)}
+  {bloco_aprendizado(serie)}
+  {bloco_premissas(p)}
+
+  <div class="so-impressao">
+    <p style="font-size:11pt;margin-top:10px">Documento gerado automaticamente pelo
+    MOBGOV a partir do arquivo <b>{esc(origem)}</b> em {esc(p["gerado_em"])}.
+    Os valores podem ser reproduzidos executando novamente o motor de
+    dimensionamento com as mesmas premissas.</p>
+    <p style="font-size:11pt;margin-top:24px">Responsável pela conferência:
+    ______________________________________  Data: ____/____/______</p>
+  </div>
+
+  <footer>
+    <span>MOBGOV · plataforma de roteirização e dimensionamento de frota para
+    governos — módulo de transporte escolar</span>
+    <span>Fonte dos dados: {esc(origem)}</span>
+  </footer>
+</div>
+<script>{js}</script>
+</body>
+</html>
+"""
+
+
+def montar_html(caminho_relatorio: str = economia_mod.RELATORIO_PADRAO,
+                diesel: float = None, dias: int = None,
+                caminho_serie: str = None):
+    """Devolve (html, painel) — usado pelo gerador de arquivo e pelo servidor."""
+    rel = economia_mod.carregar_relatorio(caminho_relatorio)
+    premissas = economia_mod.premissas_do_relatorio(rel).substituir(
+        preco_diesel_l=diesel, dias_letivos_mes=dias)
+    p = economia_mod.montar_painel(rel, premissas)
+    serie = aprendizado_mod.carregar_serie(
+        caminho_serie or aprendizado_mod.SERIE_PADRAO)
+    html = renderizar(p, serie, rel["frota_otimizada"]["rotas"],
+                      os.path.basename(caminho_relatorio))
+    return html, p
+
+
+def gerar(caminho_relatorio: str = economia_mod.RELATORIO_PADRAO,
+          saida: str = SAIDA_PADRAO, diesel: float = None,
+          dias: int = None, caminho_serie: str = None) -> str:
+    html, _ = montar_html(caminho_relatorio, diesel, dias, caminho_serie)
+    os.makedirs(os.path.dirname(os.path.abspath(saida)), exist_ok=True)
+    with open(saida, "w", encoding="utf-8") as f:
+        f.write(html)
+    return saida
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Gera o painel de economia do MOBGOV")
+    ap.add_argument("--relatorio", default=economia_mod.RELATORIO_PADRAO,
+                    help="JSON produzido por motor/dimensionar.py")
+    ap.add_argument("--saida", default=SAIDA_PADRAO, help="arquivo HTML de saída")
+    ap.add_argument("--diesel", type=float, default=None,
+                    help="preço do diesel por litro (padrão: o do relatório)")
+    ap.add_argument("--dias", type=int, default=None,
+                    help="dias letivos no mês (padrão: o do relatório)")
+    ap.add_argument("--aprendizado", default=None,
+                    help="JSON da série de aprendizado (padrão: relatorios/aprendizado.json)")
+    a = ap.parse_args()
+    html, p = montar_html(a.relatorio, a.diesel, a.dias, a.aprendizado)
+    os.makedirs(os.path.dirname(os.path.abspath(a.saida)), exist_ok=True)
+    with open(a.saida, "w", encoding="utf-8") as f:
+        f.write(html)
+    e = p["economia"]
+    print(f"Painel gerado: {a.saida}")
+    print(f"  {p['atual']['total_veiculos']} → {p['otimizada']['total_veiculos']} veículos "
+          f"({pct(e['reducao_frota_pct'])}) · {reais(e['custo_mes'])}/mês · "
+          f"{reais(e['custo_ano'])}/ano")
+
+
+if __name__ == "__main__":
+    main()
