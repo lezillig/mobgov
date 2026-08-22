@@ -139,6 +139,20 @@ h3{font-size:16px}
 .lista .conta{font-size:12.5px;color:var(--tinta-2);flex:0 0 100%}
 .lista input[type=search]{flex:1;border:1px solid var(--linha);border-radius:8px;
   padding:9px 11px;background:var(--superficie-2)}
+.abas{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;
+  border-bottom:1px solid var(--linha);background:var(--superficie-2)}
+.abas .titulo-abas{flex:0 0 100%;font-size:11.5px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-2)}
+.abas .aba{display:inline-flex;align-items:center;gap:6px;background:var(--superficie);
+  border:1px solid var(--linha);border-radius:999px;padding:5px 11px;
+  font-size:13px;cursor:pointer;color:var(--tinta-2);text-align:left}
+.abas .aba small{background:var(--superficie-2);border-radius:999px;
+  padding:0 6px;font-size:11.5px}
+.abas .aba:hover{color:var(--tinta)}
+.abas .aba[aria-selected="true"]{background:var(--marca);color:#fff;
+  border-color:var(--marca);font-weight:600}
+.abas .aba[aria-selected="true"] small{background:rgba(255,255,255,.22);color:#fff}
+.lista .marca-contrato{margin-top:4px;font-size:12px;color:var(--tinta-2)}
 .lista .itens{max-height:520px;overflow:auto}
 .lista button.item{display:block;width:100%;text-align:left;background:none;
   border:0;border-bottom:1px solid var(--linha);padding:13px 16px;cursor:pointer}
@@ -682,6 +696,7 @@ var DADOS = __DADOS__;
   /* -------------------------------------------------------------- operar */
   var rotaSelecionada = null;
   var filtro = "";
+  var contraparte = "";   /* id do cliente (empresa) ou do fornecedor (governo) */
   function telaOperar() {
     return '<h1>Operar</h1>'
       + '<p class="chamada">O dia como ele está: as rotas no mapa, os avisos '
@@ -690,35 +705,64 @@ var DADOS = __DADOS__;
       + '<div>' + listaDeRotas() + '</div>'
       + '<div><div id="area-mapa">' + desenharMapa(mapaPadrao())
       + '</div>' + resumoDoDia() + '</div></div>'
+      + secaoContratos()
       + secaoPessoas();
   }
 
-  /* Mapa nunca abre vazio: sem rota escolhida, mostra as três primeiras —
-     um mapa só de pontinhos não diz nada a quem despacha. */
+  /* Mapa nunca abre vazio: sem rota escolhida, mostra as primeiras do filtro
+     em vigor — um mapa só de pontinhos não diz nada a quem despacha, e um
+     mapa que ignora o contrato escolhido diz a coisa errada. */
   function mapaPadrao() {
     if (rotaSelecionada) { return [rotaSelecionada]; }
-    return (DADOS.mapa.viagens || []).slice(0, 3);
+    return rotasVisiveis().slice(0, 3);
+  }
+
+  /* Rotas visíveis: o texto digitado E o contrato escolhido. Quem despacha
+     pergunta "o que está rodando para o cliente X hoje" antes de perguntar
+     qualquer outra coisa. */
+  function rotasVisiveis() {
+    return (DADOS.mapa.viagens || []).filter(function (v) {
+      if (contraparte && v.contraparte_id !== contraparte) { return false; }
+      if (!filtro) { return true; }
+      var alvo = (v.id + " " + v.destino + " " + v.turno + " "
+        + (v.veiculo || "") + " " + (v.contraparte || "") + " "
+        + (v.paradas || []).join(" ")).toLowerCase();
+      return alvo.indexOf(filtro.toLowerCase()) >= 0;
+    });
+  }
+
+  function abasDeContrato() {
+    var c = (DADOS.operar || {}).contratos || {};
+    if (!(c.itens || []).length) { return ""; }
+    var todas = '<button class="aba" data-contraparte="" aria-selected="'
+      + (!contraparte) + '">Todos<small>'
+      + num((DADOS.mapa.viagens || []).length) + '</small></button>';
+    return '<div class="abas" role="group" aria-label="Filtrar por '
+      + esc(c.rotulo) + '"><span class="titulo-abas">'
+      + maiuscula(c.rotulo) + '</span>' + todas
+      + c.itens.map(function (i) {
+          return '<button class="aba" data-contraparte="' + esc(i.id) + '" '
+            + 'aria-selected="' + (contraparte === i.id) + '">'
+            + esc(i.nome) + '<small>' + num(i.rotas) + '</small></button>';
+        }).join("") + '</div>';
   }
 
   function listaDeRotas() {
-    var viagens = (DADOS.mapa.viagens || []).filter(function (v) {
-      if (!filtro) { return true; }
-      var alvo = (v.id + " " + v.destino + " " + v.turno + " "
-        + (v.veiculo || "") + " " + (v.paradas || []).join(" ")).toLowerCase();
-      return alvo.indexOf(filtro.toLowerCase()) >= 0;
-    });
+    var viagens = rotasVisiveis();
     var itens = viagens.slice(0, 60).map(function (v) {
       return '<button class="item" data-viagem="' + esc(v.id) + '" '
         + 'aria-selected="' + (rotaSelecionada && rotaSelecionada.id === v.id)
         + '"><div class="titulo">' + esc(v.id) + '</div>'
         + '<div class="meta">' + esc(v.destino) + ' · ' + esc(v.turno) + ' · '
         + num(v.passageiros) + ' pessoas · ' + num(v.km, 1) + ' km</div>'
+        + (v.contraparte ? '<div class="marca-contrato">'
+            + esc(v.contraparte) + '</div>' : "")
         + '</button>';
-    }).join("") || '<div class="vazio">Nenhuma rota com “' + esc(filtro)
-      + '”.</div>';
+    }).join("") || '<div class="vazio">Nenhuma rota' + (filtro
+      ? ' com “' + esc(filtro) + '”' : "") + ' neste filtro.</div>';
 
     var total = (DADOS.mapa.viagens || []).length;
-    var conta = filtro
+    var conta = (filtro || contraparte)
       ? viagens.length + " de " + total + " rotas"
       : total + " rotas hoje";
     return '<div class="lista" style="margin-bottom:16px"><header>'
@@ -726,7 +770,40 @@ var DADOS = __DADOS__;
       + 'value="' + esc(filtro) + '" aria-label="Filtrar rotas">'
       + '<span class="conta">' + conta
       + (viagens.length > 60 ? " · rolando as 60 primeiras" : "")
-      + '</span></header><div class="itens">' + itens + '</div></div>';
+      + '</span></header>' + abasDeContrato()
+      + '<div class="itens">' + itens + '</div></div>';
+  }
+
+  /* O contrato como número, não só como filtro: quantas rotas, quanta gente
+     e quantas escalas de veículo cada um consome. */
+  function secaoContratos() {
+    var c = (DADOS.operar || {}).contratos || {};
+    if (!(c.itens || []).length) { return ""; }
+    var linhas = c.itens.map(function (i) {
+      return '<tr><td><b>' + esc(i.nome) + '</b>'
+        + '<div class="apoio" style="color:var(--tinta-2);font-size:13px">'
+        + esc(i.destinos.join(" · ")) + '</div></td>'
+        + '<td class="num">' + num(i.rotas) + '</td>'
+        + '<td class="num">' + num(i.passageiros) + '</td>'
+        + '<td class="num">' + num(i.escalas_de_veiculo) + '</td>'
+        + '<td class="num">' + num(i.km, 1) + '</td></tr>';
+    }).join("");
+    return '<section class="secao"><header>'
+      + '<h2>Por ' + esc(c.rotulo) + '</h2>' + selo(DADOS.resumo.selo)
+      + '</header>'
+      + '<div class="rolagem"><table><thead><tr>'
+      + '<th>' + maiuscula(c.rotulo) + '</th><th class="num">Rotas</th>'
+      + '<th class="num">' + maiuscula(DADOS.operacao.passageiros) + '</th>'
+      + '<th class="num">Escalas de veículo</th><th class="num">km/dia</th>'
+      + '</tr></thead><tbody>' + linhas + '</tbody></table></div>'
+      + (c.veiculo_em_mais_de_um
+          ? '<div class="aviso" style="margin-top:10px">O mesmo veículo '
+            + 'atende mais de um contrato ao longo do dia: a coluna de '
+            + 'escalas não soma para a frota, que é ' + num(DADOS.resumo.veiculos)
+            + ' ' + (DADOS.resumo.veiculos === 1 ? "veículo" : "veículos")
+            + '.</div>'
+          : "")
+      + '</section>';
   }
 
   function resumoDoDia() {
@@ -839,6 +916,10 @@ var DADOS = __DADOS__;
   }
 
   /* ------------------------------------------------------------- gaveta */
+  function rotuloContraparte() {
+    return ((DADOS.operar || {}).contratos || {}).rotulo || "contrato";
+  }
+
   function abrirGaveta(viagem) {
     var gaveta = document.getElementById("gaveta");
     var paradas = (viagem.paradas || []).map(function (p, i) {
@@ -846,6 +927,9 @@ var DADOS = __DADOS__;
     }).join("");
     gaveta.innerHTML = '<header><div><h2>' + esc(viagem.id) + '</h2>'
       + '<p class="chamada">' + esc(viagem.destino) + ' · ' + esc(viagem.turno)
+      + (viagem.contraparte
+          ? ' · ' + esc(rotuloContraparte()) + ': ' + esc(viagem.contraparte)
+          : "")
       + '</p></div><button class="fechar" aria-label="Fechar">×</button></header>'
       + '<div class="grade n2">'
       + numeroCartao("Pessoas", num(viagem.passageiros),
@@ -918,33 +1002,45 @@ var DADOS = __DADOS__;
         });
       });
     }
-    if (destino === "operar") {
-      var filtroCampo = document.getElementById("filtro-rotas");
-      if (filtroCampo) {
-        filtroCampo.addEventListener("input", function () {
-          filtro = filtroCampo.value;
-          var lista = document.querySelector(".lista");
-          lista.outerHTML = listaDeRotas();
-          ligarEventos("operar");
-          var novo = document.getElementById("filtro-rotas");
-          novo.focus();
-          novo.setSelectionRange(novo.value.length, novo.value.length);
-        });
-      }
-      document.querySelectorAll("[data-viagem]").forEach(function (b) {
-        b.addEventListener("click", function () {
-          rotaSelecionada = (DADOS.mapa.viagens || []).filter(function (v) {
-            return v.id === b.dataset.viagem;
-          })[0];
-          document.getElementById("area-mapa").innerHTML =
-            desenharMapa([rotaSelecionada]);
-          document.querySelectorAll("[data-viagem]").forEach(function (o) {
-            o.setAttribute("aria-selected", o === b);
-          });
-          abrirGaveta(rotaSelecionada);
-        });
+    if (destino === "operar") { ligarLista(); }
+  }
+
+  /* Só o que está dentro da lista — ela é redesenhada a cada tecla do filtro,
+     e religar a tela inteira aqui deixaria dois ouvintes no mesmo botão. */
+  function ligarLista() {
+    var lista = document.querySelector(".lista");
+    if (!lista) { return; }
+    var filtroCampo = lista.querySelector("#filtro-rotas");
+    if (filtroCampo) {
+      filtroCampo.addEventListener("input", function () {
+        filtro = filtroCampo.value;
+        lista.outerHTML = listaDeRotas();
+        ligarLista();
+        var novo = document.getElementById("filtro-rotas");
+        novo.focus();
+        novo.setSelectionRange(novo.value.length, novo.value.length);
       });
     }
+    lista.querySelectorAll("[data-contraparte]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        contraparte = b.dataset.contraparte;
+        rotaSelecionada = null;
+        pintar();
+      });
+    });
+    lista.querySelectorAll("[data-viagem]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        rotaSelecionada = (DADOS.mapa.viagens || []).filter(function (v) {
+          return v.id === b.dataset.viagem;
+        })[0];
+        document.getElementById("area-mapa").innerHTML =
+          desenharMapa([rotaSelecionada]);
+        lista.querySelectorAll("[data-viagem]").forEach(function (o) {
+          o.setAttribute("aria-selected", o === b);
+        });
+        abrirGaveta(rotaSelecionada);
+      });
+    });
   }
 
   /* ------------------------------------------------------------- contexto */

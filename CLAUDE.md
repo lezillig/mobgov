@@ -213,6 +213,14 @@ python -m unittest discover -s testes -v
   fretamento.
 - **Número que o sistema duvida não aparece limpo.** Se `coerencia` traz aviso
   sobre a base de comparação, o cartão de economia diz isso ao lado do número.
+- **Contraparte é um campo só, com rótulo dos dois lados.** `Contraparte` em
+  `dados/perfis.py` é o FORNECEDOR do lote quando quem usa é a prefeitura, e o
+  CLIENTE dono da planta quando quem usa é a transportadora. O vínculo é com o
+  **destino** (é assim que os dois contratos são escritos) e a atribuição é da
+  **viagem**, nunca do veículo — o mesmo carro serve contratos diferentes no
+  mesmo dia, e por isso a coluna de escalas por contrato não soma para a frota.
+  Casa por id **ou** por nome do destino: plano vindo de planilha renumera os
+  destinos (E1, E2, E3) e só preserva o nome da coluna.
 - **Teste antes de commitar.** As fórmulas, a coerência dos indicadores e a meta
   de ≥20% de redução de frota são cobertas por testes; se a economia cair abaixo
   disso, a suíte quebra de propósito.

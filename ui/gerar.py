@@ -25,6 +25,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from comercial import diagnostico as diagnostico_mod  # noqa: E402
+from dados import perfis as perfis_mod  # noqa: E402
 from comercial import operacao_atual as operacao_mod  # noqa: E402
 from comercial import precificacao as precificacao_mod  # noqa: E402
 from comercial.precificacao import Premissas  # noqa: E402
@@ -67,6 +68,83 @@ def _selo(origem: str) -> dict:
         "simulado": {"rotulo": "simulado", "explicacao":
                      "dado de demonstração — nenhuma pessoa real"},
     }.get(origem, {"rotulo": origem, "explicacao": ""})
+
+
+def _contrato(perfil: dict) -> dict:
+    """Quem responde por cada destino, e como chamar isso na tela.
+
+    O plano guarda o perfil inteiro, então o normal é o contrato vir dele.
+    Planos gravados antes deste campo existir caem no catálogo de perfis
+    embutidos — pelo id do perfil, nunca por adivinhação de nome.
+    """
+    contrapartes = perfil.get("contrapartes")
+    rotulo = perfil.get("rotulo_contraparte")
+    if contrapartes is None:
+        # plano sem perfil é escolar — é o padrão histórico do sistema
+        embutido = perfis_mod.EMBUTIDOS.get(perfil.get("id"),
+                                            perfis_mod.PERFIL_ESCOLAR)
+        contrapartes = [{"id": c.id, "nome": c.nome, "destinos": c.destinos}
+                        for c in embutido.contrapartes]
+        rotulo = rotulo or embutido.rotulo_contraparte
+    if not contrapartes:
+        return {}
+    # Plano vindo de planilha numera os destinos na ordem em que aparecem
+    # (E1, E2, E3) e guarda o nome da coluna — o id do perfil não sobrevive à
+    # importação. Por isso o contrato casa por id OU por nome.
+    por_destino = {}
+    for c in contrapartes:
+        for destino in c["destinos"]:
+            por_destino[_chave(destino)] = c
+    return {"rotulo": rotulo or "fornecedor", "por_destino": por_destino,
+            "contrapartes": contrapartes}
+
+
+def _chave(texto: str) -> str:
+    return " ".join(str(texto or "").split()).casefold()
+
+
+def _por_contrato(viagens: list, contrato: dict) -> dict:
+    """Resumo por contraparte, com as duas ressalvas que ele exige.
+
+    1. veículo que serve dois contratos aparece nos dois: a coluna NÃO soma
+       para a frota;
+    2. o que se conta aqui é ESCALA de veículo (o mesmo carro na manhã e na
+       tarde são duas), não veículo — a frota é o pior turno, não a soma.
+
+    As duas são ditas na tela, em vez de virarem número que parece certo.
+    """
+    if not contrato:
+        return {}
+    linhas = {}
+    for v in viagens:
+        chave = v.get("contraparte_id")
+        if not chave:
+            continue
+        linha = linhas.setdefault(chave, {
+            "id": chave, "nome": v.get("contraparte"), "rotas": 0,
+            "passageiros": 0, "km": 0.0, "veiculos": set(),
+            "destinos": set()})
+        linha["rotas"] += 1
+        linha["passageiros"] += v.get("passageiros") or 0
+        linha["km"] += v.get("km") or 0.0
+        if v.get("veiculo"):
+            linha["veiculos"].add(v["veiculo"])
+        if v.get("destino"):
+            linha["destinos"].add(v["destino"])
+    frota = {v["veiculo"] for v in viagens if v.get("veiculo")}
+    itens = [{"id": ln["id"], "nome": ln["nome"], "rotas": ln["rotas"],
+              "passageiros": ln["passageiros"], "km": round(ln["km"], 1),
+              "escalas_de_veiculo": len(ln["veiculos"]),
+              "destinos": sorted(ln["destinos"])}
+             for ln in sorted(linhas.values(),
+                              key=lambda x: -x["passageiros"])]
+    return {
+        "rotulo": contrato["rotulo"],
+        "itens": itens,
+        "escalas_de_veiculo": len(frota),
+        "veiculo_em_mais_de_um": (
+            sum(i["escalas_de_veiculo"] for i in itens) > len(frota)),
+    }
 
 
 def _na_lingua(texto: str, perfil: dict) -> str:
@@ -237,11 +315,37 @@ def montar(caminho_plano: str = None, com_comercial: bool = True,
     # (Spare, RideCo). Vai o desenho, não a tabela — a tabela fica ao lado.
     geografia = plano.get("geografia") or {}
     viagens = (plano.get("frota_otimizada") or {}).get("viagens", [])
+    # Quem responde pelo destino: fornecedor do lote (prefeitura) ou cliente
+    # dono da planta (transportadora). Vai por viagem, nunca por veículo — o
+    # mesmo carro pode servir contratos diferentes no mesmo dia.
+    contrato = _contrato(perfil)
+    por_destino = contrato.get("por_destino", {})
+
+    def _parte(destino_id, nome=None):
+        return (por_destino.get(_chave(destino_id))
+                or por_destino.get(_chave(nome)) or {})
+
+    nome_do_destino = {d.get("id"): d.get("nome")
+                       for d in geografia.get("escolas", [])}
+
     mapa = {
-        "destinos": geografia.get("escolas", []),
+        "destinos": [dict(d,
+                          contraparte=_parte(d.get("id"),
+                                             d.get("nome")).get("nome"),
+                          contraparte_id=_parte(d.get("id"),
+                                                d.get("nome")).get("id"))
+                     for d in geografia.get("escolas", [])],
         "pontos": geografia.get("pontos", {}),
         "viagens": [{"id": v["id"], "destino": v.get("escola"),
                      "destino_id": v.get("escola_id"),
+                     "contraparte": _parte(
+                         v.get("escola_id"),
+                         v.get("escola") or nome_do_destino.get(
+                             v.get("escola_id"))).get("nome"),
+                     "contraparte_id": _parte(
+                         v.get("escola_id"),
+                         v.get("escola") or nome_do_destino.get(
+                             v.get("escola_id"))).get("id"),
                      "turno": v.get("turno_nome"), "veiculo": v.get("veiculo"),
                      "paradas": v.get("paradas", []),
                      "passageiros": v.get("alunos"),
@@ -325,6 +429,7 @@ def montar(caminho_plano: str = None, com_comercial: bool = True,
                           "jornada": v["min_turno"]}
                          for v in veiculos[:18]],
             "equipe": equipe,
+            "contratos": _por_contrato(mapa["viagens"], contrato),
             "elegibilidade": elegibilidade,
             "aprendizado": {
                 "erro_inicial": (aprendizado or {}).get("semanas", [{}])[0]

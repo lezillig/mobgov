@@ -152,6 +152,69 @@ class TestFretamento(unittest.TestCase):
         self.assertTrue((vender["diagnostico"] or {}).get("achados"))
 
 
+class TestContrato(unittest.TestCase):
+    """Filtro por cliente (empresa) e por fornecedor (governo).
+
+    É a mesma relação vista dos dois lados; o que muda é o rótulo e quem
+    está do outro lado do contrato.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.escolar = ui.montar()
+        caminho = os.path.join(ui.DIR_RELATORIOS, "plano-fretamento.json")
+        cls.empresa = ui.montar(caminho) if os.path.exists(caminho) else None
+
+    def test_prefeitura_filtra_por_fornecedor(self):
+        self.assertEqual(self.escolar["operar"]["contratos"]["rotulo"],
+                         "fornecedor")
+
+    def test_empresa_filtra_por_cliente(self):
+        if not self.empresa:
+            self.skipTest("sem plano de fretamento gerado")
+        self.assertEqual(self.empresa["operar"]["contratos"]["rotulo"],
+                         "cliente")
+
+    def test_toda_rota_tem_dono(self):
+        """Rota sem contraparte cai fora do filtro e some da tela."""
+        for dados in filter(None, (self.escolar, self.empresa)):
+            for viagem in dados["mapa"]["viagens"]:
+                self.assertTrue(viagem["contraparte_id"], viagem["id"])
+
+    def test_as_rotas_do_contrato_somam_o_total(self):
+        for dados in filter(None, (self.escolar, self.empresa)):
+            contratos = dados["operar"]["contratos"]
+            soma = sum(i["rotas"] for i in contratos["itens"])
+            self.assertEqual(soma, len(dados["mapa"]["viagens"]))
+
+    def test_casa_pelo_nome_quando_a_planilha_renumerou_o_destino(self):
+        """Plano importado numera E1, E2, E3 — o id do perfil não sobrevive.
+
+        Sem o casamento por nome, a operação de fretamento ficaria sem
+        cliente nenhum e o filtro sumiria da tela.
+        """
+        if not self.empresa:
+            self.skipTest("sem plano de fretamento gerado")
+        ids = {d["id"] for d in self.empresa["mapa"]["destinos"]}
+        self.assertTrue(ids and not ids & {"PL1", "PL2", "PL3"})
+        self.assertTrue(all(d["contraparte"]
+                            for d in self.empresa["mapa"]["destinos"]))
+
+    def test_escala_de_veiculo_nao_soma_para_a_frota(self):
+        """A armadilha do projeto, agora numa coluna nova."""
+        contratos = self.escolar["operar"]["contratos"]
+        soma = sum(i["escalas_de_veiculo"] for i in contratos["itens"])
+        if soma > contratos["escalas_de_veiculo"]:
+            self.assertTrue(contratos["veiculo_em_mais_de_um"])
+        self.assertGreaterEqual(contratos["escalas_de_veiculo"],
+                                self.escolar["resumo"]["veiculos"])
+
+    def test_operacao_sem_contrato_declarado_nao_ganha_nome_inventado(self):
+        perfil = {"id": "cliente-x", "vertical": "fretamento",
+                  "contrapartes": []}
+        self.assertEqual(ui._contrato(perfil), {})
+
+
 class TestHtmlGerado(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

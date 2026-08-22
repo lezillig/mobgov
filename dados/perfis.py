@@ -64,6 +64,28 @@ class RegrasDeJornada:
 
 
 @dataclass
+class Contraparte:
+    """Quem está do outro lado do contrato daquele destino.
+
+    É a mesma relação vista dos dois lados, por isso é um campo só:
+
+        escolar      quem usa é a PREFEITURA, que contrata — a contraparte é o
+                     FORNECEDOR que opera o lote (a viação vencedora);
+        fretamento   quem usa é a TRANSPORTADORA, que é contratada — a
+                     contraparte é o CLIENTE dono da planta.
+
+    O vínculo é pelo destino porque é assim que os dois contratos são
+    escritos: lote de escolas no edital da prefeitura, planta (ou conjunto de
+    plantas) no contrato de fretamento. Um veículo pode servir contrapartes
+    diferentes ao longo do dia — por isso a atribuição é da viagem, nunca do
+    veículo.
+    """
+    id: str
+    nome: str
+    destinos: list                         # ids de destino sob este contrato
+
+
+@dataclass
 class Perfil:
     """Uma operação inteira descrita como dado."""
     id: str
@@ -76,6 +98,9 @@ class Perfil:
     rotulo_passageiro_plural: str = "alunos"
     rotulo_destino: str = "escola"
     rotulo_destino_plural: str = "escolas"
+    rotulo_contraparte: str = "fornecedor"
+    rotulo_contraparte_plural: str = "fornecedores"
+    contrapartes: list = field(default_factory=list)
     tempo_max_trajeto_min: int = 75
     dias_operacao_mes: int = 22
     custo_motorista_mes: float = 0.0       # 0 = já embutido no custo do veículo
@@ -88,6 +113,12 @@ class Perfil:
     def turno_por_id(self, ident: str):
         return next((t for t in self.turnos if t.id == ident), None)
 
+    def contraparte_do_destino(self, destino_id: str):
+        """Quem responde pelo destino — None quando o contrato não foi
+        declarado, e aí a tela simplesmente não oferece o filtro."""
+        return next((c for c in self.contrapartes
+                     if destino_id in c.destinos), None)
+
     def como_dicionario(self) -> dict:
         return {
             "id": self.id, "nome": self.nome, "vertical": self.vertical,
@@ -95,6 +126,11 @@ class Perfil:
             "rotulo_passageiro_plural": self.rotulo_passageiro_plural,
             "rotulo_destino": self.rotulo_destino,
             "rotulo_destino_plural": self.rotulo_destino_plural,
+            "rotulo_contraparte": self.rotulo_contraparte,
+            "rotulo_contraparte_plural": self.rotulo_contraparte_plural,
+            "contrapartes": [{"id": c.id, "nome": c.nome,
+                              "destinos": list(c.destinos)}
+                             for c in self.contrapartes],
             "tempo_max_trajeto_min": self.tempo_max_trajeto_min,
             "dias_operacao_mes": self.dias_operacao_mes,
             "custo_motorista_mes": self.custo_motorista_mes,
@@ -117,11 +153,23 @@ class Perfil:
 
 
 # ------------------------------------------------------------------ escolar ---
+# Lotes do edital: é assim que a prefeitura divide o contrato — por região,
+# cada lote com uma empresa vencedora. Nomes fictícios, como todo o Município
+# Modelo. Numa prefeitura real isso vem do resultado da licitação.
+FORNECEDORES = [
+    Contraparte("F1", "Viação São Cristóvão", ["E1", "EMEF Centro"]),
+    Contraparte("F2", "Trans Norte Transportes", ["E2", "EMEF Distrito Norte"]),
+    Contraparte("F3", "Rota Rural Ltda.", ["E3", "EMEF Vila Rural Sul"]),
+]
+
 PERFIL_ESCOLAR = Perfil(
     id="escolar", nome="Transporte escolar municipal", vertical="escolar",
     turnos=TURNOS, destinos=ESCOLAS, tipos_veiculo=TIPOS_VEICULO,
     rotulo_passageiro="aluno", rotulo_passageiro_plural="alunos",
     rotulo_destino="escola", rotulo_destino_plural="escolas",
+    # a prefeitura contrata: do outro lado está o fornecedor do lote
+    rotulo_contraparte="fornecedor", rotulo_contraparte_plural="fornecedores",
+    contrapartes=FORNECEDORES,
     tempo_max_trajeto_min=75, dias_operacao_mes=22,
     # no escolar o custo do motorista já vem dentro do custo fixo do veículo,
     # que é como a prefeitura contrata (veículo com motorista)
@@ -150,11 +198,25 @@ TIPOS_FRETAMENTO = [
     TipoVeiculo("VANPCD", "Van acessível 12 lugares", 12, 2, 1.95, 5600.0, 7.8),
 ]
 
-# Plantas de um cliente industrial fictício — o equivalente às escolas.
+# Plantas atendidas pela transportadora — o equivalente às escolas.
 PLANTAS = [
     Escola("PL1", "Planta 1 — Fábrica", -21.140, -47.790),
     Escola("PL2", "Planta 2 — Centro de distribuição", -21.205, -47.845),
     Escola("PL3", "Escritório administrativo", -21.158, -47.802),
+]
+
+# Quem usa o sistema aqui é a transportadora, e ela atende mais de um
+# contratante — por isso a planta pertence a um cliente, e não o contrário.
+# Nomes fictícios; numa operação real vêm do cadastro de clientes.
+# O destino é listado por id E por nome de propósito: plano vindo de planilha
+# renumera os destinos na ordem em que aparecem e só preserva o nome da
+# coluna — o id do perfil não sobrevive à importação.
+CLIENTES = [
+    Contraparte("C1", "Indústria Modelo S.A.",
+                ["PL1", "PL2", "Planta 1 — Fábrica",
+                 "Planta 2 — Centro de distribuição"]),
+    Contraparte("C2", "Modelo Serviços Ltda.",
+                ["PL3", "Escritório administrativo"]),
 ]
 
 PERFIL_FRETAMENTO = Perfil(
@@ -162,6 +224,9 @@ PERFIL_FRETAMENTO = Perfil(
     turnos=TURNOS_FRETAMENTO, destinos=PLANTAS, tipos_veiculo=TIPOS_FRETAMENTO,
     rotulo_passageiro="colaborador", rotulo_passageiro_plural="colaboradores",
     rotulo_destino="planta", rotulo_destino_plural="plantas",
+    # a transportadora é contratada: do outro lado está o cliente
+    rotulo_contraparte="cliente", rotulo_contraparte_plural="clientes",
+    contrapartes=CLIENTES,
     # colaborador aceita trajeto maior que criança, e o contrato costuma
     # fixar 90 min como teto de porta a porta
     tempo_max_trajeto_min=90, dias_operacao_mes=22,
@@ -188,6 +253,14 @@ def de_dicionario(dados: dict) -> Perfil:
     regras = RegrasDeJornada(**{k: v for k, v in
                                 (dados.get("regras_jornada") or {}).items()
                                 if k in RegrasDeJornada.__dataclass_fields__})
+    # Contrato é dado do cliente: se ele declarar os lotes (ou a carteira de
+    # clientes), vale o dele; senão fica sem, e a tela não oferece o filtro —
+    # em vez de herdar contraparte de demonstração, que seria nome inventado
+    # em cima de operação real.
+    contrapartes = [Contraparte(c["id"], c["nome"], list(c.get("destinos", [])))
+                    for c in dados.get("contrapartes", [])]
+    if "contrapartes" not in dados and destinos is base.destinos:
+        contrapartes = base.contrapartes
     return Perfil(
         id=dados.get("id", base.id), nome=dados.get("nome", base.nome),
         vertical=dados.get("vertical", base.vertical),
@@ -199,6 +272,11 @@ def de_dicionario(dados: dict) -> Perfil:
         rotulo_destino=dados.get("rotulo_destino", base.rotulo_destino),
         rotulo_destino_plural=dados.get("rotulo_destino_plural",
                                         base.rotulo_destino_plural),
+        rotulo_contraparte=dados.get("rotulo_contraparte",
+                                     base.rotulo_contraparte),
+        rotulo_contraparte_plural=dados.get("rotulo_contraparte_plural",
+                                            base.rotulo_contraparte_plural),
+        contrapartes=contrapartes,
         tempo_max_trajeto_min=dados.get("tempo_max_trajeto_min",
                                         base.tempo_max_trajeto_min),
         dias_operacao_mes=dados.get("dias_operacao_mes",
