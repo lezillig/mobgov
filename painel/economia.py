@@ -255,7 +255,7 @@ def qualidade_do_servico(rel: dict, otimizada: dict) -> dict:
         "viagens": len(viagens),
         "viagens_por_veiculo_turno": rel["frota_otimizada"].get(
             "viagens_por_veiculo_turno"),
-        "viagens_por_veiculo_atual": rel["frota_atual"].get(
+        "viagens_por_veiculo_atual": (rel.get("frota_atual") or {}).get(
             "viagens_por_veiculo_turno"),
         "ocupacao_media_pct": round(sum(ocupacoes) / len(ocupacoes), 1),
         "ocupacao_min_pct": min(ocupacoes),
@@ -321,16 +321,33 @@ def memoria_de_calculo(atual: dict, otimizada: dict, premissas: Premissas,
 
 # --------------------------------------------------------------- cenários ---
 def _economia_com(rel: dict, premissas: Premissas) -> dict:
+    """A conta do 'antes vs depois' — e o caso em que não existe 'antes'.
+
+    Plano vindo de planilha sai SEM frota atual quando o município não
+    informou a dele: o motor se recusa a estimar (ver `permitir_estimativa`),
+    porque comparar com uma frota inventada produz economia que não existe.
+    Aqui isso é estado previsto, não erro — o painel mostra a frota
+    necessária e diz que a comparação não existe.
+    """
     tipos = rel["premissas"]["custos_por_tipo"]
-    atual = avaliar_frota(
-        "Frota atual", rel["frota_atual"]["composicao"],
-        _km_rateado(rel["frota_atual"]["composicao"],
-                    rel["frota_atual"]["km_dia"]),
-        tipos, premissas)
     otim = avaliar_frota(
         "Frota necessária", rel["frota_otimizada"]["composicao"],
         _km_por_tipo_dos_veiculos(rel["frota_otimizada"]["veiculos"],
                                   premissas.viagens_por_rota),
+        tipos, premissas)
+
+    frota_atual = rel.get("frota_atual")
+    if not frota_atual or not frota_atual.get("composicao"):
+        return {"atual": None, "otimizada": otim, "economia": None,
+                "comparacao_indisponivel": rel.get(
+                    "comparacao_indisponivel",
+                    "A frota atual não foi informada, então não há 'antes' "
+                    "para comparar. Informe a composição e a quilometragem "
+                    "de hoje para o sistema calcular a economia.")}
+
+    atual = avaliar_frota(
+        "Frota atual", frota_atual["composicao"],
+        _km_rateado(frota_atual["composicao"], frota_atual["km_dia"]),
         tipos, premissas)
     return {"atual": atual, "otimizada": otim, "economia": comparar(atual, otim)}
 
@@ -353,16 +370,20 @@ def grade_de_cenarios(rel: dict, premissas: Premissas,
         for d in dias:
             p = premissas.substituir(preco_diesel_l=preco, dias_letivos_mes=d)
             r = _economia_com(rel, p)
+            # sem frota atual informada o cenário existe do mesmo jeito: o
+            # custo do plano muda com diesel e dias letivos, e é isso que a
+            # secretaria precisa comparar. O que não existe é a economia.
             cenarios.append({
                 "preco_diesel_l": preco,
                 "dias_letivos_mes": d,
                 "padrao": (preco == premissas.preco_diesel_l
                            and d == premissas.dias_letivos_mes),
-                "custo_atual_mes": r["atual"]["custo_mes"],
+                "custo_atual_mes": (r["atual"] or {}).get("custo_mes"),
                 "custo_otimizado_mes": r["otimizada"]["custo_mes"],
-                "economia_mes": r["economia"]["custo_mes"],
-                "economia_ano": r["economia"]["custo_ano"],
-                "reducao_custo_pct": r["economia"]["reducao_custo_pct"],
+                "economia_mes": (r["economia"] or {}).get("custo_mes"),
+                "economia_ano": (r["economia"] or {}).get("custo_ano"),
+                "reducao_custo_pct": (r["economia"] or {}).get(
+                    "reducao_custo_pct"),
             })
     return cenarios
 
@@ -381,12 +402,14 @@ def montar_painel(rel: dict, premissas: Premissas = None,
         "premissas": asdict(premissas),
         "demanda": rel["demanda"],
         "atual": r["atual"],
-        "atual_origem": rel["frota_atual"].get("como_foi_estimada"),
+        "atual_origem": (rel.get("frota_atual") or {}).get("como_foi_estimada"),
         "otimizada": r["otimizada"],
         "economia": r["economia"],
+        "comparacao_indisponivel": r.get("comparacao_indisponivel", ""),
         "qualidade": qualidade_do_servico(rel, r["otimizada"]),
-        "memoria_calculo": memoria_de_calculo(
-            r["atual"], r["otimizada"], premissas, tipos),
+        "memoria_calculo": (
+            memoria_de_calculo(r["atual"], r["otimizada"], premissas, tipos)
+            if r["atual"] else []),
     }
     if rel.get("geografia"):
         painel["geografia"] = rel["geografia"]

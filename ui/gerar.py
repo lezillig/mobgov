@@ -355,8 +355,8 @@ def _pendencias(plano, elegibilidade, importacao, equipe) -> list:
 
 # -------------------------------------------------------------- montagem ---
 def montar(caminho_plano: str = None, com_comercial: bool = True,
-           chave_atual: str = None) -> dict:
-    plano = economia_mod.carregar_relatorio(
+           chave_atual: str = None, plano: dict = None) -> dict:
+    plano = plano or economia_mod.carregar_relatorio(
         caminho_plano or economia_mod.RELATORIO_PADRAO)
     premissas = economia_mod.premissas_do_relatorio(plano)
     painel = economia_mod.montar_painel(plano, premissas, com_cenarios=False)
@@ -536,6 +536,98 @@ def montar(caminho_plano: str = None, com_comercial: bool = True,
         "ajustes": _ajustes(plano, perfil),
         "vender": comercial,
     }
+
+
+def montar_ao_vivo(importacao: dict = None, plano: dict = None,
+                   perfil: dict = None, rodando: bool = False,
+                   progresso: list = None, erro: str = "") -> dict:
+    """O payload do sistema servido pelo servidor de planejamento.
+
+    Enquanto não há plano roteirizado, a tela precisa existir mesmo assim —
+    é nela que a planilha é enviada e conferida. Sem isso a remodelagem teria
+    levado a arquitetura para o lugar certo e deixado a porta de entrada na
+    casa velha.
+    """
+    if plano:
+        dados = montar(plano=plano, com_comercial=False)
+    else:
+        dados = _payload_sem_plano(importacao, perfil)
+    dados["ao_vivo"] = True
+    dados["trabalho"] = {"rodando": rodando, "progresso": progresso or [],
+                         "erro": erro}
+    if importacao is not None:
+        dados["planejar"]["importacao"] = importacao.get("resumo", {})
+        dados["planejar"]["problemas"] = [
+            dict(x, problema=_na_lingua(x.get("problema"), perfil or {}),
+                 sugestao=_na_lingua(x.get("sugestao"), perfil or {}))
+            for x in (importacao.get("problemas") or [])[:60]]
+        dados["planejar"]["arquivo"] = importacao.get("arquivo")
+    return dados
+
+
+def _payload_sem_plano(importacao: dict, perfil: dict) -> dict:
+    """A mesma forma de sempre, com as seções que ainda não existem vazias.
+
+    Vazio aqui é estado legítimo, não erro: a operação acabou de começar.
+    Números inventados para "não deixar a tela feia" seriam bem piores.
+    """
+    perfil = perfil or {}
+    importacao = importacao or {}
+    resumo = importacao.get("resumo") or {}
+    pendencias = _pendencias({}, None, importacao, None)
+    if not importacao:
+        pendencias = [{
+            "urgencia": "alta", "destino": "planejar",
+            "titulo": "Nenhuma planilha foi enviada ainda",
+            "detalhe": "O sistema começa pela base da operação: a planilha "
+                       "que a secretaria já tem, do jeito que ela está. "
+                       "Coluna com nome estranho e endereço sem número são "
+                       "esperados — é para isso que existe a conferência.",
+            "quem_decide": "quem tem o arquivo",
+            "acao": "Enviar a planilha",
+        }]
+    return {
+        "gerado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "operacao": {
+            "nome": perfil.get("nome") or "Operação nova",
+            "vertical": perfil.get("vertical", "escolar"),
+            "passageiro": perfil.get("rotulo_passageiro", "aluno"),
+            "passageiros": perfil.get("rotulo_passageiro_plural", "alunos"),
+            "destino": perfil.get("rotulo_destino", "escola"),
+            "destinos": perfil.get("rotulo_destino_plural", "escolas"),
+        },
+        "operacoes": [],
+        "pendencias": pendencias,
+        "resumo": {"passageiros": resumo.get("alunos_importados"),
+                   "veiculos": None, "viagens": None, "motoristas": None,
+                   "economia_mes": None, "ocupacao_pct": None,
+                   "selo": _selo("planejado")},
+        "hoje": {"eventos": {}, "faltas": {}, "rodadas": {}, "politica": {},
+                 "selo": _selo("planejado"), "rota_exemplo": {}},
+        "planejar": {"importacao": resumo, "problemas": [], "agrupamento": {},
+                     "nao_atendida": {}, "coerencia": [], "frota": {},
+                     "frota_atual": None, "economia": None, "memoria": [],
+                     "por_turno": [], "arquivo": importacao.get("arquivo"),
+                     "origem": {}, "demanda": {}, "cenarios": [],
+                     "premissas": {}, "frota_por_tipo": []},
+        "mapa": {"destinos": [], "pontos": _pontos_da_importacao(importacao),
+                 "viagens": [], "pings": []},
+        "operar": {"veiculos": [], "equipe": None, "contratos": {},
+                   "elegibilidade": None, "aprendizado": {}},
+        "fiscalizar": None,
+        "saude": None,
+        "ajustes": _ajustes({}, perfil),
+        "vender": None,
+    }
+
+
+def _pontos_da_importacao(importacao: dict) -> dict:
+    """Os endereços já geocodificados, para o mapa não abrir em branco."""
+    pontos = {}
+    for aluno in (importacao.get("pontos") or importacao.get("alunos") or []):
+        if aluno.get("lat") is not None and aluno.get("lon") is not None:
+            pontos[aluno["id"]] = [aluno["lat"], aluno["lon"]]
+    return pontos
 
 
 def gerar(saida: str = SAIDA_PADRAO, caminho_plano: str = None,

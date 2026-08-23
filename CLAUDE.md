@@ -67,6 +67,8 @@ previu X, aconteceu Y, ajustou Z".
 | 11 | `ui/` — o sistema remodelado por momento de trabalho (Início · Planejar · Operar · Fiscalizar · Vender · Ajustes), descrito em `docs/ux-modelo.md` | ✅ pronto |
 | 12 | `fiscalizacao/` — medição do contrato: planejado × realizado, pagamento, glosa com evidência e boletim mensal por fornecedor | ✅ pronto |
 | 13 | `saude/` — transporte de pacientes: tratamento recorrente, prioridade clínica, volta sem hora, maca em viagem dedicada | ✅ pronto |
+| 14 | `saude/tfd.py` — TFD: fila justa, acompanhante por direito, espera no destino medida | ✅ pronto |
+| 14 | `GET /sistema` — a tela remodelada servida pelo servidor de planejamento: envia a planilha, roteiriza e publica de dentro dela | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -120,6 +122,7 @@ mobgov/                          (raiz deste repositório)
   saude/tratamento.py            a agenda que se repete: prioridade, volta, maca
   saude/demanda.py               pacientes sintéticos, sem nenhum dado clínico
   saude/rodar.py                 o dia do transporte sanitário, pelo PDPTW
+  saude/tfd.py                   a van intermunicipal: fila, acompanhante, espera
   painel/console.py              console: Hoje, Elegibilidade, Equipe, Assistente
   docs/demonstracao/gerar_telas_estaticas.py  todas as telas em HTML autocontido
   motor/rodadas.py               reotimização contínua: o dia inteiro em rodadas
@@ -171,6 +174,7 @@ python ui/gerar.py                     # o sistema remodelado (prefeitura + empr
 python -m fiscalizacao.relatorio       # boletim de medição do mês
 python -m saude.rodar                  # dia do transporte de pacientes
 python -m saude.rodar --dia 2 --veiculos 6
+python -m planejamento.servidor        # e abra /sistema: a tela nova, ao vivo
 python -m fiscalizacao.relatorio --modelo viagem --valor-viagem 180
 python -m painel.console               # gera relatorios/console.html
 python docs/demonstracao/gerar_telas_estaticas.py   # o sistema inteiro em HTML
@@ -226,6 +230,25 @@ python -m unittest discover -s testes -v
   fretamento.
 - **Número que o sistema duvida não aparece limpo.** Se `coerencia` traz aviso
   sobre a base de comparação, o cartão de economia diz isso ao lado do número.
+- **A tela nova é servida, não só gerada.** `GET /sistema` no servidor de
+  planejamento entrega `ui/app.html` com o estado real (`montar_ao_vivo`), e é
+  por ali que a planilha entra. `DADOS.ao_vivo` liga o envio, o botão de
+  roteirizar e o de publicar; no arquivo estático eles não existem, porque
+  botão que não faz nada é pior do que botão nenhum.
+- **Plano sem frota atual informada é estado previsto, não erro.** O motor se
+  recusa a estimar o "antes" (`permitir_estimativa=False`), então `economia`
+  vem vazia e a tela diz o que falta. `painel/economia.py` trata `frota_atual`
+  nulo em `_economia_com`, `qualidade_do_servico` e `grade_de_cenarios` — os
+  cenários continuam existindo (o custo do plano muda com diesel e dias), só a
+  economia não.
+- **No TFD, a espera no destino é o primeiro indicador.** O veículo volta com
+  todo mundo, então quem terminou às 10h espera o último. Esse número não
+  existe em relatório nenhum hoje e é o que faz a família desistir do
+  tratamento. A fila de quem não coube é por prioridade clínica e, no empate,
+  data da autorização — precisa ser defensável, não telefonema.
+- **Acompanhante de TFD é direito com motivo escrito** (menor de 18, 60 ou
+  mais, incapacidade declarada) **e ocupa vaga de verdade.** Van que "esquece"
+  o acompanhante lota no papel e deixa gente na calçada às 4h da manhã.
 - **No transporte de paciente, prioridade clínica não some.** Hemodiálise é
   `vital` e não é remarcável — faltar é internação. Quem fica sem veículo
   aparece nominalmente, em ordem de quem não pode faltar, com o que dá para

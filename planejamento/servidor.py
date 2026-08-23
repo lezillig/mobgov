@@ -45,8 +45,12 @@ from dados import perfis as perfis_mod  # noqa: E402
 from dados.planilha import ErroDePlanilha  # noqa: E402
 from motor import planejar as planejar_mod  # noqa: E402
 from planejamento import multipart  # noqa: E402
+from ui import gerar as ui_mod  # noqa: E402
 
 TELA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tela.html")
+MOLDE_SISTEMA = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "ui", "app.html")
 DIR_BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIR_RELATORIOS = os.path.join(DIR_BASE, "relatorios")
 DIR_TRABALHO = os.path.join(DIR_RELATORIOS, "planejamento")
@@ -257,6 +261,24 @@ class Planejamento(BaseHTTPRequestHandler):
         if caminho in ("/", "/index.html", "/planejamento"):
             with open(TELA, "rb") as f:
                 return self._responder(f.read(), "text/html; charset=utf-8")
+        # A tela remodelada, servida com o estado de verdade. É por aqui que
+        # a planilha entra: a remodelagem levou a arquitetura para o lugar
+        # certo, e a porta de entrada tinha ficado na casa velha.
+        if caminho in ("/sistema", "/sistema.html"):
+            with open(MOLDE_SISTEMA, encoding="utf-8") as f:
+                molde = f.read()
+            dados = ui_mod.montar_ao_vivo(
+                importacao=ESTADO.resumo_da_importacao() or None,
+                plano=ESTADO.plano,
+                perfil=ESTADO.perfil_em_dicionario(),
+                rodando=ESTADO.rodando,
+                progresso=ESTADO.progresso[-40:],
+                erro=ESTADO.erro)
+            html = molde.replace("__DADOS__",
+                                 json.dumps(dados, ensure_ascii=False))
+            return self._responder(html.encode("utf-8"),
+                                   "text/html; charset=utf-8")
+
         if caminho == "/api/estado":
             return self._json({
                 "importacao": ESTADO.resumo_da_importacao(),

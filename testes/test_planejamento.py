@@ -404,6 +404,82 @@ class TestTelaDePlanejamento(unittest.TestCase):
         finally:
             self.mod.planejar_mod.planejar = original
 
+    # ------------------------------------------- a tela nova, servida ao vivo
+    def test_sistema_e_servido_e_autocontido(self):
+        with urllib.request.urlopen(self.url + "/sistema") as r:
+            html = r.read().decode("utf-8")
+        self.assertIn("MOBGOV", html)
+        self.assertNotIn("__DADOS__", html)
+        self.assertNotIn("src=\"http", html)
+
+    def test_sistema_sem_planilha_pede_a_planilha(self):
+        """Vazio é estado previsto: a operação acabou de começar."""
+        from ui import gerar as ui_mod
+        dados = ui_mod.montar_ao_vivo()
+        self.assertTrue(dados["ao_vivo"])
+        self.assertEqual(len(dados["pendencias"]), 1)
+        self.assertIn("planilha", dados["pendencias"][0]["titulo"].lower())
+        self.assertTrue(dados["pendencias"][0]["acao"])
+        # nada inventado para "não deixar a tela feia"
+        self.assertIsNone(dados["resumo"]["veiculos"])
+        self.assertIsNone(dados["resumo"]["economia_mes"])
+
+    def test_sistema_depois_do_envio_mostra_o_arquivo(self):
+        from ui import gerar as ui_mod
+        self.enviar_planilha()
+        dados = ui_mod.montar_ao_vivo(
+            importacao=self.mod.ESTADO.resumo_da_importacao(),
+            perfil=self.mod.ESTADO.perfil_em_dicionario())
+        self.assertEqual(dados["planejar"]["arquivo"], "turma.csv")
+        self.assertTrue(dados["planejar"]["importacao"]["alunos_importados"])
+        # os endereços já geocodificados vão para o mapa
+        self.assertTrue(dados["mapa"]["pontos"])
+
+    def test_plano_sem_frota_atual_informada_nao_quebra_o_painel(self):
+        """O caso comum: o município não informou a frota de hoje.
+
+        O motor se recusa a estimar, então não há 'antes'. Isso é estado
+        previsto — economia vazia e a explicação do que falta, nunca erro.
+        """
+        from ui import gerar as ui_mod
+        plano = {
+            "municipio": "Teste", "gerado_em": "hoje",
+            "demanda": {"alunos": 10, "escolas": 1, "pontos_embarque": 3,
+                        "cadeirantes": 0,
+                        "alunos_por_turno": {"manha": 10},
+                        "turnos": [{"id": "manha", "nome": "Manhã",
+                                    "jornada_max_min": 100}]},
+            "premissas": {"custos_por_tipo": {
+                "VAN15A": {"nome": "Van", "capacidade": 15,
+                           "posicoes_cadeirante": 2, "fixo_mes": 10200.0,
+                           "custo_km": 1.95, "consumo_km_l": 6.0}},
+                "dias_letivos_mes": 22, "preco_diesel_l": 6.1,
+                "fator_co2_kg_l": 2.68, "tempo_max_trajeto_min": 75,
+                "tempo_virada_min": 5, "viagens_por_rota": 2},
+            "frota_atual": None,
+            "comparacao_indisponivel": "a frota atual não foi informada",
+            "frota_otimizada": {
+                "composicao": {"VAN15A": 1}, "total_veiculos": 1,
+                "km_dia": 30.0, "custo_mes": 12000.0, "litros_dia": 5.0,
+                "viagens": [{"id": "V1", "veiculo": "V1", "turno": "manha",
+                             "turno_nome": "Manhã", "escola_id": "E1",
+                             "escola": "E", "paradas": [], "alunos": 10,
+                             "km_viagem": 30.0, "min_viagem": 40,
+                             "ocupacao_pct": 66, "tipo": "VAN15A",
+                             "tipo_nome": "Van", "cadeirantes": 0}],
+                "veiculos": [{"id": "V1", "turno": "manha",
+                              "turno_nome": "Manhã", "tipo": "VAN15A",
+                              "tipo_nome": "Van", "capacidade": 15,
+                              "min_turno": 40, "km_turno": 30.0, "alunos": 10,
+                              "ocupacao_media_pct": 66, "viagens": ["V1"]}],
+                "por_turno": [{"turno": "Manhã", "alunos": 10, "viagens": 1,
+                               "veiculos": 1, "lugares_ofertados": 15}]},
+        }
+        dados = ui_mod.montar_ao_vivo(plano=plano)
+        self.assertEqual(dados["resumo"]["veiculos"], 1)
+        self.assertIsNone(dados["resumo"]["economia_mes"])
+        self.assertTrue(dados["planejar"]["frota_por_tipo"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -161,6 +161,14 @@ h3{font-size:16px}
   border-color:var(--marca);font-weight:600}
 .abas .aba[aria-selected="true"] small{background:rgba(255,255,255,.22);color:#fff}
 .lista .marca-contrato{margin-top:4px;font-size:12px;color:var(--tinta-2)}
+.envio{background:var(--superficie);border:1px dashed var(--marca);
+  border-radius:var(--raio);padding:20px;margin-bottom:16px}
+.envio .linha-envio{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  margin-top:14px}
+.envio input[type=file]{flex:1;min-width:220px}
+.envio select{padding:9px 11px;border:1px solid var(--linha);border-radius:8px;
+  background:var(--superficie-2)}
+.envio #estado-envio{margin-top:12px}
 .numero.campo code{font-size:11.5px;color:var(--tinta-2);background:var(--superficie-2);
   border-radius:5px;padding:1px 6px}
 .numero.campo .valor{font-size:23px;font-weight:700;margin:6px 0 4px}
@@ -510,22 +518,32 @@ var DADOS = __DADOS__;
     var pl = DADOS.planejar, imp = pl.importacao || {};
     var marcos = [
       {id: "dados", nome: "Dados",
-       estado: !pl.arquivo ? "espera" : (imp.erros ? "voce" : "pronto"),
+       // sem base não há nada pronto adiante: com a tela servida pelo
+       // sistema, Dados é justamente o que está esperando por você
+       estado: !pl.arquivo ? (DADOS.ao_vivo ? "voce" : "espera")
+         : (imp.erros ? "voce" : "pronto"),
        resumo: pl.arquivo
          ? num(imp.alunos_importados) + " importados · " + num(imp.erros)
            + " erros"
-         : "base de demonstração, sem planilha"},
-      {id: "mapa", nome: "Mapa", estado: imp.precisam_ajuste_no_mapa
-         ? "voce" : "pronto",
+         : (DADOS.ao_vivo ? "nenhuma planilha enviada"
+                          : "base de demonstração, sem planilha")},
+      {id: "mapa", nome: "Mapa",
+       estado: (DADOS.ao_vivo && !pl.arquivo) ? "espera"
+         : (imp.precisam_ajuste_no_mapa ? "voce" : "pronto"),
        resumo: pl.arquivo
          ? num(imp.precisam_ajuste_no_mapa || 0) + " para ajustar"
          : num((pl.agrupamento || {}).pontos
              || Object.keys(DADOS.mapa.pontos || {}).length) + " pontos"},
-      {id: "rotas", nome: "Rotas", estado: "pronto",
-       resumo: num((pl.frota || {}).total_veiculos) + " veículos · "
-         + num((DADOS.resumo || {}).viagens) + " viagens"},
+      {id: "rotas", nome: "Rotas",
+       estado: (DADOS.ao_vivo && !(pl.frota || {}).total_veiculos)
+         ? (pl.arquivo ? "voce" : "espera") : "pronto",
+       resumo: (pl.frota || {}).total_veiculos
+         ? num(pl.frota.total_veiculos) + " veículos · "
+           + num((DADOS.resumo || {}).viagens) + " viagens"
+         : "ainda não roteirizado"},
       {id: "publicar", nome: "Publicar",
-       estado: (pl.nao_atendida || {}).alunos ? "voce" : "espera",
+       estado: (DADOS.ao_vivo && !(pl.frota || {}).total_veiculos) ? "espera"
+         : ((pl.nao_atendida || {}).alunos ? "voce" : "espera"),
        resumo: (pl.nao_atendida || {}).alunos
          ? num(pl.nao_atendida.alunos) + " sem rota possível"
          : "pronto para publicar"}
@@ -563,7 +581,7 @@ var DADOS = __DADOS__;
 
   function marcoDados(pl) {
     var imp = pl.importacao || {};
-    if (!pl.arquivo) { return semPlanilha(pl); }
+    if (!pl.arquivo) { return areaDeEnvio() + semPlanilha(pl); }
     var tipos = {};
     (pl.problemas || []).forEach(function (p) {
       var chave = p.gravidade + "|" + p.problema + "|" + p.sugestao;
@@ -583,7 +601,8 @@ var DADOS = __DADOS__;
         + (t.linhas.length > 6 ? "…" : "") + '</td></tr>';
     }).join("");
 
-    return '<div class="grade n3" style="margin-bottom:16px">'
+    return areaDeEnvio()
+      + '<div class="grade n3" style="margin-bottom:16px">'
       + numeroCartao("Importados", num(imp.alunos_importados),
           esc(pl.arquivo || ""))
       + numeroCartao("Erros", num(imp.erros), "a linha não entrou")
@@ -594,6 +613,29 @@ var DADOS = __DADOS__;
           + '<th>Onde</th></tr></thead><tbody>' + linhas + '</tbody></table></div>'
         : '<div class="cartao vazio"><b>Nada a corrigir</b>A planilha entrou '
           + 'inteira.</div>');
+  }
+
+  /* A porta de entrada da operação. Só aparece quando a tela está sendo
+     servida pelo sistema — no arquivo estático não há para onde enviar, e um
+     botão que não faz nada é pior do que botão nenhum. */
+  function areaDeEnvio() {
+    if (!DADOS.ao_vivo) { return ""; }
+    return '<div class="envio" id="envio">'
+      + '<h3>Enviar a planilha da operação</h3>'
+      + '<p class="chamada">O arquivo que a secretaria já tem, do jeito que '
+      + 'ele está: .xlsx, .csv ou .tsv. Coluna com nome estranho, endereço '
+      + 'sem número e turno escrito de seis jeitos são esperados — a '
+      + 'conferência mostra cada um com o que fazer.</p>'
+      + '<div class="linha-envio">'
+      + '<input type="file" id="arquivo-planilha" accept=".xlsx,.csv,.tsv">'
+      + '<label for="perfil-envio">Perfil</label>'
+      + '<select id="perfil-envio">'
+      + '<option value="escolar">Transporte escolar</option>'
+      + '<option value="fretamento">Fretamento corporativo</option>'
+      + '</select>'
+      + '<button class="botao" id="enviar-planilha">Enviar e conferir</button>'
+      + '</div>'
+      + '<div id="estado-envio" class="chamada"></div></div>';
   }
 
   /* Plano que não veio de planilha: dizer isso, em vez de mostrar "0 erros"
@@ -649,6 +691,9 @@ var DADOS = __DADOS__;
   }
 
   function marcoRotas(pl) {
+    if (DADOS.ao_vivo && !(pl.frota || {}).total_veiculos) {
+      return cartaoRoteirizar(pl);
+    }
     var cenarios = pl.cenarios || [];
     var base = cenarios.filter(function (c) { return c.selecionado; })[0]
       || cenarios[0];
@@ -691,6 +736,38 @@ var DADOS = __DADOS__;
       + '<th class="num">Pessoas</th><th class="num">Viagens</th>'
       + '<th class="num">Veículos</th><th>Ocupação</th></tr></thead>'
       + '<tbody>' + turnos + '</tbody></table></div></div>';
+  }
+
+  /* Ao vivo e sem plano: o botão que chama o motor, com o que ele vai usar
+     à vista. Roteirizar e publicar continuam sendo dois botões — nada vai
+     para a rua por acidente. */
+  function cartaoRoteirizar(pl) {
+    var imp = pl.importacao || {};
+    if (!pl.arquivo) {
+      return '<div class="cartao vazio"><b>Envie a planilha primeiro</b>'
+        + 'A roteirização precisa da base de quem vai ser transportado. '
+        + 'Ela está no marco Dados.</div>';
+    }
+    var t = (DADOS.ajustes || {}).tempo || {};
+    var c = (DADOS.ajustes || {}).caminhada || {};
+    return '<div class="cartao">'
+      + '<h3>Roteirizar</h3>'
+      + '<p class="chamada">' + num(imp.alunos_importados) + ' '
+      + esc(DADOS.operacao.passageiros) + ' importados. O motor vai montar os '
+      + 'pontos de embarque e resolver as rotas com os parâmetros que estão '
+      + 'em Ajustes — ainda não publica nada.</p>'
+      + '<div class="grade n3" style="margin:14px 0">'
+      + numeroCartao("Tempo máximo a bordo", num(t.max_trajeto_min) + " min",
+          "restrição dura do motor")
+      + numeroCartao("Raio de caminhada", num(c.raio_urbano_m) + " m",
+          num(c.raio_rural_m) + " m no rural")
+      + numeroCartao("Tipos de veículo",
+          num(((DADOS.ajustes || {}).tipos_veiculo || []).length),
+          "o motor só usa os cadastrados")
+      + '</div>'
+      + '<button class="botao" id="roteirizar-agora">Roteirizar agora</button>'
+      + '<div id="estado-roteirizacao" class="chamada" '
+      + 'style="margin-top:12px"></div></div>';
   }
 
   function tabelaFrotaPorTipo(linhas) {
@@ -752,7 +829,9 @@ var DADOS = __DADOS__;
           "por dia")
       + '</div>'
       + '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'
-      + '<button class="botao" data-acao="publicar">Publicar este plano</button>'
+      + '<button class="botao" ' + (DADOS.ao_vivo
+          ? 'id="publicar-agora"' : 'data-acao="publicar"')
+      + '>Publicar este plano</button>'
       + '<button class="botao calmo" data-acao="proposta">Ver como proposta'
       + '</button></div></div>'
       + coerencia
@@ -1621,6 +1700,7 @@ var DADOS = __DADOS__;
       });
     }
     if (destino === "operar") { ligarLista(); }
+    if (destino === "planejar" && DADOS.ao_vivo) { ligarEnvio(); }
     document.querySelectorAll("[data-aviso]").forEach(function (b) {
       b.addEventListener("click", function () {
         alert("Nesta demonstração nada é enviado. No sistema, \u201c"
@@ -1628,6 +1708,104 @@ var DADOS = __DADOS__;
           + "e registra quem decidiu, com data e hora.");
       });
     });
+  }
+
+  /* ------------------------------------------------------- envio ao vivo */
+  function ligarEnvio() {
+    var botao = document.getElementById("enviar-planilha");
+    if (botao) {
+      botao.addEventListener("click", function () { enviarPlanilha(botao); });
+    }
+    var roteirizar = document.getElementById("roteirizar-agora");
+    if (roteirizar) {
+      roteirizar.addEventListener("click", function () {
+        dispararRoteirizacao(roteirizar);
+      });
+    }
+    var publicar = document.getElementById("publicar-agora");
+    if (publicar) {
+      publicar.addEventListener("click", function () { publicarPlano(publicar); });
+    }
+  }
+
+  function publicarPlano(botao) {
+    // publicar troca a rota de gente que está na rua: confirma antes, e a
+    // pergunta diz o tamanho do efeito
+    var pl = DADOS.planejar || {};
+    var quantos = (pl.frota || {}).total_veiculos;
+    var viagens = (DADOS.resumo || {}).viagens;
+    if (!window.confirm("Publicar vai trocar a rota de " + quantos
+        + " veículos e " + viagens + " viagens no aplicativo dos motoristas. "
+        + "O plano anterior vai para o histórico, datado. Confirmar?")) {
+      return;
+    }
+    botao.disabled = true;
+    fetch("/api/publicar", {method: "POST",
+                            headers: {"Content-Type": "application/json"},
+                            body: "{}"})
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.erro) { botao.disabled = false; alert(d.erro); return; }
+        alert(d.mensagem);
+        location.reload();
+      })
+      .catch(function (e) { botao.disabled = false; alert(String(e)); });
+  }
+
+  function avisar(texto, erro) {
+    var no = document.getElementById("estado-envio")
+      || document.getElementById("estado-roteirizacao");
+    if (no) {
+      no.innerHTML = (erro ? '<b style="color:var(--alerta)">' : '<b>')
+        + esc(texto) + '</b>';
+    }
+  }
+
+  function enviarPlanilha(botao) {
+    var campo = document.getElementById("arquivo-planilha");
+    if (!campo || !campo.files.length) {
+      avisar("Escolha o arquivo antes de enviar.", true);
+      return;
+    }
+    var corpo = new FormData();
+    corpo.append("planilha", campo.files[0]);
+    corpo.append("perfil", document.getElementById("perfil-envio").value);
+    botao.disabled = true;
+    avisar("Lendo a planilha…");
+    fetch("/api/enviar-planilha", {method: "POST", body: corpo})
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.erro) { botao.disabled = false; avisar(d.erro, true); return; }
+        // recarrega a tela inteira com o estado novo do servidor: é ele que
+        // manda, e reconstruir o payload aqui abriria duas verdades
+        location.reload();
+      })
+      .catch(function (e) { botao.disabled = false; avisar(String(e), true); });
+  }
+
+  function dispararRoteirizacao(botao) {
+    botao.disabled = true;
+    avisar("Roteirizando… o motor leva alguns minutos.");
+    fetch("/api/roteirizar", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({tempo_limite: 20})
+    }).then(function () { acompanharRoteirizacao(); })
+      .catch(function (e) { botao.disabled = false; avisar(String(e), true); });
+  }
+
+  function acompanharRoteirizacao() {
+    fetch("/api/estado").then(function (r) { return r.json(); })
+      .then(function (d) {
+        var ultimo = (d.progresso || [])[d.progresso.length - 1];
+        if (d.rodando) {
+          avisar(ultimo ? ultimo.etapa + ": " + ultimo.detalhe
+                        : "Roteirizando…");
+          setTimeout(acompanharRoteirizacao, 1500);
+          return;
+        }
+        if (d.erro) { avisar(d.erro, true); return; }
+        location.reload();
+      });
   }
 
   /* Só o que está dentro da lista — ela é redesenhada a cada tecla do filtro,
