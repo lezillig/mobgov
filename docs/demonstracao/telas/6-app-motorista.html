@@ -75,7 +75,8 @@ button:active{transform:scale(.98)}
 (function () {
   "use strict";
   var DADOS = {"rota": {"motorista": "VM17", "veiculo": "Ônibus escolar 31 lugares", "capacidade": 31, "turno": "Manhã", "jornada_prevista_min": 100, "jornada_limite_min": 100, "viagens": [{"viagem": "E2-manha-05", "escola": "EMEF Distrito Norte", "turno": "Manhã", "alunos": 31, "cadeirantes": 0, "km": 10.6, "minutos": 25, "chegada_prevista": "05h25", "paradas": [{"ponto": "P147", "lat": -21.083461, "lon": -47.778514, "hora_prevista": "05h00"}, {"ponto": "P114", "lat": -21.070085, "lon": -47.777269, "hora_prevista": "05h05"}, {"ponto": "P107", "lat": -21.063994, "lon": -47.785428, "hora_prevista": "05h10"}, {"ponto": "P104", "lat": -21.068585, "lon": -47.788593, "hora_prevista": "05h15"}, {"ponto": "P097", "lat": -21.076636, "lon": -47.786987, "hora_prevista": "05h20"}]}, {"viagem": "E1-manha-01", "escola": "EMEF Centro", "turno": "Manhã", "alunos": 30, "cadeirantes": 0, "km": 5.5, "minutos": 24, "chegada_prevista": "05h55", "paradas": [{"ponto": "P062", "lat": -21.136194, "lon": -47.795108, "hora_prevista": "05h30"}, {"ponto": "P013", "lat": -21.136892, "lon": -47.793234, "hora_prevista": "05h35"}, {"ponto": "P074", "lat": -21.135548, "lon": -47.792777, "hora_prevista": "05h40"}, {"ponto": "P042", "lat": -21.135516, "lon": -47.79204, "hora_prevista": "05h45"}, {"ponto": "P002", "lat": -21.137504, "lon": -47.78994, "hora_prevista": "05h50"}]}, {"viagem": "E1-manha-04", "escola": "EMEF Centro", "turno": "Manhã", "alunos": 31, "cadeirantes": 0, "km": 4.1, "minutos": 20, "chegada_prevista": "06h20", "paradas": [{"ponto": "P005", "lat": -21.148444, "lon": -47.804259, "hora_prevista": "06h00"}, {"ponto": "P080", "lat": -21.155418, "lon": -47.810666, "hora_prevista": "06h04"}, {"ponto": "P017", "lat": -21.156576, "lon": -47.810436, "hora_prevista": "06h08"}, {"ponto": "P061", "lat": -21.156564, "lon": -47.807906, "hora_prevista": "06h12"}, {"ponto": "P068", "lat": -21.155799, "lon": -47.805887, "hora_prevista": "06h16"}]}], "total_alunos": 92}};
-  var estado = {falta: false};
+  var estado = {falta: false, paciente_nao_vai: false,
+                paciente_liberado: false};
 
   function resposta(corpo) {
     return Promise.resolve({
@@ -98,6 +99,25 @@ button:active{transform:scale(.98)}
     if (caminho === "/api/desfazer-falta") {
       estado.falta = false;
       return resposta({registrado: "volta_atras"});
+    }
+    /* app do paciente: as três ações mudam o mesmo estado local, e a tela
+       se redesenha sozinha — igual ao app de verdade */
+    if (caminho === "/api/minha-viagem") {
+      return resposta(estado.paciente_liberado ? DADOS.paciente_liberado
+        : (estado.paciente_nao_vai ? DADOS.paciente_nao_vai
+                                   : DADOS.paciente));
+    }
+    if (caminho === "/api/nao-vou") {
+      estado.paciente_nao_vai = true;
+      return resposta({ok: true});
+    }
+    if (caminho === "/api/desfazer") {
+      estado.paciente_nao_vai = false;
+      return resposta({ok: true});
+    }
+    if (caminho === "/api/liberado") {
+      estado.paciente_liberado = true;
+      return resposta({ok: true});
     }
     if (caminho === "/api/eventos") {
       var corpo = {};

@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from motor import porta_a_porta  # noqa: E402
 from saude import demanda as demanda_mod  # noqa: E402
+from saude import acompanhamento as acompanhamento_mod  # noqa: E402
 from saude import tfd as tfd_mod  # noqa: E402
 from saude.tratamento import PRIORIDADES, pedidos_do_dia  # noqa: E402
 
@@ -120,6 +121,10 @@ def rodar(dia_da_semana: int = 0, veiculos_por_tipo: int = None,
         "nao_atendidos": fora,
         "alertas": _alertas(vitais_fora, agenda),
         "tfd": _tfd(),
+        # a contrapartida do botão do paciente: sem esta fila o aviso não
+        # vira nada
+        "fila_de_retorno": acompanhamento_mod.fila_de_retorno(
+            tratamentos=tratamentos),
         "unidades": demanda_mod.nomes_das_unidades(),
         "prioridades": {k: dict(v, id=k) for k, v in PRIORIDADES.items()},
     }

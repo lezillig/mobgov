@@ -284,5 +284,131 @@ class TestTFD(unittest.TestCase):
             self.assertIn(a.especialidade, demanda_mod.ESPECIALIDADES)
 
 
+class TestAcompanhamento(unittest.TestCase):
+    """O que o paciente vê e o que ele consegue fazer."""
+
+    def setUp(self):
+        from saude import acompanhamento
+        self.ac = acompanhamento
+        self.tratamentos = [tratamento("consulta", dias_da_semana=(0,),
+                                       hora_chegada_min=10 * 60),
+                            tratamento("hemodialise", id="T2",
+                                       paciente_id="PA2",
+                                       dias_da_semana=(0, 2, 4),
+                                       hora_chegada_min=6 * 60)]
+
+    def situacao(self, paciente, eventos=None, agora=5 * 60):
+        return self.ac.situacao(paciente, dia_da_semana=0, dia="2026-08-24",
+                                tratamentos=self.tratamentos,
+                                eventos=eventos or [], agora_min=agora)
+
+    def test_previsao_nunca_e_medida_por_otimismo(self):
+        """Errar uma vez custa a confiança do ano."""
+        s = self.situacao("PA1")
+        self.assertEqual(s["ida"]["selo"]["rotulo"], "planejado")
+        medido = self.situacao("PA1", eventos=[
+            {"tipo": "ping", "paciente": "PA1", "em": "2026-08-24T09:00:00"}])
+        self.assertEqual(medido["ida"]["selo"]["rotulo"], "medido")
+
+    def test_volta_sem_hora_e_dita_como_sem_hora(self):
+        s = self.situacao("PA1")
+        self.assertEqual(s["volta"]["tipo"], "por_chamada")
+        self.assertIsNone(s["volta"]["hora"])
+        self.assertIn("liberar", s["volta"]["explicacao"])
+
+    def test_volta_com_hora_aparece_com_hora(self):
+        s = self.situacao("PA2")
+        self.assertEqual(s["volta"]["tipo"], "com_hora")
+        self.assertNotEqual(s["volta"]["hora"], "—")
+
+    def test_botao_de_liberado_so_existe_quando_faz_sentido(self):
+        """Botão que não faz efeito engana quem está esperando."""
+        com_chamada = [a["id"] for a in self.situacao("PA1")["acoes"]]
+        self.assertIn("liberado", com_chamada)
+        com_hora = [a["id"] for a in self.situacao("PA2")["acoes"]]
+        self.assertNotIn("liberado", com_hora)
+
+    def test_liberado_some_depois_de_avisar(self):
+        eventos = [{"tipo": "liberado", "paciente": "PA1",
+                    "em": "2026-08-24T11:30:00"}]
+        s = self.situacao("PA1", eventos=eventos)
+        self.assertTrue(s["volta"]["liberado"])
+        self.assertNotIn("liberado", [a["id"] for a in s["acoes"]])
+
+    def test_avisar_cedo_libera_vaga_e_em_cima_da_hora_nao_promete(self):
+        cedo = self.situacao("PA1", agora=6 * 60)
+        self.assertTrue(cedo["aviso_ainda_libera_vaga"])
+        self.assertIn("fila", cedo["acoes"][0]["explicacao"])
+        emcima = self.situacao("PA1", agora=9 * 60 + 40)
+        self.assertFalse(emcima["aviso_ainda_libera_vaga"])
+        self.assertNotIn("fila", emcima["acoes"][0]["explicacao"])
+
+    def test_aviso_e_desfazivel_enquanto_o_veiculo_nao_passou(self):
+        eventos = [{"tipo": "nao_vou", "paciente": "PA1",
+                    "em": "2026-08-24T06:00:00"}]
+        antes = self.situacao("PA1", eventos=eventos, agora=7 * 60)
+        self.assertTrue(antes["avisou_que_nao_vai"])
+        self.assertTrue(antes["pode_desfazer"])
+        self.assertEqual([a["id"] for a in antes["acoes"]], ["desfazer"])
+
+        depois = self.situacao("PA1", eventos=eventos, agora=11 * 60)
+        self.assertFalse(depois["pode_desfazer"])
+
+    def test_dia_sem_viagem_responde_quando_e_a_proxima(self):
+        """Tela vazia faz a pessoa ligar para a secretaria."""
+        s = self.ac.situacao("PA2", dia_da_semana=1, dia="2026-08-25",
+                             tratamentos=self.tratamentos, eventos=[])
+        self.assertFalse(s["tem_viagem"])
+        self.assertIn("próximo", s["mensagem"])
+
+    def test_codigo_desconhecido_nao_vaza_nada(self):
+        s = self.ac.situacao("PA999", dia_da_semana=0, dia="2026-08-24",
+                             tratamentos=self.tratamentos, eventos=[])
+        self.assertFalse(s["tem_viagem"])
+        self.assertNotIn("tratamento", s)
+
+    def test_fila_de_retorno_ordena_por_quem_espera_ha_mais_tempo(self):
+        eventos = [{"tipo": "liberado", "paciente": "PA2",
+                    "em": "2026-08-24T10:00:00"},
+                   {"tipo": "liberado", "paciente": "PA1",
+                    "em": "2026-08-24T13:00:00"}]
+        fila = self.ac.fila_de_retorno("2026-08-24", eventos,
+                                       self.tratamentos)
+        self.assertEqual(fila["resumo"]["pessoas"], 2)
+        esperas = [x["esperando_ha_min"] for x in fila["esperando"]]
+        self.assertEqual(esperas, sorted(esperas, reverse=True))
+
+    def test_fila_so_conta_o_dia_pedido(self):
+        eventos = [{"tipo": "liberado", "paciente": "PA1",
+                    "em": "2026-08-20T10:00:00"}]
+        fila = self.ac.fila_de_retorno("2026-08-24", eventos,
+                                       self.tratamentos)
+        self.assertEqual(fila["resumo"]["pessoas"], 0)
+
+
+class TestTokenDoPaciente(unittest.TestCase):
+    def test_token_do_paciente_nao_vale_para_outro(self):
+        from operacao import registro
+        bom = registro.token_do_paciente("PA1")
+        self.assertTrue(registro.token_de_paciente_valido("PA1", bom))
+        self.assertFalse(registro.token_de_paciente_valido("PA2", bom))
+
+    def test_token_de_familia_nao_vira_token_de_paciente(self):
+        """Prefixo próprio: identificador coincidir não pode dar acesso."""
+        from operacao import registro
+        familia = registro.token_do_responsavel("PA1")
+        self.assertFalse(registro.token_de_paciente_valido("PA1", familia))
+
+    def test_evento_do_paciente_exige_o_paciente(self):
+        import tempfile
+        from operacao import registro
+        arquivo = os.path.join(tempfile.mkdtemp(), "e.jsonl")
+        with self.assertRaises(registro.ErroDeRegistro):
+            registro.registrar({"tipo": "liberado"}, arquivo)
+        gravado = registro.registrar({"tipo": "liberado", "paciente": "PA1"},
+                                     arquivo)
+        self.assertEqual(gravado["paciente"], "PA1")
+
+
 if __name__ == "__main__":
     unittest.main()

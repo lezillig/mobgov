@@ -1192,8 +1192,49 @@ var DADOS = __DADOS__;
             + '</div></section>'
           : "")
 
+      + secaoFilaDeRetorno(s.fila_de_retorno)
       + secaoTFD(s.tfd)
       + secaoNaoAtendidos(s.nao_atendidos || []);
+  }
+
+  /* A contrapartida do botão "já fui liberado" no app do paciente. Sem esta
+     fila o aviso não vira nada — e a alternativa real é a pessoa esperando
+     sentada até alguém lembrar dela. */
+  function secaoFilaDeRetorno(f) {
+    if (!f) { return ""; }
+    var r = f.resumo || {};
+    var cabeca = '<section class="secao"><header>'
+      + '<h2>Esperando o carro da volta</h2>'
+      + selo({rotulo: "medido", explicacao:
+          "veio do aplicativo do paciente, quando o médico liberou"})
+      + '</header>';
+    if (!r.pessoas) {
+      return cabeca + '<div class="cartao vazio">'
+        + '<b>Ninguém esperando neste momento</b>'
+        + 'Quando um paciente tocar em “já fui liberado” no aplicativo, ele '
+        + 'aparece aqui com o tempo de espera — é assim que a volta sem hora '
+        + 'marcada vira corrida de verdade.</div></section>';
+    }
+    return cabeca
+      + '<div class="grade n3" style="margin-bottom:14px">'
+      + numeroCartao("Pessoas esperando", num(r.pessoas), "já liberadas")
+      + numeroCartao("Maior espera", horas(r.espera_maxima_min),
+          "desde o aviso")
+      + numeroCartao("Precisam de veículo próprio",
+          num((r.com_cadeira || 0) + (r.com_maca || 0)),
+          num(r.com_cadeira || 0) + " de cadeira · " + num(r.com_maca || 0)
+          + " de maca")
+      + '</div>'
+      + '<div class="rolagem"><table><thead><tr><th>Paciente</th>'
+      + '<th>Local</th><th>Avisou às</th><th class="num">Esperando</th>'
+      + '</tr></thead><tbody>'
+      + (f.esperando || []).map(function (x) {
+          return '<tr><td><b>' + esc(x.paciente) + '</b></td>'
+            + '<td>' + esc(x.unidade || "—") + '</td>'
+            + '<td>' + esc(x.avisou_as) + '</td>'
+            + '<td class="num">' + horas(x.esperando_ha_min) + '</td></tr>';
+        }).join("")
+      + '</tbody></table></div></section>';
   }
 
   /* TFD: a van que sai de madrugada para a capital. O indicador que abre a

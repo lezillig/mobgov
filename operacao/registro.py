@@ -41,7 +41,13 @@ TIPOS_DO_MOTORISTA = ("ping", "embarque", "desembarque", "imprevisto",
 # vai hoje; "volta_atras" é o responsável desdizendo o aviso, o que acontece
 # bastante e precisa chegar antes de o veículo passar.
 TIPOS_DO_RESPONSAVEL = ("falta", "volta_atras")
-TIPOS = TIPOS_DO_MOTORISTA + TIPOS_DO_RESPONSAVEL
+# O app do paciente fecha o laço do transporte sanitário. "confirmado" e
+# "nao_vou" liberam vaga com antecedência — no vertical de saúde uma poltrona
+# devolvida pode ir para quem está na fila do TFD. "liberado" é o paciente
+# avisando que o médico o dispensou: é o que transforma a volta sem hora
+# (consulta, quimioterapia) em pedido de verdade para a reotimização.
+TIPOS_DO_PACIENTE = ("confirmado", "nao_vou", "liberado")
+TIPOS = TIPOS_DO_MOTORISTA + TIPOS_DO_RESPONSAVEL + TIPOS_DO_PACIENTE
 _trava = threading.Lock()
 
 
@@ -88,6 +94,22 @@ def token_de_responsavel_valido(aluno: str, token: str, ponto: str = "",
         token_do_responsavel(aluno, ponto, turno, chave), token or "")
 
 
+def token_do_paciente(paciente: str, chave: str = None) -> str:
+    """Token do paciente. Prefixo próprio, pelo mesmo motivo dos outros:
+    token de família não pode virar token de paciente por coincidência de
+    identificador — e no vertical de saúde o dado do outro lado é mais
+    sensível ainda."""
+    chave = chave or os.environ.get("MOBGOV_CHAVE", "demonstracao")
+    return hmac.new(chave.encode("utf-8"),
+                    f"paciente:{paciente}".encode("utf-8"),
+                    hashlib.sha256).hexdigest()[:16]
+
+
+def token_de_paciente_valido(paciente: str, token: str,
+                             chave: str = None) -> bool:
+    return hmac.compare_digest(token_do_paciente(paciente, chave), token or "")
+
+
 # ---------------------------------------------------------------- eventos ---
 def _agora() -> str:
     return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -104,6 +126,9 @@ def registrar(evento: dict, arquivo: str = None) -> dict:
     if tipo in TIPOS_DO_RESPONSAVEL:
         if not evento.get("aluno"):
             raise ErroDeRegistro("Aviso da família sem identificação do aluno.")
+    elif tipo in TIPOS_DO_PACIENTE:
+        if not evento.get("paciente"):
+            raise ErroDeRegistro("Aviso sem identificação do paciente.")
     elif not evento.get("motorista"):
         raise ErroDeRegistro("Evento sem motorista.")
 
@@ -137,7 +162,8 @@ def registrar_lote(eventos: list, arquivo: str = None) -> dict:
 
 
 def ler_eventos(arquivo: str = None, motorista: str = None,
-                tipo: str = None, aluno: str = None) -> list:
+                tipo: str = None, aluno: str = None,
+                paciente: str = None) -> list:
     arquivo = arquivo or ARQUIVO_EVENTOS
     if not os.path.exists(arquivo):
         return []
@@ -154,6 +180,8 @@ def ler_eventos(arquivo: str = None, motorista: str = None,
             if motorista and evento.get("motorista") != motorista:
                 continue
             if aluno and evento.get("aluno") != aluno:
+                continue
+            if paciente and evento.get("paciente") != paciente:
                 continue
             if tipo and evento.get("tipo") != tipo:
                 continue

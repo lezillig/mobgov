@@ -35,6 +35,7 @@ from operacao.servidor import vinculos_de_demonstracao  # noqa: E402
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DIR_OPERACAO = os.path.join(DIR, "..", "..", "operacao")
+DIR_SAUDE = os.path.join(DIR, "..", "..", "saude")
 
 FAIXA = """
 <div style="position:sticky;top:0;z-index:99;background:#E8A24E;color:#1A1206;
@@ -52,7 +53,8 @@ CASCA = """
 (function () {
   "use strict";
   var DADOS = %s;
-  var estado = {falta: false};
+  var estado = {falta: false, paciente_nao_vai: false,
+                paciente_liberado: false};
 
   function resposta(corpo) {
     return Promise.resolve({
@@ -76,6 +78,25 @@ CASCA = """
       estado.falta = false;
       return resposta({registrado: "volta_atras"});
     }
+    /* app do paciente: as três ações mudam o mesmo estado local, e a tela
+       se redesenha sozinha — igual ao app de verdade */
+    if (caminho === "/api/minha-viagem") {
+      return resposta(estado.paciente_liberado ? DADOS.paciente_liberado
+        : (estado.paciente_nao_vai ? DADOS.paciente_nao_vai
+                                   : DADOS.paciente));
+    }
+    if (caminho === "/api/nao-vou") {
+      estado.paciente_nao_vai = true;
+      return resposta({ok: true});
+    }
+    if (caminho === "/api/desfazer") {
+      estado.paciente_nao_vai = false;
+      return resposta({ok: true});
+    }
+    if (caminho === "/api/liberado") {
+      estado.paciente_liberado = true;
+      return resposta({ok: true});
+    }
     if (caminho === "/api/eventos") {
       var corpo = {};
       try { corpo = JSON.parse((opcoes || {}).body || "{}"); } catch (e) {}
@@ -89,8 +110,10 @@ CASCA = """
 """
 
 
-def _montar(nome_arquivo: str, dados: dict, saida: str) -> str:
-    with open(os.path.join(DIR_OPERACAO, nome_arquivo), encoding="utf-8") as f:
+def _montar(nome_arquivo: str, dados: dict, saida: str,
+            diretorio: str = None) -> str:
+    with open(os.path.join(diretorio or DIR_OPERACAO, nome_arquivo),
+              encoding="utf-8") as f:
         html = f.read()
     # a casca precisa existir ANTES do script do app, que dispara no carregamento
     html = html.replace("<body>", "<body>" + FAIXA
@@ -142,6 +165,8 @@ def main():
                     "ponto": vinculo["ponto"], "viagem": viagem["id"],
                     "em": datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}])
 
+    paciente_html = _gerar_app_do_paciente()
+
     motorista_html = _montar("app_motorista.html", {"rota": rota},
                              "app-motorista-demo.html")
     familia_html = _montar("app_responsavel.html",
@@ -155,7 +180,46 @@ def main():
     print(f"App do responsável: {familia_html}")
     print(f"  ponto {vinculo['ponto']} · previsão {situacao['previsao']} "
           f"({situacao['origem_da_previsao']})")
+    if paciente_html:
+        print(f"App do paciente:    {paciente_html}")
     return 0
+
+
+def _gerar_app_do_paciente():
+    """O app do transporte sanitário, com os três estados que ele tem.
+
+    Escolhe um tratamento de volta POR CHAMADA de propósito: é ele que mostra
+    o botão "já fui liberado", que é a parte do app que não existe em nenhum
+    outro sistema.
+    """
+    from saude import acompanhamento as ac
+    from saude import demanda as demanda_saude
+
+    tratamentos = demanda_saude.gerar_tratamentos()
+    escolhido = next((t for t in tratamentos
+                      if not t.retorno_previsivel and t.dias_da_semana), None)
+    if not escolhido:
+        return None
+    dia_da_semana = escolhido.dias_da_semana[0]
+    dia = date.today().isoformat()
+    comum = dict(dia_da_semana=dia_da_semana, dia=dia,
+                 tratamentos=tratamentos, agora_min=escolhido.hora_chegada_min
+                 - 90)
+
+    def com(eventos):
+        d = ac.situacao(escolhido.paciente_id, eventos=eventos, **comum)
+        d["demonstracao"] = True
+        return d
+
+    aviso = {"tipo": "nao_vou", "paciente": escolhido.paciente_id,
+             "em": f"{dia}T06:00:00"}
+    liberacao = {"tipo": "liberado", "paciente": escolhido.paciente_id,
+                 "em": f"{dia}T11:30:00"}
+    return _montar("app_paciente.html",
+                   {"paciente": com([]),
+                    "paciente_nao_vai": com([aviso]),
+                    "paciente_liberado": com([liberacao])},
+                   "app-paciente-demo.html", DIR_SAUDE)
 
 
 if __name__ == "__main__":

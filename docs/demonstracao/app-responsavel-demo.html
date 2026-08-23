@@ -78,7 +78,8 @@ button[disabled]{opacity:.5}
 (function () {
   "use strict";
   var DADOS = {"situacao": {"aluno": "AP074", "ponto": "P074", "viagem": "E1-manha-01", "escola": "EMEF Centro", "turno": "Manhã", "motorista": "VM17", "veiculo": "Ônibus escolar 31 lugares", "chegada_na_escola": "05h55", "hora_planejada": "05h40", "previsao": "05h43", "origem_da_previsao": "medido", "atraso_min": 3, "sinal_inconsistente": false, "estado": "a_caminho", "mensagem": "O veículo está a caminho. Previsão de passar no seu ponto: 05h43 (3 min atrasado).", "paradas_antes_de_voce": 2, "posicao_do_veiculo": null, "aviso_de_falta": false, "pode_avisar_falta": true, "paradas": [{"ponto": "P062", "hora_prevista": "05h30", "lat": -21.136194, "lon": -47.795108, "e_o_seu": false}, {"ponto": "P013", "hora_prevista": "05h35", "lat": -21.136892, "lon": -47.793234, "e_o_seu": false}, {"ponto": "P074", "hora_prevista": "05h40", "lat": -21.135548, "lon": -47.792777, "e_o_seu": true}, {"ponto": "P042", "hora_prevista": "05h45", "lat": -21.135516, "lon": -47.79204, "e_o_seu": false}, {"ponto": "P002", "hora_prevista": "05h50", "lat": -21.137504, "lon": -47.78994, "e_o_seu": false}]}, "situacao_com_falta": {"aluno": "AP074", "ponto": "P074", "viagem": "E1-manha-01", "escola": "EMEF Centro", "turno": "Manhã", "motorista": "VM17", "veiculo": "Ônibus escolar 31 lugares", "chegada_na_escola": "05h55", "hora_planejada": "05h40", "previsao": "05h43", "origem_da_previsao": "medido", "atraso_min": 3, "sinal_inconsistente": false, "estado": "falta_avisada", "mensagem": "Você avisou que hoje ele(a) não vai. O motorista já recebeu — o veículo não vai parar no seu ponto.", "paradas_antes_de_voce": 2, "posicao_do_veiculo": null, "aviso_de_falta": true, "pode_avisar_falta": false, "paradas": [{"ponto": "P062", "hora_prevista": "05h30", "lat": -21.136194, "lon": -47.795108, "e_o_seu": false}, {"ponto": "P013", "hora_prevista": "05h35", "lat": -21.136892, "lon": -47.793234, "e_o_seu": false}, {"ponto": "P074", "hora_prevista": "05h40", "lat": -21.135548, "lon": -47.792777, "e_o_seu": true}, {"ponto": "P042", "hora_prevista": "05h45", "lat": -21.135516, "lon": -47.79204, "e_o_seu": false}, {"ponto": "P002", "hora_prevista": "05h50", "lat": -21.137504, "lon": -47.78994, "e_o_seu": false}]}};
-  var estado = {falta: false};
+  var estado = {falta: false, paciente_nao_vai: false,
+                paciente_liberado: false};
 
   function resposta(corpo) {
     return Promise.resolve({
@@ -101,6 +102,25 @@ button[disabled]{opacity:.5}
     if (caminho === "/api/desfazer-falta") {
       estado.falta = false;
       return resposta({registrado: "volta_atras"});
+    }
+    /* app do paciente: as três ações mudam o mesmo estado local, e a tela
+       se redesenha sozinha — igual ao app de verdade */
+    if (caminho === "/api/minha-viagem") {
+      return resposta(estado.paciente_liberado ? DADOS.paciente_liberado
+        : (estado.paciente_nao_vai ? DADOS.paciente_nao_vai
+                                   : DADOS.paciente));
+    }
+    if (caminho === "/api/nao-vou") {
+      estado.paciente_nao_vai = true;
+      return resposta({ok: true});
+    }
+    if (caminho === "/api/desfazer") {
+      estado.paciente_nao_vai = false;
+      return resposta({ok: true});
+    }
+    if (caminho === "/api/liberado") {
+      estado.paciente_liberado = true;
+      return resposta({ok: true});
     }
     if (caminho === "/api/eventos") {
       var corpo = {};

@@ -246,6 +246,10 @@ TELAS = [
         ("7-app-responsavel.html", "App do responsável",
          "Onde está o ônibus, com a previsão marcada como medida ou "
          "planejada — e o aviso de falta, que alimenta o aprendizado."),
+        ("8-app-paciente.html", "App do paciente",
+         "Transporte de saúde: a hora com selo, “hoje eu não vou” que "
+         "libera a vaga e “já fui liberado”, que é o que chama o carro da "
+         "volta sem hora marcada."),
     ]),
 ]
 
@@ -288,7 +292,8 @@ def main():
     apps.main()
     for origem, destino in (("app-motorista-demo.html", "6-app-motorista.html"),
                             ("app-responsavel-demo.html",
-                             "7-app-responsavel.html")):
+                             "7-app-responsavel.html"),
+                            ("app-paciente-demo.html", "8-app-paciente.html")):
         caminho = os.path.join(DIR, origem)
         if os.path.exists(caminho):
             alvo = os.path.join(DIR_SAIDA, destino)

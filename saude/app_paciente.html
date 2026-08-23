@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MOBGOV — Meu transporte</title>
+<style>
+/* App do paciente. Quem usa: pessoa em tratamento, muitas vezes idosa, às
+   vezes indo em jejum, com celular antigo e plano de dados contado. Uma tela
+   só, letra grande, e os botões que importam grandes o bastante para quem
+   tem a mão trêmula. Nenhuma biblioteca, nenhuma fonte externa. */
+:root{
+  --fundo:#0E1B1E; --cartao:#16292D; --linha:#234249;
+  --texto:#F2F9FA; --fraco:#9BB8BE;
+  --ok:#2BB394; --alerta:#E8A24E; --erro:#E2683F; --acento:#3FA7A0;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--fundo);color:var(--texto);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:17px;line-height:1.5;padding-bottom:40px;overflow-x:hidden}
+header{background:var(--cartao);border-bottom:1px solid var(--linha);padding:16px}
+h1{font-size:19px}
+.sub{font-size:14px;color:var(--fraco);margin-top:3px}
+main{padding:16px;max-width:640px;margin:0 auto}
+.cartao{background:var(--cartao);border:1px solid var(--linha);
+  border-radius:16px;padding:18px;margin-bottom:16px}
+.hora{font-size:42px;font-weight:800;font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;line-height:1.1}
+.rotulo{font-size:14px;color:var(--fraco)}
+/* Selo obrigatório: horário medido e horário de plano não podem parecer a
+   mesma coisa para quem está esperando na porta de casa. */
+.selo{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;padding:3px 8px;border-radius:999px;
+  border:1px solid var(--linha);color:var(--fraco);margin-top:10px}
+.selo.medido{color:#06201A;background:var(--ok);border-color:var(--ok)}
+.linha{display:flex;justify-content:space-between;gap:12px;padding:11px 0;
+  border-top:1px solid var(--linha);font-size:15px;flex-wrap:wrap}
+.linha:first-child{border-top:0}
+.linha b{font-variant-numeric:tabular-nums}
+.marca{display:inline-block;font-size:13px;padding:4px 10px;border-radius:999px;
+  background:#0C2A25;color:var(--ok);border:1px solid #1D4A42;margin-right:6px;
+  margin-top:8px}
+.marca.atencao{background:#2E2513;color:var(--alerta);border-color:#4A3B1B}
+button{font:inherit;border:0;border-radius:14px;padding:17px;font-weight:700;
+  width:100%;min-height:58px;background:var(--acento);color:#03110F;
+  margin-top:12px}
+button.perigo{background:var(--erro);color:#FFF}
+button.secundaria{background:transparent;color:var(--texto);
+  border:1.5px solid var(--linha)}
+button:active{transform:scale(.99)}
+button[disabled]{opacity:.5}
+.ajuda{font-size:14px;color:var(--fraco);margin-top:8px}
+.aviso{background:#2E2513;border:1px solid #4A3B1B;border-radius:14px;
+  padding:14px;margin-bottom:16px;font-size:15px}
+.faixa{background:#3A2A12;color:#F0D9A8;text-align:center;padding:10px 14px;
+  font-size:13.5px;font-weight:700}
+.vazio{text-align:center;padding:26px 18px}
+.vazio .grande{font-size:22px;font-weight:700;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="faixa" id="faixa" hidden>Demonstração — nenhum veículo real</div>
+<header>
+  <h1>Meu transporte</h1>
+  <div class="sub" id="cabecalho">carregando…</div>
+</header>
+<main id="tela"><div class="cartao">Carregando…</div></main>
+
+<script>
+(function () {
+  "use strict";
+  var parametros = new URLSearchParams(location.search);
+  var PACIENTE = parametros.get("paciente") || "";
+  var TOKEN = parametros.get("token") || "";
+
+  function esc(t) {
+    return String(t === undefined || t === null ? "" : t)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function buscar() {
+    fetch("/api/minha-viagem?paciente=" + encodeURIComponent(PACIENTE)
+          + "&token=" + encodeURIComponent(TOKEN))
+      .then(function (r) { return r.json(); })
+      .then(pintar)
+      .catch(function (e) {
+        document.getElementById("tela").innerHTML =
+          '<div class="cartao">Não consegui falar com o sistema. '
+          + 'Tente de novo em instantes.</div>';
+      });
+  }
+
+  function pintar(d) {
+    // o gerador estático já põe a faixa dele no topo; duas faixas dizendo a
+    // mesma coisa gastam a primeira dobra de uma tela de celular
+    if (d.demonstracao && typeof DADOS === "undefined") {
+      document.getElementById("faixa").hidden = false;
+    }
+    document.getElementById("cabecalho").textContent =
+      d.paciente ? "Código " + d.paciente : "";
+
+    if (d.erro) {
+      document.getElementById("tela").innerHTML =
+        '<div class="cartao">' + esc(d.erro) + '</div>';
+      return;
+    }
+    if (!d.tem_viagem) {
+      document.getElementById("tela").innerHTML =
+        '<div class="cartao vazio"><div class="grande">Hoje não tem viagem</div>'
+        + '<div class="ajuda">' + esc(d.mensagem) + '</div></div>';
+      return;
+    }
+
+    var partes = [];
+
+    if (d.avisou_que_nao_vai) {
+      partes.push('<div class="aviso"><b>Você avisou que hoje não vai.</b><br>'
+        + (d.pode_desfazer
+            ? "Dá para voltar atrás enquanto o veículo não passou."
+            : "O veículo já passou pelo seu endereço.") + '</div>');
+    }
+
+    partes.push('<div class="cartao">'
+      + '<div class="rotulo">O carro passa por você às</div>'
+      + '<div class="hora">' + esc(d.ida.passa_por_voce) + '</div>'
+      + '<div class="rotulo" style="margin-top:8px">Chegada em '
+      + esc(d.ida.unidade) + ' às <b>' + esc(d.ida.chegada_prevista) + '</b></div>'
+      + '<span class="selo ' + esc(d.ida.selo.rotulo) + '" title="'
+      + esc(d.ida.selo.explicacao) + '">' + esc(d.ida.selo.rotulo) + '</span>'
+      + '<div class="ajuda">' + esc(d.ida.selo.explicacao) + '</div>'
+      + marcas(d) + '</div>');
+
+    partes.push('<div class="cartao">'
+      + '<div class="rotulo">A volta</div>'
+      + (d.volta.tipo === "com_hora"
+          ? '<div class="hora">' + esc(d.volta.hora) + '</div>'
+          : '<div class="hora" style="font-size:26px">'
+            + (d.volta.liberado ? "a caminho" : "sem hora marcada") + '</div>')
+      + '<div class="ajuda">' + esc(d.volta.explicacao) + '</div></div>');
+
+    partes.push('<div class="cartao">'
+      + d.acoes.map(function (a) {
+          return '<button class="' + (a.estilo === "perigo" ? "perigo"
+              : (a.estilo === "secundaria" ? "secundaria" : ""))
+            + '" data-acao="' + esc(a.id) + '">' + esc(a.rotulo) + '</button>'
+            + '<div class="ajuda">' + esc(a.explicacao) + '</div>';
+        }).join("")
+      + '</div>');
+
+    partes.push('<div class="cartao">'
+      + '<div class="linha"><span>Tratamento</span><b>'
+      + esc(d.tratamento.nome) + '</b></div>'
+      + '<div class="linha"><span>Local</span><b>'
+      + esc(d.tratamento.unidade) + '</b></div>'
+      + '<div class="linha"><span>Horário</span><b>'
+      + esc(d.tratamento.hora) + '</b></div></div>');
+
+    document.getElementById("tela").innerHTML = partes.join("");
+    document.querySelectorAll("[data-acao]").forEach(function (b) {
+      b.addEventListener("click", function () { agir(b, b.dataset.acao); });
+    });
+  }
+
+  function marcas(d) {
+    var itens = [];
+    if (d.tratamento.cadeirante) { itens.push(["", "Vai de cadeira de rodas"]); }
+    if (d.tratamento.maca) { itens.push(["", "Vai de maca"]); }
+    if (d.tratamento.acompanhante) { itens.push(["", "Com acompanhante"]); }
+    if (d.tratamento.jejum) { itens.push(["atencao", "Em jejum"]); }
+    if (d.observacao_operacional) {
+      itens.push(["", d.observacao_operacional]);
+    }
+    return itens.map(function (i) {
+      return '<span class="marca ' + i[0] + '">' + esc(i[1]) + '</span>';
+    }).join("");
+  }
+
+  var CAMINHOS = {nao_vou: "/api/nao-vou", desfazer: "/api/desfazer",
+                  liberado: "/api/liberado"};
+
+  function agir(botao, acao) {
+    botao.disabled = true;
+    fetch(CAMINHOS[acao] + "?paciente=" + encodeURIComponent(PACIENTE)
+          + "&token=" + encodeURIComponent(TOKEN), {method: "POST"})
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.erro) { botao.disabled = false; alert(d.erro); return; }
+        buscar();
+      })
+      .catch(function (e) { botao.disabled = false; alert(String(e)); });
+  }
+
+  buscar();
+  // o horário muda enquanto a pessoa espera na porta; sem isso ela recarrega
+  // a página na mão, gastando dado que muitas vezes é contado
+  setInterval(buscar, 45000);
+})();
+</script>
+</body>
+</html>

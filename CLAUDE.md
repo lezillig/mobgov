@@ -69,6 +69,7 @@ previu X, aconteceu Y, ajustou Z".
 | 13 | `saude/` — transporte de pacientes: tratamento recorrente, prioridade clínica, volta sem hora, maca em viagem dedicada | ✅ pronto |
 | 14 | `saude/tfd.py` — TFD: fila justa, acompanhante por direito, espera no destino medida | ✅ pronto |
 | 14 | `GET /sistema` — a tela remodelada servida pelo servidor de planejamento: envia a planilha, roteiriza e publica de dentro dela | ✅ pronto |
+| 15 | `saude/app_paciente.html` + `saude/acompanhamento.py` — o paciente avisa que não vai (libera vaga) e que foi liberado (chama o carro da volta) | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -123,6 +124,9 @@ mobgov/                          (raiz deste repositório)
   saude/demanda.py               pacientes sintéticos, sem nenhum dado clínico
   saude/rodar.py                 o dia do transporte sanitário, pelo PDPTW
   saude/tfd.py                   a van intermunicipal: fila, acompanhante, espera
+  saude/acompanhamento.py        o que o paciente vê e o que ele consegue fazer
+  saude/app_paciente.html        app do paciente: hora com selo e as duas ações
+  saude/servidor.py              API do app e a fila de retorno do despachante
   painel/console.py              console: Hoje, Elegibilidade, Equipe, Assistente
   docs/demonstracao/gerar_telas_estaticas.py  todas as telas em HTML autocontido
   motor/rodadas.py               reotimização contínua: o dia inteiro em rodadas
@@ -175,6 +179,7 @@ python -m fiscalizacao.relatorio       # boletim de medição do mês
 python -m saude.rodar                  # dia do transporte de pacientes
 python -m saude.rodar --dia 2 --veiculos 6
 python -m planejamento.servidor        # e abra /sistema: a tela nova, ao vivo
+python -m saude.servidor               # app do paciente (8070)
 python -m fiscalizacao.relatorio --modelo viagem --valor-viagem 180
 python -m painel.console               # gera relatorios/console.html
 python docs/demonstracao/gerar_telas_estaticas.py   # o sistema inteiro em HTML
@@ -230,6 +235,15 @@ python -m unittest discover -s testes -v
   fretamento.
 - **Número que o sistema duvida não aparece limpo.** Se `coerencia` traz aviso
   sobre a base de comparação, o cartão de economia diz isso ao lado do número.
+- **O botão do paciente só existe quando faz efeito.** "Já fui liberado" não
+  aparece para tratamento com volta planejada, nem para quem avisou que hoje
+  não vai — nos dois casos ele produziria uma corrida para buscar ninguém.
+  "Hoje eu não vou" é sempre aceito, mas perto da saída ele para de prometer
+  que libera vaga, porque não libera.
+- **A fila de retorno é a contrapartida do botão.** Sem `fila_de_retorno`, o
+  aviso do paciente não vira nada — e a alternativa real é a pessoa esperando
+  sentada até alguém lembrar dela. Ela aparece em Saúde, ordenada por quem
+  espera há mais tempo.
 - **A tela nova é servida, não só gerada.** `GET /sistema` no servidor de
   planejamento entrega `ui/app.html` com o estado real (`montar_ao_vivo`), e é
   por ali que a planilha entra. `DADOS.ao_vivo` liga o envio, o botão de

@@ -1,5 +1,5 @@
 {
-  "gerado_em": "23/08/2026 16:27",
+  "gerado_em": "23/08/2026 17:00",
   "origem": "simulacao",
   "explicacao_selo": "pacientes sintéticos — nenhum dado clínico, nenhuma pessoa real",
   "dia_da_semana": "segunda",
@@ -601,6 +601,16 @@
       "custo": "uma segunda viagem de ida e volta do veículo, ou um segundo carro no mesmo dia"
     },
     "autorizacoes_no_dia": 26
+  },
+  "fila_de_retorno": {
+    "dia": "2026-08-23",
+    "esperando": [],
+    "resumo": {
+      "pessoas": 0,
+      "espera_maxima_min": 0,
+      "com_cadeira": 0,
+      "com_maca": 0
+    }
   },
   "unidades": {
     "U1": "Clínica de Hemodiálise",
