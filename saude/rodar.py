@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from motor import porta_a_porta  # noqa: E402
 from saude import demanda as demanda_mod  # noqa: E402
+from saude import tfd as tfd_mod  # noqa: E402
 from saude.tratamento import PRIORIDADES, pedidos_do_dia  # noqa: E402
 
 DIR_RELATORIOS = os.path.join(
@@ -118,9 +119,22 @@ def rodar(dia_da_semana: int = 0, veiculos_por_tipo: int = None,
         "rotas": [_rota_resumida(r) for r in resultado.get("rotas", [])],
         "nao_atendidos": fora,
         "alertas": _alertas(vitais_fora, agenda),
+        "tfd": _tfd(),
         "unidades": demanda_mod.nomes_das_unidades(),
         "prioridades": {k: dict(v, id=k) for k, v in PRIORIDADES.items()},
     }
+
+
+def _tfd(data: str = "2026-08-24") -> dict:
+    """A viagem intermunicipal do dia, com a espera de cada um no destino."""
+    autorizacoes = demanda_mod.gerar_autorizacoes_tfd(data)
+    veiculo = tfd_mod.VeiculoTFD("TFD1", "Van TFD 15 lugares", 15,
+                                 posicoes_cadeirante=2)
+    viagem = tfd_mod.montar_viagem(autorizacoes, data, veiculo,
+                                   demanda_mod.GARAGEM)
+    viagem["se_dividir_o_retorno"] = tfd_mod.dividir_retorno(viagem)
+    viagem["autorizacoes_no_dia"] = len(autorizacoes)
+    return viagem
 
 
 def _resolver(pedidos, tipos, tempo_limite_s, veiculos_por_tipo) -> dict:

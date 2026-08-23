@@ -1113,7 +1113,86 @@ var DADOS = __DADOS__;
             + '</div></section>'
           : "")
 
+      + secaoTFD(s.tfd)
       + secaoNaoAtendidos(s.nao_atendidos || []);
+  }
+
+  /* TFD: a van que sai de madrugada para a capital. O indicador que abre a
+     seção é a espera no destino — o número que nenhum sistema mede e que faz
+     a família desistir do tratamento. */
+  function secaoTFD(t) {
+    if (!t || !(t.passageiros || []).length) { return ""; }
+    var o = t.ocupacao, e = t.espera, c = t.custos;
+    var d = t.se_dividir_o_retorno || {};
+    return '<section class="secao"><header>'
+      + '<h2>Tratamento fora do domicílio</h2>'
+      + selo({rotulo: "simulado", explicacao:
+          "autorizações sintéticas — nenhuma pessoa real"}) + '</header>'
+      + '<p class="chamada" style="margin-bottom:14px">A viagem de '
+      + esc(t.data) + ' para ' + esc(t.cidade_destino) + ': sai às '
+      + esc(t.saida) + ' e volta às ' + esc(t.retorno_previsto)
+      + '. O veículo espera todo mundo — quem manda no retorno é o último '
+      + 'liberado.</p>'
+      + '<div class="grade n4">'
+      + numeroCartao("Espera média no destino", horas(e.media_min),
+          "a pior é de " + horas(e.maxima_min),
+          {porque: "Quem tem consulta às 8h e volta às 19h porque outro tem "
+            + "consulta às 15h passou o dia num saguão — em jejum, muitas "
+            + "vezes idoso. Esse número não aparece em relatório nenhum "
+            + "hoje, e é o que faz o paciente desistir do tratamento."})
+      + numeroCartao("Acima do aceitável", num(e.acima_do_aceitavel),
+          "pessoas esperando mais de " + horas(e.limite_min))
+      + numeroCartao("Na van", num(o.pacientes) + " + " + num(o.acompanhantes),
+          "pacientes + acompanhantes, " + num(o.ocupacao_pct, 1) + "% da lotação",
+          {porque: "Acompanhante não é cortesia: menor de 18, maior de 60 ou "
+            + "incapacidade declarada têm direito pela norma do TFD, e ocupa "
+            + "vaga de verdade. Sistema que esquece isso lota a van no papel "
+            + "e deixa gente na calçada às 4h da manhã."})
+      + numeroCartao("Na fila", num((t.fila || []).length),
+          "de " + num(t.autorizacoes_no_dia) + " autorizações do dia")
+      + '</div>'
+      + (d.horas_de_espera_poupadas
+          ? '<div class="cartao" style="margin-top:14px">'
+            + '<h3>Se o retorno fosse dividido em dois</h3>'
+            + '<p class="chamada">' + num(d.pessoas_no_primeiro)
+            + ' pessoas voltariam às ' + esc(d.primeiro_retorno) + ' e '
+            + num(d.pessoas_no_segundo) + ' às ' + esc(d.segundo_retorno)
+            + '. A espera média cairia de ' + horas(d.espera_media_antes_min)
+            + ' para ' + horas(d.espera_media_depois_min) + ' — '
+            + '<b>' + num(d.horas_de_espera_poupadas, 1) + ' horas de espera '
+            + 'poupadas por dia</b>. Custo: ' + esc(d.custo) + '.</p></div>'
+          : "")
+      + (t.alertas || []).map(function (x) {
+          return '<div class="aviso" style="margin-top:12px">' + esc(x)
+            + '</div>';
+        }).join("")
+      + '<h3 style="margin-top:18px">Quem vai, e quanto espera</h3>'
+      + '<div class="rolagem"><table><thead><tr><th>Paciente</th>'
+      + '<th>Destino</th><th>Atendimento</th><th>Liberado</th>'
+      + '<th class="num">Espera</th><th>Acompanhante</th>'
+      + '</tr></thead><tbody>'
+      + t.passageiros.map(function (p) {
+          return '<tr><td><b>' + esc(p.paciente) + '</b></td>'
+            + '<td>' + esc(p.unidade) + '<div class="apoio" '
+            + 'style="color:var(--tinta-2);font-size:12.5px">'
+            + esc(p.especialidade) + '</div></td>'
+            + '<td>' + esc(p.hora_atendimento) + '</td>'
+            + '<td>' + esc(p.liberado_previsto) + '</td>'
+            + '<td class="num">' + (p.espera_demais
+                ? '<b>' + horas(p.espera_no_destino_min) + '</b>'
+                : horas(p.espera_no_destino_min)) + '</td>'
+            + '<td>' + (p.acompanhante
+                ? esc(p.motivo_do_acompanhante) : "—") + '</td></tr>';
+        }).join("")
+      + '</tbody></table></div>'
+      + '<div class="grade n3" style="margin-top:14px">'
+      + numeroCartao("Rodagem", num(c.km, 1) + " km",
+          reais(c.custo_rodagem) + " de custo")
+      + numeroCartao("Ajuda de custo", reais(c.ajuda_de_custo_total),
+          num(c.pessoas_com_ajuda) + " pessoas × "
+          + reais(c.ajuda_de_custo_unitaria))
+      + numeroCartao("Custo da viagem", reais(c.total), "rodagem + ajuda")
+      + '</div></section>';
   }
 
   function tabelaPrioridades(contagem, prioridades) {

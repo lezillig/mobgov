@@ -172,5 +172,117 @@ class TestAgendaDaSemana(unittest.TestCase):
             self.assertFalse(t.maca and t.cadeirante, t.id)
 
 
+class TestTFD(unittest.TestCase):
+    """A van que sai de madrugada para a capital."""
+
+    @classmethod
+    def setUpClass(cls):
+        from saude import tfd
+        cls.tfd = tfd
+        cls.autorizacoes = demanda_mod.gerar_autorizacoes_tfd("2026-08-24")
+        cls.veiculo = tfd.VeiculoTFD("TFD1", "Van TFD 15", 15,
+                                     posicoes_cadeirante=2)
+        cls.viagem = tfd.montar_viagem(cls.autorizacoes, "2026-08-24",
+                                       cls.veiculo, demanda_mod.GARAGEM)
+
+    def test_acompanhante_e_direito_com_motivo_escrito(self):
+        tem, motivo = self.tfd.direito_a_acompanhante(15)
+        self.assertTrue(tem)
+        self.assertIn("menor", motivo)
+        tem, motivo = self.tfd.direito_a_acompanhante(70)
+        self.assertTrue(tem)
+        self.assertTrue(motivo)
+        tem, motivo = self.tfd.direito_a_acompanhante(40)
+        self.assertFalse(tem)
+        self.assertEqual(motivo, "")
+
+    def test_incapacidade_da_direito_em_qualquer_idade(self):
+        tem, motivo = self.tfd.direito_a_acompanhante(35, incapacidade=True)
+        self.assertTrue(tem)
+        self.assertIn("incapacidade", motivo)
+
+    def test_acompanhante_ocupa_vaga_de_verdade(self):
+        """Van que 'esquece' o acompanhante deixa gente na calçada às 4h."""
+        ocupacao = self.viagem["ocupacao"]
+        self.assertEqual(
+            ocupacao["vagas_usadas"],
+            ocupacao["pacientes"] + ocupacao["acompanhantes"])
+        self.assertLessEqual(ocupacao["vagas_usadas"], self.veiculo.lugares)
+
+    def test_cadeira_e_limite_proprio(self):
+        self.assertLessEqual(self.viagem["ocupacao"]["cadeirantes"],
+                             self.veiculo.posicoes_cadeirante)
+
+    def test_ninguem_some_da_fila(self):
+        total = (self.viagem["ocupacao"]["pacientes"]
+                 + len(self.viagem["fila"]))
+        self.assertEqual(total, len(self.autorizacoes))
+        for item in self.viagem["fila"]:
+            self.assertTrue(item["posicao"])
+            self.assertTrue(item["motivo"])
+            self.assertTrue(item["o_que_fazer"])
+
+    def test_fila_e_por_prioridade_e_data_de_autorizacao(self):
+        """A fila precisa ser defensável: não é telefonema, é data."""
+        ordenadas = sorted(self.autorizacoes, key=self.tfd._ordem_da_fila)
+        prioridades = [a.prioridade for a in ordenadas]
+
+        # nenhum eletivo entra antes de um vital
+        vitais = [i for i, p in enumerate(prioridades) if p == "vital"]
+        eletivos = [i for i, p in enumerate(prioridades) if p == "eletivo"]
+        self.assertTrue(vitais and eletivos, "amostra sem os dois casos")
+        self.assertLess(max(vitais), min(eletivos))
+
+        # dentro da mesma prioridade, quem autorizou antes vai antes
+        datas = [a.autorizada_em for a in ordenadas
+                 if a.prioridade == "vital"]
+        self.assertEqual(datas, sorted(datas))
+
+    def test_espera_no_destino_e_medida_por_pessoa(self):
+        """O número que ninguém mede: quantas horas no saguão."""
+        self.assertIn("espera", self.viagem)
+        self.assertGreater(self.viagem["espera"]["maxima_min"], 0)
+        for p in self.viagem["passageiros"]:
+            self.assertGreaterEqual(p["espera_no_destino_min"], 0)
+        # o último liberado espera zero; é ele que define o retorno
+        self.assertEqual(min(p["espera_no_destino_min"]
+                             for p in self.viagem["passageiros"]), 0)
+
+    def test_retorno_e_do_ultimo_liberado(self):
+        liberacoes = [p["liberado_previsto"]
+                      for p in self.viagem["passageiros"]]
+        self.assertTrue(self.viagem["retorno_previsto"] >= max(liberacoes))
+
+    def test_viagem_longa_avisa_sobre_a_jornada(self):
+        """15 h de amplitude não fecham na Lei 13.103 — o sistema diz isso."""
+        if self.viagem["duracao_total_min"] > 14 * 60:
+            self.assertTrue(any("13.103" in a for a in self.viagem["alertas"]))
+
+    def test_dividir_retorno_mostra_o_ganho_sem_decidir(self):
+        divisao = self.tfd.dividir_retorno(self.viagem)
+        self.assertLess(divisao["espera_media_depois_min"],
+                        divisao["espera_media_antes_min"])
+        self.assertGreater(divisao["horas_de_espera_poupadas"], 0)
+        self.assertTrue(divisao["custo"])
+
+    def test_custo_separa_rodagem_de_ajuda_de_custo(self):
+        custos = self.viagem["custos"]
+        self.assertAlmostEqual(
+            custos["total"],
+            custos["custo_rodagem"] + custos["ajuda_de_custo_total"], places=2)
+        self.assertEqual(custos["pessoas_com_ajuda"],
+                         self.viagem["ocupacao"]["vagas_usadas"])
+
+    def test_dia_sem_autorizacao_nao_inventa_viagem(self):
+        vazia = self.tfd.montar_viagem(self.autorizacoes, "2030-01-01",
+                                       self.veiculo, demanda_mod.GARAGEM)
+        self.assertEqual(vazia["passageiros"], [])
+        self.assertEqual(vazia["ocupacao"]["vagas_usadas"], 0)
+
+    def test_especialidade_nao_e_diagnostico(self):
+        for a in self.autorizacoes:
+            self.assertIn(a.especialidade, demanda_mod.ESPECIALIDADES)
+
+
 if __name__ == "__main__":
     unittest.main()

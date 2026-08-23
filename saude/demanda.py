@@ -83,6 +83,37 @@ PROPORCAO_JEJUM_EM_EXAME = 0.6
 OBSERVACOES = ["usa oxigênio portátil", "não sobe escada",
                "precisa de apoio para caminhar", ""]
 
+# ------------------------------------------------------------------- TFD ---
+# A cidade-polo e os hospitais de referência. Distâncias reais de um município
+# do interior paulista até a capital regional.
+# ~120 km da sede: é essa distância que faz a van sair antes das 5h e
+# transforma a espera no destino no problema que ela é.
+CIDADE_POLO = "Capital regional"
+HOSPITAIS_DE_REFERENCIA = [
+    {"id": "H1", "nome": "Hospital das Clínicas", "lat": -22.208, "lon": -47.885,
+     "especialidades": ["oncologia", "cardiologia", "neurologia"]},
+    {"id": "H2", "nome": "Hospital do Câncer", "lat": -22.224, "lon": -47.856,
+     "especialidades": ["oncologia"]},
+    {"id": "H3", "nome": "Centro de Oftalmologia", "lat": -22.196, "lon": -47.872,
+     "especialidades": ["oftalmologia"]},
+    {"id": "H4", "nome": "Instituto de Ortopedia", "lat": -22.238, "lon": -47.894,
+     "especialidades": ["ortopedia"]},
+]
+
+# Especialidade é o SERVIÇO contratado — o que decide para qual hospital a
+# pessoa vai. Não é diagnóstico, e não vira laudo em lugar nenhum.
+ESPECIALIDADES = {
+    "oncologia": {"prioridade": "vital", "duracao_min": 240},
+    "cardiologia": {"prioridade": "continuado", "duracao_min": 150},
+    "neurologia": {"prioridade": "continuado", "duracao_min": 120},
+    "oftalmologia": {"prioridade": "eletivo", "duracao_min": 90},
+    "ortopedia": {"prioridade": "eletivo", "duracao_min": 120},
+}
+
+HORARIOS_TFD = [7 * 60 + 30, 8 * 60, 9 * 60, 10 * 60, 13 * 60, 14 * 60,
+                15 * 60]
+PROPORCAO_INCAPACIDADE = 0.18
+
 
 def _sorteia_casa(rng) -> tuple:
     nome, lat, lon, raio, _ = rng.choices(
@@ -133,6 +164,42 @@ def gerar_tratamentos(semente: int = SEMENTE) -> list:
                 distrito=distrito,
                 observacao_operacional=rng.choice(OBSERVACOES)))
     return tratamentos
+
+
+def gerar_autorizacoes_tfd(data: str = "2026-08-24", quantas: int = 26,
+                           semente: int = SEMENTE) -> list:
+    """A fila de TFD de um dia — autorizações já aprovadas pela secretaria."""
+    from saude.tfd import AutorizacaoTFD
+
+    rng = random.Random(semente + 7)
+    por_especialidade = {}
+    for h in HOSPITAIS_DE_REFERENCIA:
+        for e in h["especialidades"]:
+            por_especialidade.setdefault(e, []).append(h)
+
+    autorizacoes = []
+    for i in range(1, quantas + 1):
+        casa, distrito = _sorteia_casa(rng)
+        especialidade = rng.choice(list(ESPECIALIDADES))
+        hospital = rng.choice(por_especialidade[especialidade])
+        regra = ESPECIALIDADES[especialidade]
+        # a idade decide o direito a acompanhante, e é por isso que ela existe
+        # aqui: não é dado clínico, é o que a norma do TFD usa
+        idade = rng.choice([8, 15, 27, 34, 41, 52, 63, 68, 74, 81])
+        autorizacoes.append(AutorizacaoTFD(
+            id=f"TFD{i:03d}", paciente_id=f"PT{i:04d}", origem=casa,
+            cidade_destino=CIDADE_POLO, unidade_destino=hospital["nome"],
+            coordenada_destino=(hospital["lat"], hospital["lon"]),
+            data_do_atendimento=data,
+            hora_atendimento_min=rng.choice(HORARIOS_TFD),
+            duracao_prevista_min=regra["duracao_min"],
+            especialidade=especialidade, idade=idade,
+            incapacidade=rng.random() < PROPORCAO_INCAPACIDADE,
+            cadeirante=rng.random() < PROPORCAO_CADEIRANTE,
+            prioridade=regra["prioridade"],
+            autorizada_em=f"2026-08-{rng.randint(1, 20):02d}",
+            distrito=distrito))
+    return autorizacoes
 
 
 def unidades_por_id() -> dict:
