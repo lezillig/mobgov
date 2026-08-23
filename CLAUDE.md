@@ -66,6 +66,7 @@ previu X, aconteceu Y, ajustou Z".
 | 10 | `comercial/` — precificação (custo → preço com margem por divisão) e diagnóstico da operação existente | ✅ pronto |
 | 11 | `ui/` — o sistema remodelado por momento de trabalho (Início · Planejar · Operar · Fiscalizar · Vender · Ajustes), descrito em `docs/ux-modelo.md` | ✅ pronto |
 | 12 | `fiscalizacao/` — medição do contrato: planejado × realizado, pagamento, glosa com evidência e boletim mensal por fornecedor | ✅ pronto |
+| 13 | `saude/` — transporte de pacientes: tratamento recorrente, prioridade clínica, volta sem hora, maca em viagem dedicada | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -110,12 +111,15 @@ mobgov/                          (raiz deste repositório)
   planejamento/servidor.py       a tela da roteirização: envia, confere, ajusta, publica
   planejamento/tela.html         os cinco passos numa página só
   planejamento/multipart.py      envio de arquivo sem dependência (o cgi saiu do 3.13)
-  ui/app.html                    o sistema remodelado: 5 destinos, mapa vivo, trilha
+  ui/app.html                    o sistema remodelado: 7 destinos, mapa vivo, trilha
   ui/gerar.py                    monta o payload real e escreve a tela autocontida
   fiscalizacao/medicao.py        plano publicado × eventos: o que de fato rodou
   fiscalizacao/contrato.py       do medido para o pago: modelo, glosa e suspenso
   fiscalizacao/simulador.py      um mês de execução imperfeita (selo simulado)
   fiscalizacao/relatorio.py      o boletim de medição que vai para o processo
+  saude/tratamento.py            a agenda que se repete: prioridade, volta, maca
+  saude/demanda.py               pacientes sintéticos, sem nenhum dado clínico
+  saude/rodar.py                 o dia do transporte sanitário, pelo PDPTW
   painel/console.py              console: Hoje, Elegibilidade, Equipe, Assistente
   docs/demonstracao/gerar_telas_estaticas.py  todas as telas em HTML autocontido
   motor/rodadas.py               reotimização contínua: o dia inteiro em rodadas
@@ -165,6 +169,8 @@ python comercial/cli.py diagnosticar --plano ... --linhas linhas-atuais.csv
 python comercial/cli.py proposta --plano ... --linhas ... --cliente "Empresa X"
 python ui/gerar.py                     # o sistema remodelado (prefeitura + empresa)
 python -m fiscalizacao.relatorio       # boletim de medição do mês
+python -m saude.rodar                  # dia do transporte de pacientes
+python -m saude.rodar --dia 2 --veiculos 6
 python -m fiscalizacao.relatorio --modelo viagem --valor-viagem 180
 python -m painel.console               # gera relatorios/console.html
 python docs/demonstracao/gerar_telas_estaticas.py   # o sistema inteiro em HTML
@@ -220,6 +226,21 @@ python -m unittest discover -s testes -v
   fretamento.
 - **Número que o sistema duvida não aparece limpo.** Se `coerencia` traz aviso
   sobre a base de comparação, o cartão de economia diz isso ao lado do número.
+- **No transporte de paciente, prioridade clínica não some.** Hemodiálise é
+  `vital` e não é remarcável — faltar é internação. Quem fica sem veículo
+  aparece nominalmente, em ordem de quem não pode faltar, com o que dá para
+  fazer. Consulta remarcada e hemodiálise perdida nunca saem na mesma linha.
+- **Volta sem hora não entra no plano da manhã.** Consulta e quimioterapia
+  terminam quando o médico libera; planejar essa hora é inventá-la e deixar
+  veículo parado no estacionamento do hospital. Elas entram pela reotimização,
+  e o relatório diz quantas esperar para a tarde.
+- **Maca é viagem dedicada, não passageiro grande.** Vai em ambulância de
+  transporte, resolvida num passe separado do solver. Contar só assentos
+  deixaria duas macas numa van de oito lugares, que não existe na rua.
+- **Nada clínico atravessa para a rota.** Como em `elegibilidade/`: doença,
+  CID e laudo ficam no processo; para o veículo vai a necessidade (maca,
+  cadeira, acompanhante, jejum). Há teste que quebra se um campo clínico
+  aparecer no pedido.
 - **Falta de evidência não é prova de falta.** Viagem sem nenhum evento é
   `sem_evidencia`, nunca `nao_realizada`: aparelho descarregado e zona rural
   sem sinal acontecem toda semana. Ela vira valor EM SUSPENSO, com dono da

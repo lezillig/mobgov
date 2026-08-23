@@ -1,0 +1,202 @@
+{
+  "gerado_em": "23/08/2026 15:59",
+  "origem": "simulacao",
+  "explicacao_selo": "pacientes sintéticos — nenhum dado clínico, nenhuma pessoa real",
+  "dia_da_semana": "segunda",
+  "tratamentos_ativos": 185,
+  "agenda": {
+    "pedidos_planejaveis": 97,
+    "idas": 57,
+    "voltas_planejadas": 40,
+    "voltas_por_chamada": 17,
+    "por_prioridade": {
+      "vital": 19,
+      "continuado": 22,
+      "eletivo": 16
+    },
+    "por_tipo": {
+      "hemodialise": 18,
+      "quimioterapia": 1,
+      "fisioterapia": 22,
+      "consulta": 14,
+      "exame": 2
+    },
+    "com_maca": 2,
+    "cadeirantes": 24,
+    "com_acompanhante": 38,
+    "em_jejum": 2,
+    "assentos_necessarios_no_pico": null
+  },
+  "frota": {
+    "total_veiculos": 13,
+    "composicao": {
+      "CARRO4": 3,
+      "VANPCD8": 8,
+      "AMBTRANS": 2
+    },
+    "km_dia": 718.0
+  },
+  "indicadores": {
+    "usuarios_por_veiculo": 8.64,
+    "tempo_bordo_medio_min": 24.5,
+    "tempo_bordo_max_min": 51,
+    "dentro_do_limite_pct": 100.0,
+    "compartilhamento_max": 8,
+    "ocupacao_media_pct": 71.5,
+    "km_por_usuario": 7.1
+  },
+  "remocoes_de_maca": {
+    "viagens": 2,
+    "veiculos": 2,
+    "km_dia": 43.6
+  },
+  "rotas": [
+    {
+      "id": "PP01",
+      "tipo": "Carro de apoio 4 lugares",
+      "km": 12.6,
+      "min": null,
+      "usuarios": 1,
+      "ocupacao_maxima": 2,
+      "ocupacao_maxima_pct": 50
+    },
+    {
+      "id": "PP02",
+      "tipo": "Carro de apoio 4 lugares",
+      "km": 66.2,
+      "min": null,
+      "usuarios": 4,
+      "ocupacao_maxima": 2,
+      "ocupacao_maxima_pct": 50
+    },
+    {
+      "id": "PP03",
+      "tipo": "Carro de apoio 4 lugares",
+      "km": 31.0,
+      "min": null,
+      "usuarios": 3,
+      "ocupacao_maxima": 4,
+      "ocupacao_maxima_pct": 100
+    },
+    {
+      "id": "PP04",
+      "tipo": "Van adaptada 8 lugares",
+      "km": 103.7,
+      "min": null,
+      "usuarios": 18,
+      "ocupacao_maxima": 5,
+      "ocupacao_maxima_pct": 62
+    },
+    {
+      "id": "PP05",
+      "tipo": "Van adaptada 8 lugares",
+      "km": 186.3,
+      "min": null,
+      "usuarios": 22,
+      "ocupacao_maxima": 8,
+      "ocupacao_maxima_pct": 100
+    },
+    {
+      "id": "PP06",
+      "tipo": "Van adaptada 8 lugares",
+      "km": 15.0,
+      "min": null,
+      "usuarios": 4,
+      "ocupacao_maxima": 6,
+      "ocupacao_maxima_pct": 75
+    },
+    {
+      "id": "PP07",
+      "tipo": "Van adaptada 8 lugares",
+      "km": 46.4,
+      "min": null,
+      "usuarios": 10,
+      "ocupacao_maxima": 6,
+      "ocupacao_maxima_pct": 75
+    },
+    {
+      "id": "PP08",
+      "tipo": "Van adaptada 8 lugares",
+      "km": 20.7,
+      "min": null,
+      "usuarios": 3,
+      "ocupacao_maxima": 6,
+      "ocupacao_maxima_pct": 75
+    },
+    {
+      "id": "PP09",
+      "tipo": "Van adaptada 8 lugares",
+      "km": 91.6,
+      "min": null,
+      "usuarios": 16,
+      "ocupacao_maxima": 5,
+      "ocupacao_maxima_pct": 62
+    },
+    {
+      "id": "PP10",
+      "tipo": "Van adaptada 8 lugares",
+      "km": 45.1,
+      "min": null,
+      "usuarios": 7,
+      "ocupacao_maxima": 5,
+      "ocupacao_maxima_pct": 62
+    },
+    {
+      "id": "PP11",
+      "tipo": "Van adaptada 8 lugares",
+      "km": 55.8,
+      "min": null,
+      "usuarios": 7,
+      "ocupacao_maxima": 6,
+      "ocupacao_maxima_pct": 75
+    },
+    {
+      "id": "PP01",
+      "tipo": "Ambulância de transporte (maca)",
+      "km": 21.8,
+      "min": null,
+      "usuarios": 1,
+      "ocupacao_maxima": 3,
+      "ocupacao_maxima_pct": 75
+    },
+    {
+      "id": "PP02",
+      "tipo": "Ambulância de transporte (maca)",
+      "km": 21.8,
+      "min": null,
+      "usuarios": 1,
+      "ocupacao_maxima": 3,
+      "ocupacao_maxima_pct": 75
+    }
+  ],
+  "nao_atendidos": [],
+  "alertas": [
+    "17 voltas não têm hora — consulta e quimioterapia terminam quando o médico libera. Elas NÃO estão no plano da manhã de propósito: entram pela reotimização quando o paciente avisa. Reserve folga de frota para a tarde."
+  ],
+  "unidades": {
+    "U1": "Clínica de Hemodiálise",
+    "U2": "Hospital Municipal",
+    "U3": "Centro de Especialidades",
+    "U4": "UBS Distrito Norte"
+  },
+  "prioridades": {
+    "vital": {
+      "rotulo": "não pode faltar",
+      "explicacao": "sem a sessão o paciente interna — hemodiálise, quimioterapia em ciclo, oncologia",
+      "remarcavel": false,
+      "id": "vital"
+    },
+    "continuado": {
+      "rotulo": "não deveria faltar",
+      "explicacao": "interromper atrasa a recuperação — fisioterapia, reabilitação, pré-natal",
+      "remarcavel": true,
+      "id": "continuado"
+    },
+    "eletivo": {
+      "rotulo": "remarcável",
+      "explicacao": "consulta, exame e retorno de rotina",
+      "remarcavel": true,
+      "id": "eletivo"
+    }
+  }
+}

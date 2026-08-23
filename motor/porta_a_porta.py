@@ -39,6 +39,10 @@ from dados.demanda_pcd import (
 )
 
 TEMPO_LIMITE_SOLVER_S = 30
+# O horizonte é RELÓGIO ABSOLUTO: as janelas vêm em minutos desde 00:00, e a
+# dimensão de tempo não zera na saída da garagem. 16 h cobre o dia do porta a
+# porta escolar; o transporte sanitário vai além (hemodiálise do turno das
+# 16 h volta às 20 h), e por isso os dois são parâmetro, não constante.
 HORIZONTE_MIN = 16 * 60          # o dia de operação cabe em 16 h
 ESPERA_MAXIMA_MIN = 30           # veículo parado esperando janela abrir
 
@@ -48,7 +52,9 @@ _zona = tempos_mod.zona_de
 
 def resolver(pedidos: list, tipos=None, provedor=None, partida_min: int = 7 * 60,
              tempo_limite_s: int = TEMPO_LIMITE_SOLVER_S,
-             veiculos_por_tipo: int = None) -> dict:
+             veiculos_por_tipo: int = None,
+             horizonte_min: int = HORIZONTE_MIN,
+             espera_maxima_min: int = ESPERA_MAXIMA_MIN) -> dict:
     """Resolve o dia do porta a porta. Devolve rotas, frota e indicadores."""
     if not pedidos:
         return {"rotas": [], "composicao": {}, "total_veiculos": 0,
@@ -121,7 +127,7 @@ def resolver(pedidos: list, tipos=None, provedor=None, partida_min: int = 7 * 60
         cc, 0, [t.posicoes_cadeirante for t in frota], True, "Cadeiras")
 
     # ---- tempo: com folga (o veículo pode esperar a janela abrir)
-    routing.AddDimension(ti, ESPERA_MAXIMA_MIN, HORIZONTE_MIN, False, "Tempo")
+    routing.AddDimension(ti, espera_maxima_min, horizonte_min, False, "Tempo")
     dim_tempo = routing.GetDimensionOrDie("Tempo")
 
     solver = routing.solver()
@@ -138,9 +144,13 @@ def resolver(pedidos: list, tipos=None, provedor=None, partida_min: int = 7 * 60
         ini, fim = p.janela_chegada
         dim_tempo.CumulVar(des).SetRange(int(ini), int(fim))
 
-        # tempo máximo a bordo
+        # tempo máximo a bordo. O pedido pode apertar o limite geral — quem
+        # vai fazer exame em jejum não pode rodar 90 min coletando os outros.
         direto = tempo[no_embarque(i)][no_desembarque(i)]
         limite = limite_tempo_bordo_min(direto)
+        aperto = getattr(p, "tempo_max_bordo_min", None)
+        if aperto:
+            limite = min(limite, int(aperto))
         solver.Add(dim_tempo.CumulVar(des) - dim_tempo.CumulVar(emb) <= limite)
 
     for v in range(n_veic):

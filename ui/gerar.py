@@ -530,6 +530,9 @@ def montar(caminho_plano: str = None, com_comercial: bool = True,
             },
         },
         "fiscalizar": _opcional("fiscalizacao.json"),
+        # transporte de paciente é outra secretaria do mesmo município; numa
+        # operação de empresa ele não existe e o destino não aparece
+        "saude": None if e_fretamento else _opcional("saude.json"),
         "ajustes": _ajustes(plano, perfil),
         "vender": comercial,
     }

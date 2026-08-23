@@ -249,6 +249,11 @@ demonstração, nada aqui é publicado de verdade</div>
       <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
       <span>Operar<small>o dia acontecendo</small></span></a>
+    <a href="#saude" data-destino="saude" data-so-escolar="1">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><path d="M12 8v8m-4-4h8"/>
+        <rect x="3" y="5" width="18" height="14" rx="2"/></svg>
+      <span>Saúde<small>transporte de pacientes</small></span></a>
     <a href="#fiscalizar" data-destino="fiscalizar">
       <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2"><path d="M9 11l3 3 7-7"/>
@@ -1018,6 +1023,146 @@ var DADOS = __DADOS__;
     });
   }
 
+  /* --------------------------------------------------------------- saúde */
+  function telaSaude() {
+    var s = DADOS.saude;
+    if (!s) {
+      return '<h1>Saúde</h1><div class="cartao vazio">'
+        + '<b>Este destino é do transporte de pacientes</b>'
+        + 'Ele aparece quando a secretaria de saúde do município entra no '
+        + 'sistema, com a agenda de tratamentos.</div>';
+    }
+    var a = s.agenda, f = s.frota, i = s.indicadores || {};
+    var prioridades = s.prioridades || {};
+
+    return '<h1>Transporte de pacientes</h1>'
+      + '<p class="chamada">O dia de ' + esc(s.dia_da_semana) + '. Aqui a '
+      + 'pergunta não é só quantos veículos: é quem não pode faltar.</p>'
+
+      + (s.alertas || []).map(function (x) {
+          return '<div class="aviso" style="margin-top:14px">' + esc(x)
+            + '</div>';
+        }).join("")
+
+      + '<section class="secao"><header><h2>A agenda de hoje</h2>'
+      + selo({rotulo: s.origem === "simulacao" ? "simulado" : "planejado",
+              explicacao: s.explicacao_selo || ""}) + '</header>'
+      + '<div class="grade n4">'
+      + numeroCartao("Tratamentos ativos", num(s.tratamentos_ativos),
+          "pacientes com transporte recorrente",
+          {porque: "Tratamento é assinatura, não pedido avulso: hemodiálise "
+            + "são três sessões por semana, sempre. O sistema monta o dia a "
+            + "partir dessa agenda, e não de uma lista de solicitações."})
+      + numeroCartao("Viagens planejáveis", num(a.pedidos_planejaveis),
+          num(a.idas) + " idas + " + num(a.voltas_planejadas) + " voltas")
+      + numeroCartao("Voltas sem hora", num(a.voltas_por_chamada),
+          "entram pela chamada do paciente",
+          {porque: "Consulta e quimioterapia terminam quando o médico libera. "
+            + "Planejar essa hora seria inventá-la — e deixar o veículo "
+            + "parado três horas no estacionamento do hospital. Elas entram "
+            + "pela reotimização, quando o paciente avisa."})
+      + numeroCartao("Veículos", num(f.total_veiculos),
+          num(f.km_dia, 1) + " km no dia")
+      + '</div></section>'
+
+      + '<section class="secao"><header>'
+      + '<h2>Quem não pode faltar</h2></header>'
+      + '<p class="chamada" style="margin-bottom:14px">A prioridade não é '
+      + 'classificação de risco: é o que acontece se a viagem não sair.</p>'
+      + tabelaPrioridades(a.por_prioridade || {}, prioridades)
+      + '</section>'
+
+      + '<section class="secao"><header>'
+      + '<h2>O que a rota precisa saber</h2></header>'
+      + '<p class="chamada" style="margin-bottom:14px">Só a necessidade '
+      + 'operacional atravessa para o veículo. Diagnóstico, CID e laudo ficam '
+      + 'no processo — o motorista sabe que o paciente vai de maca, nunca por '
+      + 'quê.</p>'
+      + '<div class="grade n4">'
+      + numeroCartao("De maca", num(a.com_maca),
+          (s.remocoes_de_maca && s.remocoes_de_maca.veiculos
+            ? num(s.remocoes_de_maca.veiculos) + " ambulâncias de transporte"
+            : "viagem dedicada"),
+          {porque: "Remoção de maca não compartilha veículo com mais ninguém: "
+            + "é ambulância de transporte, viagem dedicada. Contar só "
+            + "assentos deixaria duas macas numa van de oito lugares, que não "
+            + "existe na rua."})
+      + numeroCartao("Em cadeira de rodas", num(a.cadeirantes),
+          "posição de cadeira, não assento")
+      + numeroCartao("Com acompanhante", num(a.com_acompanhante),
+          "ocupa assento e tem direito por norma")
+      + numeroCartao("Em jejum", num(a.em_jejum),
+          "tempo a bordo menor que o limite geral",
+          {porque: "Quem vai fazer exame em jejum não pode rodar 90 minutos "
+            + "coletando as outras pessoas. O motor recebe um limite menor "
+            + "só para esse pedido."})
+      + '</div></section>'
+
+      + (Object.keys(i).length
+          ? '<section class="secao"><header><h2>Como ficou a viagem</h2>'
+            + '</header><div class="grade n3">'
+            + numeroCartao("Tempo médio a bordo",
+                num(i.tempo_bordo_medio_min, 1) + " min",
+                "máximo de " + num(i.tempo_bordo_max_min) + " min")
+            + numeroCartao("Dentro do limite",
+                num(i.dentro_do_limite_pct, 1) + "%",
+                "do tempo máximo de cada paciente")
+            + numeroCartao("Pacientes por veículo",
+                num(i.usuarios_por_veiculo, 2),
+                num(i.km_por_usuario, 2) + " km por paciente")
+            + '</div></section>'
+          : "")
+
+      + secaoNaoAtendidos(s.nao_atendidos || []);
+  }
+
+  function tabelaPrioridades(contagem, prioridades) {
+    var ordem = ["vital", "continuado", "eletivo"];
+    var linhas = ordem.filter(function (k) { return prioridades[k]; })
+      .map(function (k) {
+        var p = prioridades[k];
+        return '<tr><td><b>' + esc(p.rotulo) + '</b>'
+          + '<div class="apoio" style="color:var(--tinta-2);font-size:13px">'
+          + esc(p.explicacao) + '</div></td>'
+          + '<td class="num">' + num(contagem[k] || 0) + '</td>'
+          + '<td>' + (p.remarcavel ? "pode ser remarcado"
+              : "<b>não pode ser remarcado</b>") + '</td></tr>';
+      }).join("");
+    return '<div class="rolagem"><table><thead><tr>'
+      + '<th>Prioridade</th><th class="num">Viagens hoje</th>'
+      + '<th>Se faltar veículo</th></tr></thead><tbody>' + linhas
+      + '</tbody></table></div>';
+  }
+
+  function secaoNaoAtendidos(itens) {
+    if (!itens.length) {
+      return '<section class="secao"><header>'
+        + '<h2>Ninguém ficou sem viagem</h2></header>'
+        + '<div class="cartao vazio"><b>Todos os pedidos do dia couberam</b>'
+        + 'Quando não couberem, cada paciente aparece aqui pelo nome do '
+        + 'protocolo, com o que dá para fazer — nunca some da conta.</div>'
+        + '</section>';
+    }
+    var linhas = itens.slice(0, 20).map(function (x) {
+      return '<tr><td><b>' + esc(x.paciente) + '</b></td>'
+        + '<td>' + esc(x.tratamento) + '</td>'
+        + '<td>' + esc(x.sentido) + '</td>'
+        + '<td>' + (x.remarcavel ? esc(x.rotulo)
+            : '<b>' + esc(x.rotulo) + '</b>') + '</td>'
+        + '<td>' + esc(x.o_que_fazer) + '</td></tr>';
+    }).join("");
+    return '<section class="secao"><header>'
+      + '<h2>Quem ficou sem viagem</h2></header>'
+      + '<p class="chamada" style="margin-bottom:14px">Em ordem de quem não '
+      + 'pode faltar. Uma consulta remarcada é um telefonema; uma '
+      + 'hemodiálise perdida é uma internação — os dois não podem sair na '
+      + 'mesma linha.</p>'
+      + '<div class="rolagem"><table><thead><tr><th>Paciente</th>'
+      + '<th>Tratamento</th><th>Sentido</th><th>Prioridade</th>'
+      + '<th>O que fazer</th></tr></thead><tbody>' + linhas
+      + '</tbody></table></div></section>';
+  }
+
   /* ---------------------------------------------------------- fiscalizar */
   function telaFiscalizar() {
     var b = DADOS.fiscalizar;
@@ -1344,8 +1489,8 @@ var DADOS = __DADOS__;
 
   /* --------------------------------------------------------------- rotas */
   var TELAS = {inicio: telaInicio, planejar: telaPlanejar, operar: telaOperar,
-               fiscalizar: telaFiscalizar, vender: telaVender,
-               ajustes: telaAjustes};
+               saude: telaSaude, fiscalizar: telaFiscalizar,
+               vender: telaVender, ajustes: telaAjustes};
 
   function pintar() {
     var destino = (location.hash || "#inicio").slice(1);
@@ -1455,6 +1600,9 @@ var DADOS = __DADOS__;
       + '<span class="secundario">·</span>'
       + '<span class="secundario">plano de '
       + esc(String(DADOS.gerado_em).slice(0, 5)) + '</span>';
+    document.querySelectorAll("[data-so-escolar]").forEach(function (a) {
+      a.hidden = !DADOS.saude;
+    });
     document.getElementById("operacoes").innerHTML =
       (DADOS.operacoes || []).map(function (op) {
         return '<a href="' + esc(op.arquivo) + (location.hash || "#inicio") + '"'
