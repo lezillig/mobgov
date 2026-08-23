@@ -31,6 +31,7 @@ from comercial import operacao_atual as operacao_mod  # noqa: E402
 from comercial import precificacao as precificacao_mod  # noqa: E402
 from comercial.precificacao import Premissas  # noqa: E402
 from elegibilidade import relatorio as elegibilidade_mod  # noqa: E402
+from fiscalizacao import relatorio as fiscalizacao_mod  # noqa: E402
 from operacao import onde_esta, registro, rota_do_dia as rotas  # noqa: E402
 from painel import economia as economia_mod  # noqa: E402
 
@@ -72,36 +73,12 @@ def _selo(origem: str) -> dict:
 
 
 def _contrato(perfil: dict) -> dict:
-    """Quem responde por cada destino, e como chamar isso na tela.
-
-    O plano guarda o perfil inteiro, então o normal é o contrato vir dele.
-    Planos gravados antes deste campo existir caem no catálogo de perfis
-    embutidos — pelo id do perfil, nunca por adivinhação de nome.
-    """
-    contrapartes = perfil.get("contrapartes")
-    rotulo = perfil.get("rotulo_contraparte")
-    if contrapartes is None:
-        # plano sem perfil é escolar — é o padrão histórico do sistema
-        embutido = perfis_mod.EMBUTIDOS.get(perfil.get("id"),
-                                            perfis_mod.PERFIL_ESCOLAR)
-        contrapartes = [{"id": c.id, "nome": c.nome, "destinos": c.destinos}
-                        for c in embutido.contrapartes]
-        rotulo = rotulo or embutido.rotulo_contraparte
-    if not contrapartes:
-        return {}
-    # Plano vindo de planilha numera os destinos na ordem em que aparecem
-    # (E1, E2, E3) e guarda o nome da coluna — o id do perfil não sobrevive à
-    # importação. Por isso o contrato casa por id OU por nome.
-    por_destino = {}
-    for c in contrapartes:
-        for destino in c["destinos"]:
-            por_destino[_chave(destino)] = c
-    return {"rotulo": rotulo or "fornecedor", "por_destino": por_destino,
-            "contrapartes": contrapartes}
+    """Quem responde por cada destino — a regra vive em dados/perfis.py."""
+    return perfis_mod.contrato_por_destino(perfil)
 
 
 def _chave(texto: str) -> str:
-    return " ".join(str(texto or "").split()).casefold()
+    return perfis_mod.chave_de_destino(texto)
 
 
 def _frota_por_tipo(plano: dict) -> list:
@@ -552,6 +529,7 @@ def montar(caminho_plano: str = None, com_comercial: bool = True,
                 "origem": (aprendizado or {}).get("origem"),
             },
         },
+        "fiscalizar": _opcional("fiscalizacao.json"),
         "ajustes": _ajustes(plano, perfil),
         "vender": comercial,
     }

@@ -308,6 +308,42 @@ def de_dicionario(dados: dict) -> Perfil:
         else base.regras_jornada)
 
 
+def contrato_por_destino(perfil: dict) -> dict:
+    """Quem responde por cada destino, a partir do perfil gravado no plano.
+
+    Mora aqui, e não na tela, porque quem precisa disso não é só a tela: a
+    fiscalização mede por fornecedor, o painel agrupa por contrato e a
+    proposta separa por cliente.
+
+    Casa por id **ou** por nome do destino: plano vindo de planilha renumera
+    os destinos (E1, E2, E3) e só preserva o nome da coluna, então o id do
+    perfil não sobrevive à importação.
+
+    Plano gravado antes deste campo existir cai no catálogo embutido, pelo id
+    do perfil — nunca por adivinhação de nome.
+    """
+    perfil = perfil or {}
+    contrapartes = perfil.get("contrapartes")
+    rotulo = perfil.get("rotulo_contraparte")
+    if contrapartes is None:
+        embutido = EMBUTIDOS.get(perfil.get("id"), PERFIL_ESCOLAR)
+        contrapartes = [{"id": c.id, "nome": c.nome, "destinos": c.destinos}
+                        for c in embutido.contrapartes]
+        rotulo = rotulo or embutido.rotulo_contraparte
+    if not contrapartes:
+        return {}
+    por_destino = {}
+    for c in contrapartes:
+        for destino in c.get("destinos", []):
+            por_destino[chave_de_destino(destino)] = c
+    return {"rotulo": rotulo or "fornecedor", "por_destino": por_destino,
+            "contrapartes": contrapartes}
+
+
+def chave_de_destino(texto: str) -> str:
+    return " ".join(str(texto or "").split()).casefold()
+
+
 def carregar(caminho_ou_id: str) -> Perfil:
     """Aceita 'escolar', 'fretamento' ou o caminho de um JSON de perfil."""
     if caminho_ou_id in EMBUTIDOS:

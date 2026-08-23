@@ -29,7 +29,8 @@ button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--marca);outline-offset:2px;border-radius:6px}
 
 /* ================================================================ casca === */
-.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);
+  min-height:100vh}
 .rail{background:var(--superficie);border-right:1px solid var(--linha);
   display:flex;flex-direction:column;padding:18px 14px;gap:6px;position:sticky;
   top:0;height:100vh}
@@ -61,6 +62,12 @@ button,input,select{font:inherit;color:inherit}
   border:1px solid var(--linha);border-radius:999px;padding:8px 14px;
   flex:0 1 250px;min-width:150px}
 .busca input{border:0;background:transparent;width:100%;outline:none}
+/* Tela estreita e barra cheia: some o contexto secundário antes de a página
+   ganhar rolagem horizontal — o nome da operação e o seletor ficam. */
+@media (max-width:1180px){
+  .contexto .secundario{display:none}
+  .busca{flex-basis:170px;min-width:120px}
+}
 .busca kbd{font-size:12px;background:var(--superficie);border:1px solid var(--linha);
   border-radius:5px;padding:1px 6px;color:var(--tinta-2)}
 main{padding:26px}
@@ -128,7 +135,8 @@ h3{font-size:16px}
 .explicacao[hidden]{display:none}
 
 /* ================================================= operação: mapa + lista === */
-.despacho{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start}
+.despacho{display:grid;grid-template-columns:320px minmax(0,1fr);
+  gap:16px;align-items:start}
 @media (max-width:980px){.despacho{grid-template-columns:1fr}
   .app{grid-template-columns:1fr}.rail{position:static;height:auto;
   flex-direction:row;overflow-x:auto}.rail .marca,.rail .rodape{display:none}}
@@ -241,6 +249,11 @@ demonstração, nada aqui é publicado de verdade</div>
       <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
       <span>Operar<small>o dia acontecendo</small></span></a>
+    <a href="#fiscalizar" data-destino="fiscalizar">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2"><path d="M9 11l3 3 7-7"/>
+        <path d="M20 12v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1h9"/></svg>
+      <span>Fiscalizar<small>o contrato cumprido</small></span></a>
     <a href="#vender" data-destino="vender">
       <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2"><path d="M4 20V8m5 12V4m5 16v-7m5 7V10"/></svg>
@@ -394,6 +407,22 @@ var DADOS = __DADOS__;
   }
 
   /* -------------------------------------------------------------- início */
+  /* Pendência é componente: Início e Fiscalizar mostram a mesma coisa, e
+     quem decide precisa reconhecer o cartão em qualquer tela. */
+  function cartaoPendencia(item) {
+    return '<div class="pendencia ' + esc(item.urgencia) + '">'
+      + '<div class="corpo"><h3>' + esc(item.titulo) + '</h3>'
+      + '<p>' + esc(item.detalhe) + '</p>'
+      + '<div class="quem">Quem decide: <b>' + esc(item.quem_decide)
+      + '</b></div></div>'
+      + (item.destino
+          ? '<a class="botao" href="#' + esc(item.destino) + '">'
+            + esc(item.acao) + '</a>'
+          : '<button class="botao" data-aviso="' + esc(item.acao) + '">'
+            + esc(item.acao) + '</button>')
+      + '</div>';
+  }
+
   function telaInicio() {
     var r = DADOS.resumo, p = DADOS.pendencias || [];
     var hora = new Date().getHours();
@@ -407,15 +436,8 @@ var DADOS = __DADOS__;
         + '<p class="chamada">Quando aparecer alguma pendência, ela aparece '
         + 'aqui — com quem decide e o botão que resolve.</p>';
 
-    var cartoes = p.map(function (item) {
-      return '<div class="pendencia ' + esc(item.urgencia) + '">'
-        + '<div class="corpo"><h3>' + esc(item.titulo) + '</h3>'
-        + '<p>' + esc(item.detalhe) + '</p>'
-        + '<div class="quem">Quem decide: <b>' + esc(item.quem_decide)
-        + '</b></div></div>'
-        + '<a class="botao" href="#' + esc(item.destino) + '">'
-        + esc(item.acao) + '</a></div>';
-    }).join("") || '<div class="cartao vazio"><b>Tudo em dia</b>'
+    var cartoes = p.map(cartaoPendencia).join("")
+      || '<div class="cartao vazio"><b>Tudo em dia</b>'
       + 'Nenhuma decisão pendente neste momento.</div>';
 
     var hoje = DADOS.hoje || {};
@@ -996,6 +1018,158 @@ var DADOS = __DADOS__;
     });
   }
 
+  /* ---------------------------------------------------------- fiscalizar */
+  function telaFiscalizar() {
+    var b = DADOS.fiscalizar;
+    if (!b) {
+      return '<h1>Fiscalizar</h1><div class="cartao vazio">'
+        + '<b>Ainda não há mês fechado para medir</b>'
+        + 'A medição compara o plano publicado com os eventos que chegaram '
+        + 'do aplicativo do motorista. Publique um plano e opere alguns dias '
+        + 'para o primeiro boletim aparecer.</div>';
+    }
+    var c = b.confiabilidade, r = b.resumo, p = b.pagamento;
+    var rotulo = b.rotulo_contraparte || "fornecedor";
+
+    return '<h1>Fiscalizar</h1>'
+      + '<p class="chamada">O que foi contratado contra o que aconteceu, de '
+      + esc(b.periodo.de) + ' a ' + esc(b.periodo.ate) + '. É esta peça que '
+      + 'sustenta pagamento, glosa e prestação de contas.</p>'
+
+      /* Cobertura antes de dinheiro: um boletim que abre com o valor da
+         glosa e esconde a evidência já perdeu a discussão. */
+      + '<section class="secao"><header><h2>Quanto do mês dá para afirmar</h2>'
+      + selo({rotulo: b.origem === "simulacao" ? "simulado" : "medido",
+              explicacao: b.explicacao_selo || ""}) + '</header>'
+      + '<div class="grade n3">'
+      + numeroCartao("Viagens com evidência", num(c.cobertura_pct, 1) + "%",
+          num(r.viagens_planejadas - r.sem_evidencia) + " de "
+          + num(r.viagens_planejadas) + " viagens",
+          {porque: "Evidência é qualquer coisa que o veículo mandou naquela "
+            + "viagem: início, embarque, ping de GPS ou fim. Sem nenhum "
+            + "evento o sistema NÃO afirma que a viagem deixou de rodar — o "
+            + "aparelho pode ter ficado sem sinal, e glosar por isso cai no "
+            + "primeiro recurso."})
+      + numeroCartao("Sem evidência", num(r.sem_evidencia),
+          "vão para decisão humana, não para glosa")
+      + numeroCartao("Chegadas fora do horário", num(r.atrasadas),
+          r.atraso_medio_min !== null && r.atraso_medio_min !== undefined
+            ? "atraso médio de " + num(r.atraso_medio_min, 1) + " min" : "")
+      + '</div>'
+      + (c.sustenta_glosa ? ""
+          : '<div class="aviso" style="margin-top:12px">' + esc(c.frase)
+            + '</div>')
+      + '</section>'
+
+      + ((b.pendencias || []).length
+          ? '<section class="secao"><header>'
+            + '<h2>O que precisa de decisão antes de pagar</h2></header>'
+            + b.pendencias.map(cartaoPendencia).join("") + '</section>'
+          : "")
+
+      + '<section class="secao"><header><h2>O mês medido</h2></header>'
+      + '<div class="grade n4">'
+      + numeroCartao("Realizadas", num(r.realizadas),
+          "passaram por todas as paradas")
+      + numeroCartao("Parciais", num(r.parciais),
+          "passaram por parte das paradas")
+      + numeroCartao("Não realizadas", num(r.nao_realizadas),
+          "com motivo registrado pelo motorista")
+      + numeroCartao("Km planejado", num(r.km_planejado, 1) + " km",
+          (r.km_medido !== null && r.km_medido !== undefined)
+            ? "medido: " + num(r.km_medido, 1) + " km"
+            : "sem rastro suficiente para medir",
+          {porque: c.km_medido_e_piso
+            ? "O rastro chega esparso demais em parte das viagens. Somar "
+              + "retas entre pings distantes corta as curvas: o km medido "
+              + "aí é PISO, não medida, e pagar por ele seria pagar a menos "
+              + "por defeito de aparelho."
+            : "Km planejado sai do motor; km medido, do rastro de GPS. A "
+              + "diferença é informação — rua fechada, desvio e ponto novo "
+              + "mudam o percurso."})
+      + '</div></section>'
+
+      + '<section class="secao"><header>'
+      + '<h2>Por ' + esc(rotulo) + '</h2></header>'
+      + tabelaFornecedores(b.por_fornecedor || [], rotulo)
+      + '</section>'
+
+      + '<section class="secao"><header><h2>Pagamento do período</h2>'
+      + '</header><div class="grade n3">'
+      + numeroCartao("A pagar", reaisCurto(p.a_pagar),
+          "modelo do contrato: " + esc(p.modelo))
+      + numeroCartao("Glosa apurada", reaisCurto(p.glosa),
+          num((p.glosas || []).length) + " ocorrências com evidência")
+      + numeroCartao("Em suspenso", reaisCurto(p.em_suspenso),
+          "nem pago nem glosado — esperando confirmação")
+      + '</div>'
+      + (p.alertas || []).map(function (a) {
+          return '<div class="aviso" style="margin-top:12px">' + esc(a)
+            + '</div>';
+        }).join("")
+      + '<h3 style="margin-top:18px">Memória de cálculo</h3>'
+      + '<ul class="linha-tempo">'
+      + (p.memoria || []).map(function (l) {
+          return '<li>' + esc(l) + '</li>';
+        }).join("") + '</ul>'
+      + '</section>'
+      + secaoGlosas(p.glosas || []);
+  }
+
+  function tabelaFornecedores(itens, rotulo) {
+    if (!itens.length) { return '<p class="chamada">—</p>'; }
+    var linhas = itens.map(function (f) {
+      var r = f.resumo;
+      return '<tr><td><b>' + esc(f.nome) + '</b></td>'
+        + '<td class="num">' + num(r.viagens_planejadas) + '</td>'
+        + '<td class="num">' + num(r.realizadas) + '</td>'
+        + '<td class="num">' + num(r.sem_evidencia) + '</td>'
+        + '<td class="num">' + num(r.cobertura_pct, 1) + '%</td>'
+        + '<td class="num">' + reaisCurto(f.a_pagar) + '</td>'
+        + '<td class="num">' + reaisCurto(f.glosa) + '</td>'
+        + '<td class="num">' + reaisCurto(f.em_suspenso) + '</td></tr>';
+    }).join("");
+    return '<div class="rolagem"><table><thead><tr>'
+      + '<th>' + maiuscula(rotulo) + '</th><th class="num">Planejadas</th>'
+      + '<th class="num">Realizadas</th><th class="num">Sem evidência</th>'
+      + '<th class="num">Cobertura</th><th class="num">A pagar</th>'
+      + '<th class="num">Glosa</th><th class="num">Suspenso</th>'
+      + '</tr></thead><tbody>' + linhas + '</tbody></table></div>';
+  }
+
+  function secaoGlosas(glosas) {
+    if (!glosas.length) { return ""; }
+    var linhas = glosas.slice(0, 12).map(function (g) {
+      var ev = g.evidencia || {};
+      return '<tr><td><b>' + esc(g.viagem) + '</b></td>'
+        + '<td>' + esc(g.tipo) + '</td>'
+        + '<td>' + esc(g.motivo) + '</td>'
+        + '<td>' + (ev.eventos
+            ? num(ev.eventos) + (ev.eventos === 1 ? ' evento · ' : ' eventos · ')
+              + esc(tiposDeEvento(ev.por_tipo))
+            : "—") + '</td>'
+        + '<td class="num">' + reais(g.valor) + '</td></tr>';
+    }).join("");
+    return '<section class="secao"><header><h2>Glosas, com a evidência</h2>'
+      + '</header>'
+      + '<p class="chamada" style="margin-bottom:14px">O fornecedor tem '
+      + 'direito a contestar cada linha desta tabela. Por isso ela mostra o '
+      + 'que sustenta a conclusão, e não só o valor.</p>'
+      + '<div class="rolagem"><table><thead><tr><th>Viagem</th><th>Tipo</th>'
+      + '<th>Motivo</th><th>Evidência</th><th class="num">Valor</th>'
+      + '</tr></thead><tbody>' + linhas + '</tbody></table></div>'
+      + (glosas.length > 12
+          ? '<p class="chamada" style="margin-top:10px">Mostrando as 12 '
+            + 'maiores de ' + num(glosas.length) + '.</p>' : "")
+      + '</section>';
+  }
+
+  function tiposDeEvento(porTipo) {
+    return Object.keys(porTipo || {}).map(function (t) {
+      return porTipo[t] + " " + t;
+    }).join(", ");
+  }
+
   /* ------------------------------------------------------------- ajustes */
   function telaAjustes() {
     var a = DADOS.ajustes || {};
@@ -1170,7 +1344,8 @@ var DADOS = __DADOS__;
 
   /* --------------------------------------------------------------- rotas */
   var TELAS = {inicio: telaInicio, planejar: telaPlanejar, operar: telaOperar,
-               vender: telaVender, ajustes: telaAjustes};
+               fiscalizar: telaFiscalizar, vender: telaVender,
+               ajustes: telaAjustes};
 
   function pintar() {
     var destino = (location.hash || "#inicio").slice(1);
@@ -1222,6 +1397,13 @@ var DADOS = __DADOS__;
       });
     }
     if (destino === "operar") { ligarLista(); }
+    document.querySelectorAll("[data-aviso]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        alert("Nesta demonstração nada é enviado. No sistema, \u201c"
+          + b.dataset.aviso + "\u201d abre a fila com as viagens em questão "
+          + "e registra quem decidiu, com data e hora.");
+      });
+    });
   }
 
   /* Só o que está dentro da lista — ela é redesenhada a cada tecla do filtro,
@@ -1267,9 +1449,11 @@ var DADOS = __DADOS__;
     var o = DADOS.operacao;
     document.getElementById("contexto").innerHTML =
       '<b>' + esc(o.nome) + '</b>'
-      + '<span>·</span><span>' + esc(o.vertical === "fretamento"
+      + '<span class="secundario">·</span>'
+      + '<span class="secundario">' + esc(o.vertical === "fretamento"
           ? "fretamento corporativo" : "transporte escolar") + '</span>'
-      + '<span>·</span><span>plano de '
+      + '<span class="secundario">·</span>'
+      + '<span class="secundario">plano de '
       + esc(String(DADOS.gerado_em).slice(0, 5)) + '</span>';
     document.getElementById("operacoes").innerHTML =
       (DADOS.operacoes || []).map(function (op) {

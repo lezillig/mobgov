@@ -64,7 +64,8 @@ previu X, aconteceu Y, ajustou Z".
 | 8 | `planejamento/` + `motor/planejar.py` + `dados/agrupar.py` — planilha → pontos → rotas → publicar | ✅ pronto |
 | 9 | `dados/perfis.py` + `motor/jornada.py` — perfil de fretamento: turnos configuráveis e jornada do motorista (Lei 13.103) como restrição | ✅ pronto |
 | 10 | `comercial/` — precificação (custo → preço com margem por divisão) e diagnóstico da operação existente | ✅ pronto |
-| 11 | `ui/` — o sistema remodelado por momento de trabalho (Início · Planejar · Operar · Vender · Ajustes), descrito em `docs/ux-modelo.md` | ✅ pronto |
+| 11 | `ui/` — o sistema remodelado por momento de trabalho (Início · Planejar · Operar · Fiscalizar · Vender · Ajustes), descrito em `docs/ux-modelo.md` | ✅ pronto |
+| 12 | `fiscalizacao/` — medição do contrato: planejado × realizado, pagamento, glosa com evidência e boletim mensal por fornecedor | ✅ pronto |
 | 8 | Roteiro de demonstração ensaiado (agent-qa-demo) | ⬜ |
 
 Resultado atual no Município Modelo (escolar, com trânsito **aprendido**):
@@ -111,6 +112,10 @@ mobgov/                          (raiz deste repositório)
   planejamento/multipart.py      envio de arquivo sem dependência (o cgi saiu do 3.13)
   ui/app.html                    o sistema remodelado: 5 destinos, mapa vivo, trilha
   ui/gerar.py                    monta o payload real e escreve a tela autocontida
+  fiscalizacao/medicao.py        plano publicado × eventos: o que de fato rodou
+  fiscalizacao/contrato.py       do medido para o pago: modelo, glosa e suspenso
+  fiscalizacao/simulador.py      um mês de execução imperfeita (selo simulado)
+  fiscalizacao/relatorio.py      o boletim de medição que vai para o processo
   painel/console.py              console: Hoje, Elegibilidade, Equipe, Assistente
   docs/demonstracao/gerar_telas_estaticas.py  todas as telas em HTML autocontido
   motor/rodadas.py               reotimização contínua: o dia inteiro em rodadas
@@ -159,6 +164,8 @@ python comercial/cli.py precificar --plano relatorios/plano-fretamento.json --ma
 python comercial/cli.py diagnosticar --plano ... --linhas linhas-atuais.csv
 python comercial/cli.py proposta --plano ... --linhas ... --cliente "Empresa X"
 python ui/gerar.py                     # o sistema remodelado (prefeitura + empresa)
+python -m fiscalizacao.relatorio       # boletim de medição do mês
+python -m fiscalizacao.relatorio --modelo viagem --valor-viagem 180
 python -m painel.console               # gera relatorios/console.html
 python docs/demonstracao/gerar_telas_estaticas.py   # o sistema inteiro em HTML
 python -m operacao.servidor            # apps do motorista e do responsável (8080)
@@ -213,6 +220,25 @@ python -m unittest discover -s testes -v
   fretamento.
 - **Número que o sistema duvida não aparece limpo.** Se `coerencia` traz aviso
   sobre a base de comparação, o cartão de economia diz isso ao lado do número.
+- **Falta de evidência não é prova de falta.** Viagem sem nenhum evento é
+  `sem_evidencia`, nunca `nao_realizada`: aparelho descarregado e zona rural
+  sem sinal acontecem toda semana. Ela vira valor EM SUSPENSO, com dono da
+  decisão — nem pago, nem glosado. Glosar por ausência de sinal cai no
+  primeiro recurso e derruba a credibilidade do sistema inteiro.
+- **Toda glosa cita a evidência.** Cada linha traz viagem, motivo e os
+  eventos que sustentam a conclusão. O boletim é peça de processo
+  administrativo, e o fornecedor tem direito de contestar olhando o mesmo
+  dado.
+- **Cobertura antes de dinheiro.** O boletim abre com quantas viagens têm
+  evidência; abaixo de 70% ele diz, na cara, que não sustenta glosa. Relatório
+  que abre com o valor da glosa e esconde a cobertura já perdeu a discussão.
+- **Km medido por rastro esparso é PISO, não medida.** Somar retas entre pings
+  distantes corta as curvas e sempre dá menos do que o veículo rodou — pagar
+  por esse número é pagar a menos por defeito de aparelho. `medicao.py` marca
+  `km_medido_confiavel` e a tela avisa.
+- **Medir e pagar são módulos separados.** `medicao.py` responde "o que
+  aconteceu" (técnico); `contrato.py`, "quanto vale" (jurídico). É o que
+  permite contestar o valor sem rediscutir o fato.
 - **Parâmetro que decide rota, frota ou preço mora numa tela.** O tempo
   máximo a bordo, o raio de caminhada, o catálogo de tipos de veículo, os
   turnos, a jornada e os custos ficam em Ajustes (`ui/app.html`) e são
