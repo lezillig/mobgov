@@ -35,6 +35,7 @@ from dados.municipio_modelo import Escola
 from dados.planilha import ErroDePlanilha
 from dados.planilha_exemplo import limites_do_municipio, referencias_de_bairro
 from motor import dimensionar
+from motor import forma as forma_mod
 
 DIR_RELATORIOS = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "relatorios")
@@ -236,6 +237,15 @@ def planejar(importacao: dict, coordenadas_escolas: dict = None,
     relatorio["agrupamento"] = agrupado["resumo"]
     relatorio["agrupamento"]["avisos"] = agrupado["avisos"]
     relatorio["geografia"]["escolas"] = agrupado["escolas"]
+
+    # Este relatório saiu do motor de COLETA — uma escola por viagem. Se a
+    # demanda não tem essa cara, o número de veículos está alto e com toda a
+    # aparência de rigor, que é o pior jeito de estar errado.
+    relatorio["forma_da_demanda"] = forma_mod.diagnosticar(alunos)
+    alerta = forma_mod.aviso(relatorio["forma_da_demanda"], "coleta")
+    if alerta:
+        relatorio.setdefault("alertas", []).append(alerta)
+        avisar("formato", alerta)
     return relatorio
 
 
