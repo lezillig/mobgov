@@ -45,9 +45,22 @@ TEMPO_LIMITE_SOLVER_S = 30
 # 16 h volta às 20 h), e por isso os dois são parâmetro, não constante.
 HORIZONTE_MIN = 16 * 60          # o dia de operação cabe em 16 h
 ESPERA_MAXIMA_MIN = 30           # veículo parado esperando janela abrir
+# Quantos passageiros uma rota porta a porta costuma juntar, medido na
+# operação real: ~5. É o divisor da oferta de veículos ao solver — ver o
+# comentário longo em `resolver`. Deliberadamente conservador (oferta maior
+# custa tempo de solver; oferta menor devolve "sem solução" enganoso).
+PASSAGEIROS_POR_ROTA = 4
 
 
 _zona = tempos_mod.zona_de
+
+
+def oferta_de_veiculos(quantos_pedidos: int) -> int:
+    """Quantos veículos de cada tipo oferecer ao solver.
+
+    NÃO depende da capacidade do veículo — ver o comentário em `resolver`.
+    """
+    return max(3, math.ceil(quantos_pedidos / PASSAGEIROS_POR_ROTA))
 
 
 def resolver(pedidos: list, tipos=None, provedor=None, partida_min: int = 7 * 60,
@@ -82,10 +95,18 @@ def resolver(pedidos: list, tipos=None, provedor=None, partida_min: int = 7 * 60
         servico[no_embarque(i)] = tempo_embarque_min(p)
         servico[no_desembarque(i)] = tempo_embarque_min(p)
 
-    # frota oferecida: generosa, com custo fixo por veículo usado para que o
-    # próprio solver minimize a quantidade
+    # Frota oferecida: generosa, com custo fixo por veículo usado para que o
+    # próprio solver minimize a quantidade.
+    #
+    # O divisor NÃO é a capacidade do veículo, e isso é contraintuitivo. Numa
+    # operação real de 268 alunos para 101 escolas com janela de 20 minutos, o
+    # motor fecha ~5 passageiros por veículo — seja ele de 6 ou de 12 lugares.
+    # Dimensionar a oferta por assento dava 35 veículos para um carro de 12, e
+    # o modelo saía "sem solução": não por falta de assento, por falta de
+    # carro. Quem descarta a configuração de veículo por causa disso descarta
+    # a certa. O divisor é o que uma rota porta a porta consegue juntar.
     if veiculos_por_tipo is None:
-        veiculos_por_tipo = max(3, math.ceil(len(pedidos) / 8))
+        veiculos_por_tipo = oferta_de_veiculos(len(pedidos))
     frota = []
     for t in tipos:
         frota += [t] * veiculos_por_tipo

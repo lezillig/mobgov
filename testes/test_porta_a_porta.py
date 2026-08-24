@@ -128,5 +128,31 @@ class TestSolverPortaAPorta(unittest.TestCase):
         self.assertEqual(vazio["total_veiculos"], 0)
 
 
+@unittest.skipUnless(TEM_ORTOOLS, "sem OR-Tools")
+class TestOfertaDeVeiculos(unittest.TestCase):
+    """Quantos veículos oferecer ao solver.
+
+    Contraintuitivo, e já custou um resultado errado: a oferta NÃO se calcula
+    pela capacidade do veículo. Numa operação real de 268 alunos para 101
+    escolas com janela de 20 minutos, o motor fecha ~5 passageiros por rota
+    seja o carro de 6 ou de 12 lugares. Dividindo por assento, um carro de 12
+    recebia 35 veículos e o modelo respondia "sem solução" — não por falta de
+    assento, por falta de carro. Quem lê essa mensagem descarta a
+    configuração de veículo errada.
+    """
+
+    def test_a_oferta_cobre_o_que_a_operacao_real_precisou(self):
+        """268 pedidos fecharam em 52-53 veículos; a oferta tem que passar
+        disso com folga, senão o solver responde "sem solução"."""
+        self.assertGreaterEqual(pp.oferta_de_veiculos(268), 60)
+
+    def test_cresce_com_a_demanda(self):
+        self.assertLess(pp.oferta_de_veiculos(50), pp.oferta_de_veiculos(268))
+
+    def test_demanda_minuscula_ainda_tem_folga(self):
+        self.assertGreaterEqual(pp.oferta_de_veiculos(1), 3)
+        self.assertGreaterEqual(pp.oferta_de_veiculos(0), 3)
+
+
 if __name__ == "__main__":
     unittest.main()
