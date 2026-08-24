@@ -488,6 +488,23 @@ Cada um destes fazia o arquivo entrar torto **sem erro nenhum na tela** — que
   lat/lon na planilha, o plano B é ponto de referência de bairro ou de CEP
   vindo de base local do município. Sem base, o importador recusa a linha e
   diz o que falta — nunca manda o endereço para fora.
+- **Esta operação é PDPTW, não CVRP — e o sistema precisa detectar isso.**
+  Às 07:00 são 207 alunos para **83 escolas**, e cada equipe passa por 2,2
+  escolas na mesma viagem (uma delas, por sete). No motor de coleta (uma
+  escola por viagem) seriam 83 viagens simultâneas contra as 46 equipes reais.
+  `motor/forma.py` diagnostica alunos por destino no horário mais cheio e
+  `planejar()` alerta quando o plano saiu do motor errado — o número ali é um
+  **teto**, não um dimensionamento. Errar isso dá um número alto com toda a
+  aparência de rigor.
+- **A configuração do veículo vale mais que a roteirização.** A MESMA demanda
+  cabe em 33 carros com van de 15 lugares e precisa de 48 com um carro de
+  2 cadeirantes + 4 sentados. Nenhuma otimização cobre essa diferença: com 4
+  assentos e 172 alunos andantes chegando juntos, 43 carros é aritmética. Por
+  isso `dados/frota.py` existe e a frota entra como dado, não como premissa.
+- **Chegada simultânea trava a frota.** 77% dos alunos da manhã entram às
+  07:00 em ponto — esses veículos não se revezam. Frota do turno ≈ carros
+  necessários no bloco de chegada mais cheio, não no turno inteiro. Quem
+  divide a demanda do turno pela capacidade e ignora a hora subdimensiona.
 - **Dado real não tem chave primária.** 128 grafias de escola para ~117
   escolas; `Cadeirante` em 6 grafias mais 3 células com hora dentro; coluna
   `PLACA` com texto livre e preenchida em 23 de 456 linhas; nomes de equipe
