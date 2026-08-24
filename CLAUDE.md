@@ -496,15 +496,24 @@ Cada um destes fazia o arquivo entrar torto **sem erro nenhum na tela** — que
   `planejar()` alerta quando o plano saiu do motor errado — o número ali é um
   **teto**, não um dimensionamento. Errar isso dá um número alto com toda a
   aparência de rigor.
-- **A configuração do veículo vale mais que a roteirização.** A MESMA demanda
-  cabe em 33 carros com van de 15 lugares e precisa de 48 com um carro de
-  2 cadeirantes + 4 sentados. Nenhuma otimização cobre essa diferença: com 4
-  assentos e 172 alunos andantes chegando juntos, 43 carros é aritmética. Por
-  isso `dados/frota.py` existe e a frota entra como dado, não como premissa.
+- **Piso por capacidade NÃO é piso quando a operação é multidestino.**
+  Dividir "172 alunos andantes ÷ 4 assentos = 43 carros" pressupõe que o carro
+  faz uma entrega só. No porta a porta ele embarca, desembarca e volta a
+  embarcar dentro da mesma janela — a restrição é a ocupação SIMULTÂNEA, não o
+  total do dia. Conta de capacidade serve para ordem de grandeza; quem
+  dimensiona é o solver.
+- **Nesta operação o gargalo não é assento — é a janela.** Roteirizando a
+  demanda real (geografia simulada), a manhã fecha em **53 veículos com carro
+  de 6 lugares e 52 com frota de 12 lugares**. O motor fecha ~5 alunos por
+  veículo nos dois casos: com janela de chegada de 20 min e alunos espalhados
+  por 101 escolas, não há como coletar mais. **Comprar carro grande é comprar
+  assento que não enche** — a ocupação média cai de 50,6% para 30,3%.
+  Corolário: escolha o veículo mais barato que atenda o passageiro, e trate
+  janela de chegada e tempo a bordo como as alavancas de verdade.
 - **Chegada simultânea trava a frota.** 77% dos alunos da manhã entram às
-  07:00 em ponto — esses veículos não se revezam. Frota do turno ≈ carros
-  necessários no bloco de chegada mais cheio, não no turno inteiro. Quem
-  divide a demanda do turno pela capacidade e ignora a hora subdimensiona.
+  07:00 em ponto. Frota do turno ≈ carros necessários no bloco de chegada mais
+  cheio, não no turno inteiro. Quem divide a demanda do turno pela capacidade
+  e ignora a hora subdimensiona.
 - **Dado real não tem chave primária.** 128 grafias de escola para ~117
   escolas; `Cadeirante` em 6 grafias mais 3 células com hora dentro; coluna
   `PLACA` com texto livre e preenchida em 23 de 456 linhas; nomes de equipe
