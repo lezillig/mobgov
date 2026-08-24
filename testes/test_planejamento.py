@@ -107,6 +107,43 @@ class TestAgrupamento(unittest.TestCase):
         self.assertEqual(ponto.alunos["tarde"], 1)
 
 
+class TestFrotaDeclaradaNaPlanilha(unittest.TestCase):
+    """De qual aba sai a frota de hoje.
+
+    "É a segunda aba" funcionava no arquivo de demonstração e falhava no
+    arquivo real, onde a segunda aba é a segunda metade dos alunos.
+    """
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="mobgov-frota-")
+
+    def tearDown(self):
+        shutil.rmtree(self.pasta, ignore_errors=True)
+
+    def arquivo(self, abas):
+        from dados.planilha_exemplo import escrever_xlsx
+        return escrever_xlsx(os.path.join(self.pasta, "p.xlsx"), abas)
+
+    ALUNOS = [["Aluno", "Endereço do Aluno", "CEP", "Escola"],
+              ["Ana", "Rua A, 10", "04416-200", "Escola X"]]
+
+    def test_acha_a_aba_de_frota_pelo_nome(self):
+        from motor.planejar import ler_frota_declarada
+        caminho = self.arquivo({
+            "Sul -1": self.ALUNOS, "Sul-2": self.ALUNOS,
+            "Frota atual": [["Tipo", "Capacidade", "Quantidade"],
+                            ["Van 15 lugares acessível", "15", "4"]]})
+        frota = ler_frota_declarada(caminho)
+        self.assertEqual(sum(frota["composicao"].values()), 4)
+        self.assertIn("Frota atual", frota["origem"])
+
+    def test_lista_de_alunos_na_segunda_aba_nao_vira_frota(self):
+        """O arquivo real: a aba 2 é mais 273 alunos, não é veículo nenhum."""
+        from motor.planejar import ler_frota_declarada
+        caminho = self.arquivo({"Sul -1": self.ALUNOS, "Sul-2": self.ALUNOS})
+        self.assertEqual(ler_frota_declarada(caminho), {})
+
+
 class TestEnvioDeArquivo(unittest.TestCase):
     def corpo(self, nome="planilha.csv", conteudo=b"nome;bairro\nAna;Centro\n",
               extra=None):

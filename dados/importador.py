@@ -30,7 +30,7 @@ import hashlib
 import re
 import unicodedata
 
-from dados.planilha import ler
+from dados.planilha import ErroDePlanilha, abas as listar_abas, ler
 
 # --------------------------------------------------------------- sinônimos ---
 SINONIMOS = {
@@ -44,6 +44,7 @@ SINONIMOS = {
     "numero": ["numero", "n", "no", "num", "numero casa"],
     "bairro": ["bairro", "distrito", "localidade", "comunidade", "zona",
                "povoado", "assentamento", "regiao"],
+    "cep": ["cep", "codigo postal", "cep residencial"],
     "escola": ["escola", "unidade", "unidade escolar", "destino",
                "escola de destino", "estabelecimento",
                # fretamento: o destino é a planta onde a pessoa trabalha
@@ -146,12 +147,64 @@ def converter_turno(valor: str, validos=None):
     ela, uma planilha de fretamento com "T1" entraria como turno inexistente
     numa operação escolar de manhã e tarde — e o aluno cairia num turno que
     ninguém opera.
+
+    A planilha real quase nunca escreve "manhã": escreve o horário da aula.
+    Numa lista de 456 alunos de operação em produção, a coluna de turno tinha
+    "07:00 às 12:20", "13:00 ás 18:20", "07h", "16:00:00" — vinte grafias, e
+    nenhuma delas a palavra turno. Recusar isso jogava fora a planilha
+    inteira, então o horário de entrada também vale como turno.
     """
     alvo = normalizar(valor)
     for turno, opcoes in TURNOS.items():
         if alvo in opcoes and (validos is None or turno in validos):
             return turno
+    pelo_horario = _turno_do_horario(valor)
+    if pelo_horario and (validos is None or pelo_horario in validos):
+        return pelo_horario
     return None
+
+
+def _turno_do_horario(valor: str):
+    """Turno deduzido da hora de entrada, quando a célula traz um horário.
+
+    Vale a PRIMEIRA hora da célula: "07:00 às 12:20" é aula de manhã que
+    termina ao meio-dia, não aula de tarde. O corte às 11 h e às 17 h é o que
+    separa os turnos numa escola brasileira — 12:20 é fim de manhã, 13:00 é
+    começo de tarde.
+    """
+    if valor in (None, ""):
+        return None
+    texto = str(valor).strip().lower()
+    casado = re.search(r"(\d{1,2})\s*(?::|h)", texto)
+    if not casado:
+        return None
+    hora = int(casado.group(1))
+    if hora > 23:
+        return None
+    if hora < 11:
+        return "manha"
+    return "tarde" if hora < 17 else "noite"
+
+
+def chaves_de_cep(valor) -> list:
+    """CEP em chaves de busca, do mais específico ao mais amplo.
+
+    Duas armadilhas do arquivo real, as duas silenciosas:
+
+    1. **o zero à esquerda some**. A célula é numérica, então o CEP 04416-200
+       chega como 4416200. Sem completar com zero, a cidade inteira muda de
+       região — a primeira leitura que fiz desses dados agrupou a zona sul de
+       São Paulo como se fosse interior.
+    2. o CEP vem com hífen, com ponto, com espaço ou com nada.
+
+    Devolve ["04416200", "04416", "044"]: casa com a base de referência que o
+    município tiver, seja ela por CEP exato, por logradouro ou por região.
+    """
+    digitos = re.sub(r"\D", "", str(valor or ""))
+    if not digitos or len(digitos) > 8:
+        return []
+    completo = digitos.zfill(8)
+    return [completo, completo[:5], completo[:3]]
 
 
 def converter_sim_nao(valor: str):
@@ -180,6 +233,8 @@ class Importacao:
 
     def __init__(self):
         self.alunos = []
+        self.abas_lidas = []
+        self.abas_ignoradas = []
         self.problemas = []
         self.colunas = {}
         self.cofre = {}
@@ -204,6 +259,10 @@ class Importacao:
             "por_escola": self._contar("escola"),
             "cadeirantes": sum(1 for a in self.alunos if a["cadeirante"]),
             "acompanhantes": sum(1 for a in self.alunos if a["acompanhante"]),
+            # planilha de secretaria costuma ter uma aba por região; dizer
+            # quais entraram é o que impede metade da operação de sumir
+            "abas_lidas": list(self.abas_lidas),
+            "abas_ignoradas": list(self.abas_ignoradas),
         }
 
     def _contar(self, campo) -> dict:
@@ -214,7 +273,7 @@ class Importacao:
 
 
 def importar(caminho: str, referencias: dict = None, guardar_nomes: bool = False,
-             limites=None, turnos_validos=None) -> Importacao:
+             limites=None, turnos_validos=None, aba=None) -> Importacao:
     """Lê a planilha e devolve a demanda pronta para o motor.
 
     `referencias`: {bairro_normalizado: (lat, lon)} — o ponto de referência
@@ -225,28 +284,69 @@ def importar(caminho: str, referencias: dict = None, guardar_nomes: bool = False
     trocada de lugar ou digitada errada.
     `turnos_validos`: os turnos que a operação tem (vêm do perfil). Sem isso,
     "T1" de uma planilha de fábrica viraria turno numa operação escolar.
+    `aba`: por padrão lê TODAS as abas que tenham cara de lista de alunos.
+    Passe um nome ou índice para restringir a uma só.
     """
     referencias = {normalizar(k): v for k, v in (referencias or {}).items()}
     resultado = Importacao()
 
-    linhas = ler(caminho)
-    if not linhas:
-        resultado.problema(0, "arquivo", "", "A planilha está vazia.",
-                           "Confira se a aba certa foi enviada.")
-        return resultado
-
-    inicio = _achar_cabecalho(linhas)
-    resultado.colunas = detectar_colunas(linhas[inicio])
-    if "nome" not in resultado.colunas and "endereco" not in resultado.colunas:
-        resultado.problema(
-            inicio + 1, "cabecalho", ";".join(linhas[inicio][:6]),
-            "Não reconheci as colunas da planilha.",
-            "O cabeçalho precisa ter pelo menos uma coluna de nome do aluno e "
-            "uma de endereço. Aceito variações como 'aluno', 'estudante', "
-            "'logradouro', 'rua'.")
-        return resultado
+    # Uma planilha de secretaria costuma ter UMA ABA POR REGIÃO ("Sul 1",
+    # "Sul 2"). Ler só a primeira faz metade da operação sumir sem erro
+    # nenhum — o pior tipo de defeito, porque só aparece quando falta veículo
+    # na rua. Aqui todas as abas com cara de lista de alunos entram, e as que
+    # ficaram de fora saem nomeadas no resumo.
+    nomes_das_abas = listar_abas(caminho) or [None]
+    if aba is not None:
+        nomes_das_abas = [aba]
 
     vistos = {}
+    for indice, nome_da_aba in enumerate(nomes_das_abas):
+        alvo = nome_da_aba if nome_da_aba is not None else indice
+        try:
+            linhas = ler(caminho, alvo) if nome_da_aba is not None else ler(caminho)
+        except ErroDePlanilha as erro:
+            resultado.abas_ignoradas.append(
+                {"aba": str(nome_da_aba), "motivo": str(erro)})
+            continue
+        _importar_aba(linhas, str(nome_da_aba or "única"), resultado, vistos,
+                      referencias, limites, turnos_validos, guardar_nomes)
+
+    if not resultado.alunos:
+        # Não basta ignorar as abas em silêncio: quem mandou o arquivo precisa
+        # ler numa frase por que nada entrou, e o que fazer a respeito.
+        if resultado.abas_ignoradas:
+            nomes = ", ".join(f"“{i['aba']}”" for i in resultado.abas_ignoradas)
+            resultado.problema(
+                0, "arquivo", nomes, "Nenhuma aba virou lista de alunos.",
+                f"Olhei {nomes} e não achei cabeçalho com nome e endereço do "
+                f"aluno. Confira se o cabeçalho está na planilha (pode estar "
+                f"depois de mais de dez linhas de título) e se a aba certa "
+                f"foi enviada.")
+        elif not resultado.problemas:
+            resultado.problema(0, "arquivo", "", "A planilha está vazia.",
+                               "Confira se a aba certa foi enviada.")
+    return resultado
+
+
+def _importar_aba(linhas, nome_da_aba, resultado, vistos, referencias,
+                  limites, turnos_validos, guardar_nomes):
+    """Uma aba. Aba sem cara de lista de alunos é ignorada COM NOME."""
+    if not linhas:
+        resultado.abas_ignoradas.append(
+            {"aba": nome_da_aba, "motivo": "aba vazia"})
+        return
+
+    inicio = _achar_cabecalho(linhas)
+    colunas = detectar_colunas(linhas[inicio])
+    if "nome" not in colunas and "endereco" not in colunas:
+        resultado.abas_ignoradas.append({
+            "aba": nome_da_aba,
+            "motivo": "não tem coluna de nome nem de endereço — pode ser a "
+                      "aba de frota, de contrato ou de anotações"})
+        return
+    resultado.colunas = colunas
+    resultado.abas_lidas.append(nome_da_aba)
+    antes_desta_aba = len(resultado.alunos)
     for numero_linha, linha in enumerate(linhas[inicio + 1:], start=inicio + 2):
         if not any((c or "").strip() for c in linha):
             continue                              # linha em branco no meio
@@ -254,6 +354,7 @@ def importar(caminho: str, referencias: dict = None, guardar_nomes: bool = False
                                  limites, turnos_validos)
         if aluno is None:
             continue
+        aluno["aba"] = nome_da_aba
         chave = aluno["id"]
         if chave in vistos:
             resultado.problema(
@@ -268,7 +369,13 @@ def importar(caminho: str, referencias: dict = None, guardar_nomes: bool = False
         nome_do_aluno = aluno.pop("_nome", None)
         if guardar_nomes and nome_do_aluno:
             resultado.cofre[aluno["id"]] = nome_do_aluno
-    return resultado
+
+    if len(resultado.alunos) == antes_desta_aba:
+        resultado.abas_lidas.remove(nome_da_aba)
+        resultado.abas_ignoradas.append({
+            "aba": nome_da_aba,
+            "motivo": "tem cabeçalho de lista de alunos, mas nenhuma linha "
+                      "virou aluno"})
 
 
 def _converter_linha(linha, numero_linha, resultado, referencias, limites,
@@ -332,22 +439,30 @@ def _converter_linha(linha, numero_linha, resultado, referencias, limites,
                 lat = lon = None
 
     if lat is None or lon is None:
-        referencia = referencias.get(normalizar(bairro))
+        # bairro primeiro; o CEP é o plano B de quem tem lista de endereço
+        # urbano, onde ninguém escreve o bairro mas o CEP está sempre lá
+        referencia, apoio = referencias.get(normalizar(bairro)), bairro
+        if not referencia:
+            for chave in chaves_de_cep(campo("cep")):
+                referencia = referencias.get(chave)
+                if referencia:
+                    apoio = f"CEP {chave}"
+                    break
         if referencia:
             lat, lon = referencia
             origem, ajuste = "referencia_do_bairro", True
             resultado.problema(
                 numero_linha, "endereco", endereco or bairro,
                 "Endereço sem coordenada.",
-                f"Usei o ponto de referência de “{bairro}”. Arraste o ponto "
+                f"Usei o ponto de referência de “{apoio}”. Arraste o ponto "
                 f"no mapa para a posição certa antes de publicar a rota.",
                 "aviso")
         else:
             resultado.problema(
                 numero_linha, "endereco", endereco or bairro,
                 "Endereço sem coordenada e bairro desconhecido.",
-                "Preencha latitude/longitude, ou informe um bairro que já "
-                "tenha ponto de referência cadastrado.", "erro")
+                "Preencha latitude/longitude, ou informe um bairro (ou um "
+                "CEP) que já tenha ponto de referência cadastrado.", "erro")
             return None
 
     return {

@@ -84,7 +84,24 @@ def linhas_bagunçadas(quantidade: int = 120, semente: int = 11) -> list:
 
 
 # --------------------------------------------------------------- escrita ---
-def _celula(referencia: str, texto: str) -> str:
+class Hora(float):
+    """Hora do jeito que o Excel grava de verdade: número com cara de relógio.
+
+    `Hora.de("07:00")` vale 0.291666… Existe para o teste conseguir reproduzir
+    o arquivo real, onde a coluna de horário não tem texto nenhum — só a
+    fração do dia, mais um formato de célula dizendo que aquele número é um
+    relógio.
+    """
+
+    @classmethod
+    def de(cls, texto: str) -> "Hora":
+        h, _, m = str(texto).partition(":")
+        return cls((int(h) * 60 + int(m or 0)) / (24 * 60))
+
+
+def _celula(referencia: str, texto) -> str:
+    if isinstance(texto, Hora):
+        return f'<c r="{referencia}" s="1"><v>{float(texto):.10f}</v></c>'
     if texto == "":
         return ""
     return (f'<c r="{referencia}" t="inlineStr"><is><t xml:space="preserve">'
@@ -100,7 +117,7 @@ def _referencia(coluna: int, linha: int) -> str:
     return f"{letras}{linha}"
 
 
-def escrever_xlsx(caminho: str, linhas: list):
+def _folha(linhas: list) -> str:
     corpo = []
     for i, linha in enumerate(linhas, start=1):
         celulas = "".join(_celula(_referencia(j, i), v)
@@ -108,10 +125,42 @@ def escrever_xlsx(caminho: str, linhas: list):
         if not celulas:
             continue          # o Excel não grava linha vazia: pula o <row r=N>
         corpo.append(f'<row r="{i}">{celulas}</row>')
-    planilha = ('<?xml version="1.0" encoding="UTF-8"?>'
-                '<worksheet xmlns="http://schemas.openxmlformats.org/'
-                'spreadsheetml/2006/main"><sheetData>'
-                + "".join(corpo) + '</sheetData></worksheet>')
+    return ('<?xml version="1.0" encoding="UTF-8"?>'
+            '<worksheet xmlns="http://schemas.openxmlformats.org/'
+            'spreadsheetml/2006/main"><sheetData>'
+            + "".join(corpo) + '</sheetData></worksheet>')
+
+
+# Um estilo só, o de índice 1: numFmtId 20 é o "h:mm" de fábrica do Excel.
+ESTILOS = ('<?xml version="1.0" encoding="UTF-8"?>'
+           '<styleSheet xmlns="http://schemas.openxmlformats.org/'
+           'spreadsheetml/2006/main"><cellXfs count="2">'
+           '<xf numFmtId="0"/><xf numFmtId="20" applyNumberFormat="1"/>'
+           '</cellXfs></styleSheet>')
+
+
+def escrever_xlsx(caminho: str, linhas):
+    """Escreve um XLSX de mentira que se comporta como um de verdade.
+
+    `linhas` pode ser a lista de linhas de uma aba só, ou um dicionário
+    {nome_da_aba: linhas} — a planilha da secretaria costuma ter uma aba por
+    região, e sem isso não dá para testar que as duas entram.
+    """
+    abas = linhas if isinstance(linhas, dict) else {"Alunos": linhas}
+    nomes = list(abas)
+
+    partes = "".join(
+        f'<Override PartName="/xl/worksheets/sheet{i}.xml" ContentType='
+        f'"application/vnd.openxmlformats-officedocument.'
+        f'spreadsheetml.worksheet+xml"/>' for i in range(1, len(nomes) + 1))
+    folhas = "".join(
+        f'<sheet name="{escape(n)}" sheetId="{i}" r:id="rId{i}"/>'
+        for i, n in enumerate(nomes, start=1))
+    relacoes = "".join(
+        f'<Relationship Id="rId{i}" Type="http://schemas.openxmlformats.org/'
+        f'officeDocument/2006/relationships/worksheet" '
+        f'Target="worksheets/sheet{i}.xml"/>'
+        for i in range(1, len(nomes) + 1))
 
     with zipfile.ZipFile(caminho, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("[Content_Types].xml",
@@ -123,10 +172,7 @@ def escrever_xlsx(caminho: str, linhas: list):
                    '<Default Extension="xml" ContentType="application/xml"/>'
                    '<Override PartName="/xl/workbook.xml" ContentType='
                    '"application/vnd.openxmlformats-officedocument.'
-                   'spreadsheetml.sheet.main+xml"/>'
-                   '<Override PartName="/xl/worksheets/sheet1.xml" ContentType='
-                   '"application/vnd.openxmlformats-officedocument.'
-                   'spreadsheetml.worksheet+xml"/></Types>')
+                   'spreadsheetml.sheet.main+xml"/>' + partes + '</Types>')
         z.writestr("_rels/.rels",
                    '<?xml version="1.0" encoding="UTF-8"?>'
                    '<Relationships xmlns="http://schemas.openxmlformats.org/'
@@ -139,16 +185,14 @@ def escrever_xlsx(caminho: str, linhas: list):
                    '<workbook xmlns="http://schemas.openxmlformats.org/'
                    'spreadsheetml/2006/main" xmlns:r="http://schemas.'
                    'openxmlformats.org/officeDocument/2006/relationships">'
-                   '<sheets><sheet name="Alunos" sheetId="1" r:id="rId1"/>'
-                   '</sheets></workbook>')
+                   '<sheets>' + folhas + '</sheets></workbook>')
         z.writestr("xl/_rels/workbook.xml.rels",
                    '<?xml version="1.0" encoding="UTF-8"?>'
                    '<Relationships xmlns="http://schemas.openxmlformats.org/'
-                   'package/2006/relationships"><Relationship Id="rId1" Type='
-                   '"http://schemas.openxmlformats.org/officeDocument/2006/'
-                   'relationships/worksheet" Target="worksheets/sheet1.xml"/>'
-                   '</Relationships>')
-        z.writestr("xl/worksheets/sheet1.xml", planilha)
+                   'package/2006/relationships">' + relacoes + '</Relationships>')
+        z.writestr("xl/styles.xml", ESTILOS)
+        for i, nome in enumerate(nomes, start=1):
+            z.writestr(f"xl/worksheets/sheet{i}.xml", _folha(abas[nome]))
     return caminho
 
 

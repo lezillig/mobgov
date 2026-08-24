@@ -58,17 +58,61 @@ def importar_planilha(caminho: str, guardar_nomes: bool = False,
     }
 
 
-def ler_frota_declarada(caminho: str, aba: int = 1, perfil=None) -> dict:
+PALAVRAS_DE_FROTA = ("frota", "veiculo", "veículo", "carro", "onibus",
+                     "ônibus", "van", "contrato")
+
+
+def _abas_candidatas_a_frota(caminho: str, aba) -> list:
+    """Onde procurar a frota, em ordem de aposta.
+
+    Assumir "é a segunda aba" era um chute que dava certo no arquivo de
+    demonstração e errado no arquivo real: lá a segunda aba é "Sul-2", com
+    mais 273 alunos. Ler a lista de alunos como se fosse frota inventaria
+    veículos a partir de CEP. Então: primeiro a aba que se chama de frota;
+    depois qualquer outra que não seja lista de aluno.
+    """
+    from dados.importador import detectar_colunas
+    from dados.planilha import abas as listar_abas, ler
+
+    if aba is not None:
+        return [aba]
+    nomes = listar_abas(caminho)
+    if not nomes:
+        return [1]
+    pela_cara, resto = [], []
+    for nome in nomes:
+        normal = _normalizar(nome)
+        if any(p in normal for p in PALAVRAS_DE_FROTA):
+            pela_cara.append(nome)
+            continue
+        try:
+            colunas = detectar_colunas(ler(caminho, nome)[:1][0])
+        except Exception:
+            colunas = {}
+        if "nome" not in colunas and "endereco" not in colunas:
+            resto.append(nome)
+    return pela_cara + resto
+
+
+def ler_frota_declarada(caminho: str, aba=None, perfil=None) -> dict:
     """Procura na planilha a aba com a frota que o município tem hoje.
 
-    Prefeitura costuma mandar isso na segunda aba do mesmo arquivo ("Frota
-    atual", "Veículos", "Contrato"), com uma linha por tipo. Ler daqui evita
-    pedir de novo o que já veio — e é o número sem o qual não existe "antes"
-    para comparar.
+    Prefeitura costuma mandar isso numa aba do mesmo arquivo ("Frota atual",
+    "Veículos", "Contrato"), com uma linha por tipo. Ler daqui evita pedir de
+    novo o que já veio — e é o número sem o qual não existe "antes" para
+    comparar.
 
     Devolve {} quando a aba não existe ou não é reconhecível: aí a tela
     pergunta ao gestor, em vez de o sistema inventar.
     """
+    for candidata in _abas_candidatas_a_frota(caminho, aba):
+        achado = _frota_de_uma_aba(caminho, candidata, perfil)
+        if achado:
+            return achado
+    return {}
+
+
+def _frota_de_uma_aba(caminho: str, aba, perfil=None) -> dict:
     from dados.planilha import ler
 
     try:
@@ -108,8 +152,9 @@ def ler_frota_declarada(caminho: str, aba: int = 1, perfil=None) -> dict:
 
     if not composicao:
         return {}
+    onde = f"aba “{aba}”" if isinstance(aba, str) else f"aba {int(aba) + 1}"
     return {"composicao": composicao, "km_dia": km_dia,
-            "origem": f"aba {aba + 1} da planilha enviada"}
+            "origem": f"{onde} da planilha enviada"}
 
 
 def _normalizar(texto: str) -> str:

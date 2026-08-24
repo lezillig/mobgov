@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dados import importador, planilha  # noqa: E402
 from dados.planilha_exemplo import (  # noqa: E402
-    escrever_xlsx, gerar, limites_do_municipio, referencias_de_bairro,
+    Hora, escrever_xlsx, gerar, limites_do_municipio, referencias_de_bairro,
 )
 
 CABECALHO = ["ALUNO(A)", "Endereço", "Nº", "Bairro", "Escola", "Turno",
@@ -71,6 +71,32 @@ class TestLeituraDePlanilha(BaseArquivos):
         self.assertEqual(lido[2], ["b"])
         self.assertEqual(lido[3], ["c"])
 
+    def test_lista_as_abas_na_ordem_da_planilha(self):
+        x = self.xlsx({"Sul -1": [["a"]], "Sul-2": [["b"]], "Frota": [["c"]]})
+        self.assertEqual(planilha.abas(x), ["Sul -1", "Sul-2", "Frota"])
+
+    def test_le_a_aba_pedida_por_nome_ou_por_indice(self):
+        x = self.xlsx({"Sul -1": [["a"]], "Sul-2": [["b"]]})
+        self.assertEqual(planilha.ler(x, "Sul-2"), [["b"]])
+        self.assertEqual(planilha.ler(x, 1), [["b"]])
+        self.assertEqual(planilha.ler(x), [["a"]])          # padrão: a primeira
+
+    def test_aba_inexistente_diz_quais_existem(self):
+        x = self.xlsx({"Sul -1": [["a"]], "Sul-2": [["b"]]})
+        with self.assertRaises(planilha.ErroDePlanilha) as erro:
+            planilha.ler(x, "Norte")
+        self.assertIn("Sul-2", str(erro.exception))
+
+    def test_hora_do_excel_vira_relogio_e_nao_fracao(self):
+        """No arquivo real a coluna de horário é número: 07:00 é 0,2916666.
+
+        Sem ler o formato da célula, o turno de 456 alunos chegava ao
+        importador como uma fração e virava "turno não reconhecido".
+        """
+        x = self.xlsx([["entrada"], [Hora.de("07:00")], [Hora.de("16:00")]])
+        self.assertEqual(planilha.ler(x)[1], ["07:00"])
+        self.assertEqual(planilha.ler(x)[2], ["16:00"])
+
     def test_arquivo_inexistente(self):
         with self.assertRaises(planilha.ErroDePlanilha):
             planilha.ler(os.path.join(self.pasta, "nao-existe.xlsx"))
@@ -106,6 +132,35 @@ class TestConversoes(unittest.TestCase):
         for texto in ("Tarde", "vespertino", "T"):
             self.assertEqual(importador.converter_turno(texto), "tarde", texto)
         self.assertIsNone(importador.converter_turno("integral"))
+
+    def test_turno_pelo_horario_de_entrada(self):
+        """A planilha real não escreve "manhã": escreve o horário da aula."""
+        for texto in ("07:00 às 12:20", "07:00 ás 12:20", "7h", "07:00:00",
+                      "10:30 às 15:00"):
+            self.assertEqual(importador.converter_turno(texto), "manha", texto)
+        for texto in ("13:00 às 18:20", "12:30", "16:00:00"):
+            self.assertEqual(importador.converter_turno(texto), "tarde", texto)
+        self.assertEqual(importador.converter_turno("19:00 às 23:00"), "noite")
+        # o que não é horário continua não sendo turno
+        for texto in ("RECURSO DURANTE A AULA", "SOMENTE SAÍDA", ""):
+            self.assertIsNone(importador.converter_turno(texto), texto)
+
+    def test_turno_pelo_horario_respeita_os_turnos_da_operacao(self):
+        """Numa operação de fábrica com T1/T2, "07:00" não é "manhã"."""
+        self.assertIsNone(
+            importador.converter_turno("07:00 às 16:00", ["t1", "t2", "t3"]))
+
+    def test_cep_perde_o_zero_a_esquerda_quando_vem_como_numero(self):
+        """Célula numérica: 04416-200 chega como 4416200.
+
+        Sem completar o zero, a região do aluno muda de cidade.
+        """
+        self.assertEqual(importador.chaves_de_cep("4416200"),
+                         ["04416200", "04416", "044"])
+        self.assertEqual(importador.chaves_de_cep("04416-200"),
+                         ["04416200", "04416", "044"])
+        self.assertEqual(importador.chaves_de_cep(""), [])
+        self.assertEqual(importador.chaves_de_cep("não tem"), [])
 
     def test_sim_nao(self):
         for texto in ("sim", "S", "x", "1", "SIM"):
@@ -224,6 +279,80 @@ class TestImportacao(BaseArquivos):
         r = importador.importar(self.xlsx([]))
         self.assertEqual(len(r.alunos), 0)
         self.assertTrue(r.problemas)
+
+
+class TestPlanilhaComVariasAbas(BaseArquivos):
+    """A planilha da secretaria tem uma aba por região.
+
+    Ler só a primeira faz metade da operação sumir sem erro nenhum — o pior
+    tipo de defeito, porque só aparece quando falta veículo na rua.
+    """
+
+    CABECALHO = ["Aluno", "Endereço", "Bairro", "Escola", "Turno",
+                 "Latitude", "Longitude"]
+
+    def aluno(self, nome, bairro="Sede Urbana"):
+        return [nome, "Rua A, 10", bairro, "Escola X", "manhã",
+                "-21.15", "-47.80"]
+
+    def test_le_todas_as_abas_de_alunos(self):
+        x = self.xlsx({"Sul -1": [self.CABECALHO, self.aluno("Ana")],
+                       "Sul-2": [self.CABECALHO, self.aluno("Bruno")]})
+        r = importador.importar(x, referencias=referencias_de_bairro(),
+                                limites=limites_do_municipio())
+        self.assertEqual(len(r.alunos), 2)
+        self.assertEqual(r.resumo()["abas_lidas"], ["Sul -1", "Sul-2"])
+        self.assertEqual({a["aba"] for a in r.alunos}, {"Sul -1", "Sul-2"})
+
+    def test_aba_que_nao_e_lista_de_alunos_e_ignorada_com_nome(self):
+        x = self.xlsx({"Sul -1": [self.CABECALHO, self.aluno("Ana")],
+                       "Frota": [["Placa", "Tipo"], ["ABC1D23", "Van"]]})
+        r = importador.importar(x, referencias=referencias_de_bairro(),
+                                limites=limites_do_municipio())
+        resumo = r.resumo()
+        self.assertEqual(resumo["abas_lidas"], ["Sul -1"])
+        self.assertEqual([i["aba"] for i in resumo["abas_ignoradas"]], ["Frota"])
+        self.assertIn("frota", resumo["abas_ignoradas"][0]["motivo"])
+
+    def test_aluno_repetido_entre_abas_entra_uma_vez_so(self):
+        x = self.xlsx({"Sul -1": [self.CABECALHO, self.aluno("Ana")],
+                       "Sul-2": [self.CABECALHO, self.aluno("Ana")]})
+        r = importador.importar(x, referencias=referencias_de_bairro(),
+                                limites=limites_do_municipio())
+        self.assertEqual(len(r.alunos), 1)
+        self.assertTrue(any(p["campo"] == "duplicado" for p in r.problemas))
+
+    def test_da_para_pedir_uma_aba_so(self):
+        x = self.xlsx({"Sul -1": [self.CABECALHO, self.aluno("Ana")],
+                       "Sul-2": [self.CABECALHO, self.aluno("Bruno")]})
+        r = importador.importar(x, referencias=referencias_de_bairro(),
+                                limites=limites_do_municipio(), aba="Sul-2")
+        self.assertEqual(r.resumo()["abas_lidas"], ["Sul-2"])
+        self.assertEqual(len(r.alunos), 1)
+
+    def test_horario_de_entrada_do_excel_vira_turno(self):
+        cabecalho = ["Aluno", "Endereço", "Bairro", "Escola", "Horário Entrada",
+                     "Latitude", "Longitude"]
+        linha = ["Ana", "Rua A, 10", "Sede Urbana", "Escola X",
+                 Hora.de("13:00"), "-21.15", "-47.80"]
+        r = importador.importar(self.xlsx([cabecalho, linha]),
+                                referencias=referencias_de_bairro(),
+                                limites=limites_do_municipio())
+        self.assertEqual(len(r.alunos), 1)
+        self.assertEqual(r.alunos[0]["turno"], "tarde")
+        self.assertFalse([p for p in r.problemas if p["campo"] == "turno"])
+
+    def test_cep_serve_de_referencia_quando_nao_ha_bairro(self):
+        """Lista urbana não traz bairro, mas traz CEP em toda linha."""
+        cabecalho = ["Aluno", "Endereço do Aluno", "CEP", "Escola", "Turno"]
+        linha = ["Ana", "Rua Padre Antônio, 10", "4416200", "Escola X", "manhã"]
+        r = importador.importar(self.xlsx([cabecalho, linha]),
+                                referencias={"04416": (-21.15, -47.80)},
+                                limites=limites_do_municipio())
+        self.assertEqual(len(r.alunos), 1)
+        self.assertTrue(r.alunos[0]["precisa_ajuste_no_mapa"])
+        self.assertIn("CEP 04416",
+                      [p["sugestao"] for p in r.problemas][0])
 
 
 class TestPlanilhaDeDemonstracao(BaseArquivos):

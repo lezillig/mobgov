@@ -459,6 +459,41 @@ demonstração — é essa conta que decide o preço da proposta, e ela vive em
   `params`) — e o OSRM separa coordenadas com `;`. Qualquer código que
   interprete URLs do OSRM precisa recolar `path + ';' + params`.
 
+### O que o primeiro arquivo real de cliente ensinou (456 alunos, 2 abas)
+
+Cada um destes fazia o arquivo entrar torto **sem erro nenhum na tela** — que
+é o defeito que só aparece quando falta veículo na rua.
+
+- **Planilha de secretaria tem uma aba por região.** Ler só a primeira perde
+  metade da operação. `dados/planilha.abas()` lista as abas na ordem do Excel
+  (por `xl/workbook.xml` + os rels — ordenar `sheet1, sheet2…` por nome de
+  arquivo erra), e o importador lê todas, nomeando no resumo as que ignorou e
+  por quê.
+- **Para o Excel, hora é número.** 07:00 está gravado como `0,2916666`; só o
+  formato da célula (`xl/styles.xml`) diz que aquilo é relógio. Sem isso a
+  coluna de turno chegava como fração e 456 de 456 alunos caíam em "turno não
+  reconhecido".
+- **Ninguém escreve "manhã": escreve o horário da aula.** "07:00 às 12:20",
+  "13:00 ás 18:20" (com o acento errado), "07h", "16:00:00" — vinte grafias.
+  Vale a PRIMEIRA hora da célula; corte em 11 h e 17 h.
+- **CEP em célula numérica perde o zero à esquerda**: 04416-200 chega como
+  4416200. Sem completar o zero, a região do aluno muda de cidade — a
+  primeira leitura desses dados agrupou a zona sul de São Paulo como se fosse
+  interior. `importador.chaves_de_cep()` devolve `["04416200", "04416", "044"]`.
+- **"A frota está na segunda aba" era chute.** No arquivo real a segunda aba
+  são mais 273 alunos; ler aquilo como frota inventaria veículo a partir de
+  CEP. Procura-se a aba pelo nome (frota/veículo/contrato) e, na falta,
+  qualquer aba que NÃO tenha cabeçalho de lista de aluno.
+- **Endereço de menor de idade não vai para geocodificador externo.** Sem
+  lat/lon na planilha, o plano B é ponto de referência de bairro ou de CEP
+  vindo de base local do município. Sem base, o importador recusa a linha e
+  diz o que falta — nunca manda o endereço para fora.
+- **Dado real não tem chave primária.** 128 grafias de escola para ~117
+  escolas; `Cadeirante` em 6 grafias mais 3 células com hora dentro; coluna
+  `PLACA` com texto livre e preenchida em 23 de 456 linhas; nomes de equipe
+  que só diferem por espaço. Toda contagem por nome normaliza antes de
+  agrupar, ou o diagnóstico conta a mesma escola duas vezes.
+
 ## Módulos previstos (agentes do prompt-mestre)
 
 | Agente | Responsabilidade |
