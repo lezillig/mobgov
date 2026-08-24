@@ -30,7 +30,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -107,6 +107,15 @@ class Perfil:
     # trajeto direto de cada um — 20 min de casa até a escola não pode virar
     # 75 min só porque o limite geral permite.
     tempo_max_trajeto_min: int = 75
+    # Quanto tempo antes do sinal o aluno pode chegar à escola. É o parâmetro
+    # de MAIOR efeito sobre a frota, por muita distância: na operação real de
+    # 456 alunos, abrir de 20 para 45 minutos derrubou a manhã de 52 para 32
+    # veículos — enquanto trocar o modelo do veículo valeu um carro. Fica
+    # aqui, exposto e declarado, porque a contrapartida não é técnica: é
+    # criança esperando no pátio, com portão aberto mais cedo e alguém
+    # recebendo. Quem decide isso é a secretaria, e a decisão vai no plano.
+    # 0 = usar a janela que cada turno já declara.
+    janela_chegada_min: int = 0
     fator_tempo_bordo: float = 1.6          # porta a porta: × o trajeto direto
     folga_tempo_bordo_min: int = 15         # porta a porta: + folga fixa
     embarque_comum_min: int = 2
@@ -118,6 +127,22 @@ class Perfil:
     @property
     def separa_custo_do_motorista(self) -> bool:
         return self.custo_motorista_mes > 0
+
+    def turnos_com_janela(self) -> list:
+        """Os turnos com a janela de chegada declarada aplicada.
+
+        Move só o INÍCIO da janela: a hora do sinal não se negocia, o que se
+        negocia é quanto antes o veículo pode chegar. Sem `janela_chegada_min`
+        os turnos saem como estão.
+        """
+        if not self.janela_chegada_min:
+            return list(self.turnos)
+        ajustados = []
+        for t in self.turnos:
+            fim = t.janela_chegada[1]
+            inicio = max(0, fim - int(self.janela_chegada_min))
+            ajustados.append(replace(t, janela_chegada=(inicio, fim)))
+        return ajustados
 
     def turno_por_id(self, ident: str):
         return next((t for t in self.turnos if t.id == ident), None)
@@ -141,6 +166,7 @@ class Perfil:
                               "destinos": list(c.destinos)}
                              for c in self.contrapartes],
             "tempo_max_trajeto_min": self.tempo_max_trajeto_min,
+            "janela_chegada_min": self.janela_chegada_min,
             "fator_tempo_bordo": self.fator_tempo_bordo,
             "folga_tempo_bordo_min": self.folga_tempo_bordo_min,
             "embarque_comum_min": self.embarque_comum_min,
@@ -292,6 +318,8 @@ def de_dicionario(dados: dict) -> Perfil:
         contrapartes=contrapartes,
         tempo_max_trajeto_min=dados.get("tempo_max_trajeto_min",
                                         base.tempo_max_trajeto_min),
+        janela_chegada_min=dados.get("janela_chegada_min",
+                                     base.janela_chegada_min),
         fator_tempo_bordo=dados.get("fator_tempo_bordo",
                                     base.fator_tempo_bordo),
         folga_tempo_bordo_min=dados.get("folga_tempo_bordo_min",

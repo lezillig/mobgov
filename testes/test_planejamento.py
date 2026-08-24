@@ -107,6 +107,53 @@ class TestAgrupamento(unittest.TestCase):
         self.assertEqual(ponto.alunos["tarde"], 1)
 
 
+class TestJanelaDeChegada(unittest.TestCase):
+    """A janela de chegada como parâmetro declarado.
+
+    É o parâmetro de maior efeito sobre a frota: na operação real de 456
+    alunos, abrir de 20 para 45 minutos derrubou a manhã de 52 para 32
+    veículos — enquanto trocar o modelo do veículo valeu um carro. Estava
+    enterrado na definição de cada turno, onde ninguém mexe.
+    """
+
+    def perfil(self, **kw):
+        from dados import perfis as perfis_mod
+        from dataclasses import replace
+        return replace(perfis_mod.PERFIL_ESCOLAR, **kw)
+
+    def test_sem_o_parametro_os_turnos_ficam_como_estao(self):
+        p = self.perfil()
+        self.assertEqual([t.janela_chegada for t in p.turnos_com_janela()],
+                         [t.janela_chegada for t in p.turnos])
+
+    def test_a_janela_move_o_inicio_e_nao_o_sinal(self):
+        """A hora da aula não se negocia; o que se negocia é chegar antes."""
+        p = self.perfil(janela_chegada_min=45)
+        for antes, depois in zip(p.turnos, p.turnos_com_janela()):
+            self.assertEqual(depois.janela_chegada[1], antes.janela_chegada[1])
+            self.assertEqual(depois.janela_chegada[0],
+                             antes.janela_chegada[1] - 45)
+
+    def test_janela_maior_que_o_dia_nao_vira_horario_negativo(self):
+        p = self.perfil(janela_chegada_min=10_000)
+        for t in p.turnos_com_janela():
+            self.assertGreaterEqual(t.janela_chegada[0], 0)
+
+    def test_o_parametro_atravessa_o_json_do_perfil(self):
+        from dados import perfis as perfis_mod
+        dados = self.perfil(janela_chegada_min=30).como_dicionario()
+        self.assertEqual(dados["janela_chegada_min"], 30)
+        voltou = perfis_mod.de_dicionario(dados)
+        self.assertEqual(voltou.janela_chegada_min, 30)
+
+    def test_perfil_antigo_sem_o_campo_continua_carregando(self):
+        """JSON gravado antes deste parâmetro existir não pode quebrar."""
+        from dados import perfis as perfis_mod
+        dados = self.perfil().como_dicionario()
+        dados.pop("janela_chegada_min")
+        self.assertEqual(perfis_mod.de_dicionario(dados).janela_chegada_min, 0)
+
+
 class TestFrotaDeclaradaNaPlanilha(unittest.TestCase):
     """De qual aba sai a frota de hoje.
 

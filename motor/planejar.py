@@ -178,7 +178,8 @@ def planejar(importacao: dict, coordenadas_escolas: dict = None,
              raio_urbano: float = agrupar_mod.RAIO_URBANO_M,
              raio_rural: float = agrupar_mod.RAIO_RURAL_M,
              progresso=None, perfil=None,
-             tempo_max_trajeto_min: int = None) -> dict:
+             tempo_max_trajeto_min: int = None,
+             janela_chegada_min: int = None) -> dict:
     """Agrupa os alunos importados em pontos e roteiriza.
 
     O relatório sai no mesmo formato do Município Modelo — o painel, o console
@@ -197,6 +198,12 @@ def planejar(importacao: dict, coordenadas_escolas: dict = None,
     if tempo_max_trajeto_min:
         perfil = replace(perfil,
                          tempo_max_trajeto_min=int(tempo_max_trajeto_min))
+    if janela_chegada_min:
+        perfil = replace(perfil, janela_chegada_min=int(janela_chegada_min))
+    # A janela declarada vira janela dos turnos aqui: daqui para baixo o motor
+    # só conhece turnos, e é assim que o parâmetro chega a ele sem ninguém
+    # precisar reeditar a operação.
+    perfil = replace(perfil, turnos=perfil.turnos_com_janela())
     conhecidos = {d.nome: (d.lat, d.lon) for d in perfil.destinos}
     conhecidos.update(coordenadas_escolas or {})
     avisar("agrupando", f"{len(alunos)} {perfil.rotulo_passageiro_plural} em "
